@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	deck := doko.CreateDeck()
+	deck := doko.Deck()
 
 	for _, card := range deck {
 		fmt.Println(card)

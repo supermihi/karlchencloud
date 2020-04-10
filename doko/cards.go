@@ -2,66 +2,62 @@ package doko
 
 import "fmt"
 
-type Suit int
+type Farbe int
 
 const (
-	Diamonds Suit = iota
-	Hearts
-	Spades
-	Clubs
+	Karo Farbe = iota
+	Herz
+	Pik
+	Kreuz
 )
 
-func (s Suit) String() string {
-	return [...]string{"Diamonds", "Hearts", "Spades", "Clubs"}[s]
+func (s Farbe) String() string {
+	return [...]string{"Karo", "Herz", "Pik", "Kreuz"}[s]
 }
 
-type Rank int
+type Symbol int
 
 const (
-	Nine Rank = iota
-	Jack
-	Queen
-	King
-	Ten
-	Ace
+	Neun Symbol = iota
+	Bube
+	Dame
+	Koenig
+	Zehn
+	Ass
 )
 
-func (s Rank) String() string {
-	return [...]string{"Nine", "Jack", "Queen", "King", "Ten", "Ace"}[s]
+func (s Symbol) String() string {
+	return [...]string{"Neun", "Bube", "Dame", "Koenig", "Zehn", "Ass"}[s]
 }
 
-func (s Rank) Value() int {
+func (s Symbol) Value() int {
 	return [...]int{0, 2, 3, 4, 10, 11}[s]
 }
 
-type Card struct {
-	suit Suit
-	rank Rank
+type Karte struct {
+	Farbe Farbe
+	rank  Symbol
 }
 
-func (c Card) IsDulle() bool {
-	return c.suit == Hearts && c.rank == Ten
+func (c Karte) IsDulle() bool {
+	return c.Farbe == Herz && c.rank == Zehn
 }
 
-func (c Card) IsStandardTrump() bool {
-	return c.suit == Diamonds || c.rank == Jack || c.rank == Queen || c.IsDulle()
+func (c Karte) String() string {
+	return fmt.Sprintf("%s %s", c.Farbe, c.rank)
 }
 
-func (c Card) String() string {
-	return fmt.Sprintf("%s %s", c.suit, c.rank)
-}
-
-func (c Card) Value() int {
+func (c Karte) Value() int {
 	return c.rank.Value()
 }
 
-func CreateDeck() []Card {
-	var ans [48]Card
+func Deck() []Karte {
+	var ans [48]Karte
 	pos := 0
-	for suit := Diamonds; suit <= Clubs; suit++ {
-		for rank := Nine; rank <= Ace; rank++ {
-			ans[pos] = Card{suit, rank}
-			ans[pos+1] = Card{suit, rank}
+	for suit := Karo; suit <= Kreuz; suit++ {
+		for rank := Neun; rank <= Ass; rank++ {
+			ans[pos] = Karte{suit, rank}
+			ans[pos+1] = Karte{suit, rank}
 			pos += 2
 		}
 	}

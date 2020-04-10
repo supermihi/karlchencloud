@@ -32,33 +32,37 @@ func (p Player) AdvanceBy(i int) Player {
 	return r
 }
 
-type Hand [12]Card
+type Hand []Karte
 
 type GameBasics struct {
-	Hands    [4]Hand
-	Forehand Player
+	Handkarten [4]Hand
+	Vorhand    Player
 }
 
-type Trick struct {
-	Dealer        Player
-	CardsByPlayer [4]Card
+type Stich struct {
+	Vorhand  Player
+	KarteVon [4]Karte
 }
 
-func (t Trick) NthCard(n int) Card {
-	return t.CardsByPlayer[t.Dealer.AdvanceBy(n)]
+func (t Stich) NthCard(n int) Karte {
+	return t.KarteVon[t.Vorhand.AdvanceBy(n)]
 }
-func (t Trick) FirstCard() Card {
+func (t Stich) FirstCard() Karte {
 	return t.NthCard(0)
 }
 
-type OpenTrick struct {
-	Dealer       Player
-	CardsInOrder []Card
+type LaufenderStich struct {
+	Vorhand      Player
+	CardsInOrder []Karte
+}
+
+func (trick LaufenderStich) NthCard(i int) Karte {
+	return trick.CardsInOrder[i]
 }
 
 type GameProgress struct {
-	PlayedTricks []Trick
-	CurrentTrick OpenTrick
+	PlayedTricks []Stich
+	CurrentTrick LaufenderStich
 }
 
 type GameState struct {
@@ -66,12 +70,43 @@ type GameState struct {
 	Progress GameProgress
 }
 
-type Rules interface {
-	Valid(OpenTrick, Card) bool
-	WinnerOfTrick(Trick) Player
+type SpielFarbe int
+
+const (
+	Trumpf SpielFarbe = iota
+	KaroFehl
+	HerzFehl
+	PikFehl
+	KreuzFehl
+)
+
+func (s Farbe) AlsFehl() SpielFarbe {
+	switch s {
+	case Karo:
+		return KaroFehl
+	case Herz:
+		return HerzFehl
+	case Pik:
+		return PikFehl
+	case Kreuz:
+		return KreuzFehl
+	default:
+		panic("unexpected farbe")
+	}
 }
 
-type Game struct {
-	State GameState
-	Rules Rules
+type Spielmodus interface {
+	SpielFarbe(Karte) SpielFarbe
+	Sticht(neu Karte, alt Karte) bool
+}
+
+func StichGewinner(s Stich, m Spielmodus) Player {
+	winner := s.Vorhand
+	for i := range []int{1, 2, 3} {
+		player := s.Vorhand.AdvanceBy(i)
+		if m.Sticht(s.KarteVon[player], s.KarteVon[winner]) {
+			winner = player
+		}
+	}
+	return winner
 }
