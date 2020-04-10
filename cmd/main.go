@@ -1,8 +1,8 @@
 package main
 
 import (
-	"doppelgopf/doko"
 	"fmt"
+	"github.com/supermihi/doppelgopf/doko"
 )
 
 func main() {
