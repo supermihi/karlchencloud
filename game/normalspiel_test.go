@@ -1,16 +1,16 @@
-package doko
+package game
 
 import "testing"
 
 func TestSpielFarbeTrumpf(t *testing.T) {
-	truempfe := []Karte{
+	truempfe := []Card{
 		{Herz, Zehn},
 		{Kreuz, Dame},
 		{Karo, Ass},
 		{Herz, Bube},
 	}
 	for _, trumpf := range truempfe {
-		if Normalspiel.SpielFarbe(trumpf) != Trumpf {
+		if NormalGameSuit(trumpf) != Trumpf {
 			t.Errorf("not trumpf as expected: %v", trumpf)
 		}
 	}
@@ -18,22 +18,22 @@ func TestSpielFarbeTrumpf(t *testing.T) {
 
 func TestSpielFarbeKaro(t *testing.T) {
 	for _, card := range Deck() {
-		if Normalspiel.SpielFarbe(card) == KaroFehl {
-			t.Error("karo fehl gibt es im NormalspielModus nicht")
+		if NormalGameSuit(card) == KaroFehl {
+			t.Error("karo fehl gibt es im NormalspielMode nicht")
 		}
 	}
 }
 
 func TestSpielFarbeHerz(t *testing.T) {
-	keinHerz := []Karte{{Herz, Zehn}, {Herz, Bube}, {Kreuz, Ass}}
+	keinHerz := []Card{{Herz, Zehn}, {Herz, Bube}, {Kreuz, Ass}}
 	for _, card := range keinHerz {
-		if Normalspiel.SpielFarbe(card) == HerzFehl {
+		if NormalGameSuit(card) == HerzFehl {
 			t.Errorf("kein Herz fehl: %v", card)
 		}
 	}
-	herz := []Karte{{Herz, Neun}, {Herz, Koenig}, {Herz, Ass}}
+	herz := []Card{{Herz, Neun}, {Herz, Koenig}, {Herz, Ass}}
 	for _, card := range herz {
-		if Normalspiel.SpielFarbe(card) != HerzFehl {
+		if NormalGameSuit(card) != HerzFehl {
 			t.Errorf("ist Herz fehl: %v", card)
 		}
 	}
@@ -41,16 +41,16 @@ func TestSpielFarbeHerz(t *testing.T) {
 
 func TestSticht(t *testing.T) {
 	sticht := []struct {
-		neu Karte
-		alt Karte
+		neu Card
+		alt Card
 	}{
-		{Karte{Herz, Zehn}, Karte{Kreuz, Dame}},
-		{Karte{Herz, Ass}, Karte{Herz, Koenig}},
-		{Karte{Karo, Neun}, Karte{Pik, Ass}},
-		{Karte{Kreuz, Zehn}, Karte{Kreuz, Koenig}},
+		{Card{Herz, Zehn}, Card{Kreuz, Dame}},
+		{Card{Herz, Ass}, Card{Herz, Koenig}},
+		{Card{Karo, Neun}, Card{Pik, Ass}},
+		{Card{Kreuz, Zehn}, Card{Kreuz, Koenig}},
 	}
 	for _, neuAlt := range sticht {
-		if !NormalspielSticht(neuAlt.neu, neuAlt.alt) {
+		if !NormalTakesTrick(neuAlt.neu, neuAlt.alt) {
 			t.Errorf("%v sticht %v", neuAlt.neu, neuAlt.alt)
 		}
 	}

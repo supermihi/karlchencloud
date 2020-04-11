@@ -1,9 +1,9 @@
-package doko
+package game
 
 import "testing"
 
 func TestStichGewinner(t *testing.T) {
-	if StichGewinner(Stich{Player1, [4]Karte{
+	if WinnerOfTrick(Trick{Player1, [4]Card{
 		{Kreuz, Ass},
 		{Kreuz, Ass},
 		{Kreuz, Zehn},

@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/supermihi/doppelgopf/doko"
+	"github.com/supermihi/doppelgopf/game"
 )
 
 func main() {
-	deck := doko.Deck()
+	deck := game.Deck()
 
 	for _, card := range deck {
 		fmt.Println(card)
