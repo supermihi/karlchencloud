@@ -12,15 +12,6 @@ type Game struct {
 	Mode           Mode
 }
 
-func (game Game) PlayerHasCard(p Player, c Card) bool {
-	for _, card := range game.HandCards[p] {
-		if c == card {
-			return true
-		}
-	}
-	return false
-}
-
 func WinnerOfTrick(t Trick, m Mode) Player {
 	winner := t.Forehand
 	for i := 1; i < NumPlayers; i++ {
@@ -41,7 +32,8 @@ func (game Game) WhoseTurn() Player {
 	playedCards := len(game.CurrentTrick.CardsInOrder)
 	return forehand.NthNext(playedCards)
 }
-func ValidMove(g Game, player Player, card Card) bool {
+
+func IsValidMove(g Game, player Player, card Card) bool {
 	if g.WhoseTurn() != player || !g.PlayerHasCard(player, card) {
 		return false
 	}
@@ -49,13 +41,8 @@ func ValidMove(g Game, player Player, card Card) bool {
 	if len(trick.CardsInOrder) == 0 {
 		return true
 	}
-	mode := g.Mode
-	trickSuit := mode.GameSuit(trick.NthCard(0))
-	return mode.GameSuit(card) == trickSuit ||
-		AllCards(
-			g.HandCards[player],
-			func(c Card) bool { return mode.GameSuit(c) != trickSuit })
-
+	trickSuit := g.Mode.GameSuit(trick.NthCard(0))
+	return g.Mode.GameSuit(card) == trickSuit || !g.PlayerHasCardOfSuit(player, trickSuit)
 }
 
 func (game Game) PlayCard(player Player, card Card) {
@@ -64,7 +51,7 @@ func (game Game) PlayCard(player Player, card Card) {
 }
 
 func (game Game) PerformMove(player Player, card Card) bool {
-	if !ValidMove(game, player, card) {
+	if !IsValidMove(game, player, card) {
 		return false
 	}
 	game.PlayCard(player, card)

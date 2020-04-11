@@ -90,11 +90,19 @@ func (h Hand) RemoveCard(c Card) Hand {
 
 type CardPredicate func(Card) bool
 
-func AllCards(cards []Card, predicate CardPredicate) bool {
+func AnyCard(cards []Card, predicate CardPredicate) bool {
 	for _, card := range cards {
-		if !predicate(card) {
-			return false
+		if predicate(card) {
+			return true
 		}
 	}
-	return true
+	return false
+}
+
+func (game Game) PlayerHasCard(p Player, c Card) bool {
+	return AnyCard(game.HandCards[p], func(card Card) bool { return c == card })
+}
+
+func (game Game) PlayerHasCardOfSuit(p Player, suit GameSuit) bool {
+	return AnyCard(game.HandCards[p], func(c Card) bool { return game.Mode.GameSuit(c) == suit })
 }
