@@ -23,6 +23,11 @@ func (p Player) NextPlayer() Player {
 		panic("not a valid player")
 	}
 }
+
+func Players() [NumPlayers]Player {
+	return [...]Player{Player1, Player2, Player3, Player4}
+}
+
 func (p Player) NthNext(i int) Player {
 	r := p
 	for i > 0 {

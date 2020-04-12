@@ -17,7 +17,7 @@ func TestSpielFarbeTrumpf(t *testing.T) {
 }
 
 func TestSpielFarbeKaro(t *testing.T) {
-	for _, card := range Deck() {
+	for _, card := range CreateDeck() {
 		if NormalGameSuit(card) == KaroFehl {
 			t.Error("karo fehl gibt es im NormalspielMode nicht")
 		}

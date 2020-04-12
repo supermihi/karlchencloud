@@ -1,6 +1,9 @@
 package game
 
-import "testing"
+import (
+	"sort"
+	"testing"
+)
 
 func SameHands(a Hand, b Hand) bool {
 	if len(a) != len(b) {
@@ -29,6 +32,27 @@ func TestHand_RemoveCard(t *testing.T) {
 	}
 	if !SameHands(newHand, expected) {
 		t.Error("unexpected result")
+	}
+
+}
+
+//noinspection GoNilness
+func TestDealCards(t *testing.T) {
+	hands := DealCards(126795)
+	var dealtDeck []Card
+	for _, p := range Players() {
+		dealtDeck = append(dealtDeck, hands[p]...)
+	}
+	sort.Sort(BySuitAndRank(dealtDeck))
+	plainDeck := CreateDeck()
+	sort.Sort(BySuitAndRank(plainDeck))
+	if len(plainDeck) != len(dealtDeck) {
+		t.Error("something strange happened")
+	}
+	for i, plain := range plainDeck {
+		if dealtDeck[i] != plain {
+			t.Errorf("dealt deck wrong: %v != %v", dealtDeck[i], plain)
+		}
 	}
 
 }

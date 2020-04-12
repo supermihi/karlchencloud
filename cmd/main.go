@@ -6,9 +6,17 @@ import (
 )
 
 func main() {
-	deck := game.Deck()
+	deck := game.DealCards(1264)
 
-	for _, card := range deck {
-		fmt.Println(card)
+	for i, hand := range deck {
+		fmt.Println("Player %i:", game.Player(i))
+		for j, card := range hand {
+			fmt.Print(card.String())
+			if j < len(hand)-1 {
+				fmt.Print(", ")
+			} else {
+				fmt.Println()
+			}
+		}
 	}
 }

@@ -1,10 +1,5 @@
 package game
 
-type Mode interface {
-	GameSuit(Card) GameSuit
-	TakesTrickFrom(neu Card, alt Card) bool
-}
-
 type Game struct {
 	HandCards      [NumPlayers]Hand
 	CompleteTricks []Trick
@@ -12,28 +7,17 @@ type Game struct {
 	Mode           Mode
 }
 
-func WinnerOfTrick(t Trick, m Mode) Player {
-	winner := t.Forehand
-	for i := 1; i < NumPlayers; i++ {
-		player := t.Forehand.NthNext(i)
-		if m.TakesTrickFrom(t.CardsOf[player], t.CardsOf[winner]) {
-			winner = player
-		}
-	}
-	return winner
+func (g Game) WinnerOfTrick(t Trick) Player {
+	return WinnerOfTrick(t, g.Mode)
 }
 
-func (game Game) WinnerOfTrick(t Trick) Player {
-	return WinnerOfTrick(t, game.Mode)
-}
-
-func (game Game) WhoseTurn() Player {
-	forehand := game.CurrentTrick.Forehand
-	playedCards := len(game.CurrentTrick.CardsInOrder)
+func (g Game) WhoseTurn() Player {
+	forehand := g.CurrentTrick.Forehand
+	playedCards := len(g.CurrentTrick.CardsInOrder)
 	return forehand.NthNext(playedCards)
 }
 
-func IsValidMove(g Game, player Player, card Card) bool {
+func (g Game) IsValidMove(player Player, card Card) bool {
 	if g.WhoseTurn() != player || !g.PlayerHasCard(player, card) {
 		return false
 	}
@@ -45,26 +29,34 @@ func IsValidMove(g Game, player Player, card Card) bool {
 	return g.Mode.GameSuit(card) == trickSuit || !g.PlayerHasCardOfSuit(player, trickSuit)
 }
 
-func (game Game) PlayCard(player Player, card Card) {
-	game.HandCards[player].RemoveCard(card)
-	game.CurrentTrick.CardsInOrder = append(game.CurrentTrick.CardsInOrder, card)
+func (g Game) playCard(player Player, card Card) {
+	g.HandCards[player].RemoveCard(card)
+	g.CurrentTrick.CardsInOrder = append(g.CurrentTrick.CardsInOrder, card)
 }
 
-func (game Game) PerformMove(player Player, card Card) bool {
-	if !IsValidMove(game, player, card) {
+func (g Game) PerformMove(player Player, card Card) bool {
+	if !g.IsValidMove(player, card) {
 		return false
 	}
-	game.PlayCard(player, card)
-	game.FinishOpenTrickIfComplete()
+	g.playCard(player, card)
+	g.finishOpenTrickIfComplete()
 	return true
 }
 
-func (game Game) FinishOpenTrickIfComplete() {
-	currentTrick := game.CurrentTrick
+func (g Game) finishOpenTrickIfComplete() {
+	currentTrick := g.CurrentTrick
 	if !currentTrick.IsComplete() {
 		return
 	}
 	finishedTrick := currentTrick.AsCompleteTrick()
-	game.CompleteTricks = append(game.CompleteTricks, finishedTrick)
-	game.CurrentTrick = NewIncompleteTrick(game.WinnerOfTrick(finishedTrick))
+	g.CompleteTricks = append(g.CompleteTricks, finishedTrick)
+	g.CurrentTrick = NewIncompleteTrick(g.WinnerOfTrick(finishedTrick))
+}
+
+func (g Game) PlayerHasCard(p Player, c Card) bool {
+	return g.HandCards[p].ContainsCard(c)
+}
+
+func (g Game) PlayerHasCardOfSuit(p Player, suit GameSuit) bool {
+	return AnyCard(g.HandCards[p], func(c Card) bool { return g.Mode.GameSuit(c) == suit })
 }
