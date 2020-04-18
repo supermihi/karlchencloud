@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/supermihi/doppelgopf/pkg/core"
+	"github.com/supermihi/doppelgopf/pkg/game/core"
 )
 
 func main() {

@@ -1,6 +1,6 @@
 package modes
 
-import "github.com/supermihi/doppelgopf/pkg/core"
+import "github.com/supermihi/doppelgopf/pkg/game/core"
 
 type FleischlosMode struct {
 }

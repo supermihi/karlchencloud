@@ -3,6 +3,7 @@ package core
 import "math/rand"
 
 type Hand []Card
+type Cards [NumPlayers]Hand
 
 func (h Hand) CardIndex(card Card) int {
 	for i, c := range h {
@@ -66,7 +67,10 @@ func CreateDeck() []Card {
 	return ans
 }
 
-func DealCards(seed int64) [NumPlayers]Hand {
+func DealCards(seed int64) Cards {
+	if seed == 0 {
+		seed = rand.Int63()
+	}
 	deck := CreateDeck()
 	random := rand.New(rand.NewSource(seed))
 	random.Shuffle(len(deck), func(i int, j int) { deck[i], deck[j] = deck[j], deck[i] })

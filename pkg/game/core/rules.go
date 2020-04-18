@@ -7,25 +7,26 @@ type Game struct {
 	Mode           Mode
 }
 
-func CreateGame(handCards [NumPlayers]Hand, forehand Player, mode Mode) Game {
-	return Game{handCards, make([]Trick, 0, NumHandCards), NewIncompleteTrick(forehand), mode}
+func CreateGame(handCards [NumPlayers]Hand, forehand Player, mode Mode) *Game {
+	game := Game{handCards, make([]Trick, 0, NumHandCards), NewIncompleteTrick(forehand), mode}
+	return &game
 }
 
-func (g Game) IsFinished() bool {
+func (g *Game) IsFinished() bool {
 	return len(g.CompleteTricks) == NumHandCards
 }
-func (g Game) WinnerOfTrick(t Trick) Player {
+func (g *Game) WinnerOfTrick(t Trick) Player {
 	return WinnerOfTrick(t, g.Mode)
 }
 
-func (g Game) WhoseTurn() Player {
+func (g *Game) WhoseTurn() Player {
 	if g.IsFinished() {
 		return NoPlayer
 	}
 	return g.CurrentTrick.WhoseTurn()
 }
 
-func (g Game) IsValidMove(player Player, card Card) bool {
+func (g *Game) IsValidMove(player Player, card Card) bool {
 	if g.WhoseTurn() != player || !g.PlayerHasCard(player, card) {
 		return false
 	}
@@ -37,12 +38,12 @@ func (g Game) IsValidMove(player Player, card Card) bool {
 	return g.Mode.GameSuit(card) == trickSuit || !g.PlayerHasCardOfSuit(player, trickSuit)
 }
 
-func (g Game) playCard(player Player, card Card) {
+func (g *Game) playCard(player Player, card Card) {
 	g.HandCards[player].RemoveCard(card)
 	g.CurrentTrick.CardsInOrder = append(g.CurrentTrick.CardsInOrder, card)
 }
 
-func (g Game) TryPlayCard(player Player, card Card) bool {
+func (g *Game) TryPlayCard(player Player, card Card) bool {
 	if !g.IsValidMove(player, card) {
 		return false
 	}
@@ -51,7 +52,7 @@ func (g Game) TryPlayCard(player Player, card Card) bool {
 	return true
 }
 
-func (g Game) finishOpenTrickIfComplete() {
+func (g *Game) finishOpenTrickIfComplete() {
 	currentTrick := g.CurrentTrick
 	if !currentTrick.IsComplete() {
 		return
@@ -61,11 +62,11 @@ func (g Game) finishOpenTrickIfComplete() {
 	g.CurrentTrick = NewIncompleteTrick(g.WinnerOfTrick(finishedTrick))
 }
 
-func (g Game) PlayerHasCard(p Player, c Card) bool {
+func (g *Game) PlayerHasCard(p Player, c Card) bool {
 	return g.HandCards[p].ContainsCard(c)
 }
 
-func (g Game) PlayerHasCardOfSuit(p Player, suit GameSuit) bool {
+func (g *Game) PlayerHasCardOfSuit(p Player, suit GameSuit) bool {
 	return AnyCard(g.HandCards[p], func(c Card) bool { return g.Mode.GameSuit(c) == suit })
 }
 
