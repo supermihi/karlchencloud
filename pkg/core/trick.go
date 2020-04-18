@@ -1,4 +1,4 @@
-package game
+package core
 
 type Trick struct {
 	Forehand Player
@@ -35,4 +35,9 @@ func (t IncompleteTrick) cardsByPlayer() [NumPlayers]Card {
 
 func (t IncompleteTrick) AsCompleteTrick() Trick {
 	return Trick{t.Forehand, t.cardsByPlayer()}
+}
+
+func (t IncompleteTrick) WhoseTurn() Player {
+	playedCards := len(t.CardsInOrder)
+	return t.Forehand.NthNext(playedCards)
 }

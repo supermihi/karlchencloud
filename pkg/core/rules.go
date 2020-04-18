@@ -1,4 +1,4 @@
-package game
+package core
 
 type Game struct {
 	HandCards      [NumPlayers]Hand
@@ -7,14 +7,22 @@ type Game struct {
 	Mode           Mode
 }
 
+func CreateGame(handCards [NumPlayers]Hand, forehand Player, mode Mode) Game {
+	return Game{handCards, make([]Trick, 0, NumHandCards), NewIncompleteTrick(forehand), mode}
+}
+
+func (g Game) IsFinished() bool {
+	return len(g.CompleteTricks) == NumHandCards
+}
 func (g Game) WinnerOfTrick(t Trick) Player {
 	return WinnerOfTrick(t, g.Mode)
 }
 
 func (g Game) WhoseTurn() Player {
-	forehand := g.CurrentTrick.Forehand
-	playedCards := len(g.CurrentTrick.CardsInOrder)
-	return forehand.NthNext(playedCards)
+	if g.IsFinished() {
+		return NoPlayer
+	}
+	return g.CurrentTrick.WhoseTurn()
 }
 
 func (g Game) IsValidMove(player Player, card Card) bool {
@@ -34,7 +42,7 @@ func (g Game) playCard(player Player, card Card) {
 	g.CurrentTrick.CardsInOrder = append(g.CurrentTrick.CardsInOrder, card)
 }
 
-func (g Game) PerformMove(player Player, card Card) bool {
+func (g Game) TryPlayCard(player Player, card Card) bool {
 	if !g.IsValidMove(player, card) {
 		return false
 	}
@@ -59,4 +67,32 @@ func (g Game) PlayerHasCard(p Player, c Card) bool {
 
 func (g Game) PlayerHasCardOfSuit(p Player, suit GameSuit) bool {
 	return AnyCard(g.HandCards[p], func(c Card) bool { return g.Mode.GameSuit(c) == suit })
+}
+
+func WinnerOfTrick(t Trick, m Mode) Player {
+	winner := t.Forehand
+	for i := 1; i < NumPlayers; i++ {
+		player := t.Forehand.NthNext(i)
+		if TakesTrickFrom(t.CardsOf[player], t.CardsOf[winner], m) {
+			winner = player
+		}
+	}
+	return winner
+}
+
+func TakesTrickFrom(new Card, old Card, m Mode) bool {
+	newSuit := m.GameSuit(new)
+	oldSuit := m.GameSuit(old)
+	if newSuit == Trumpf && oldSuit != Trumpf {
+		return true
+	}
+	if oldSuit == Trumpf && newSuit != Trumpf {
+		return false
+	}
+	if newSuit == Trumpf {
+		// both trumpf
+		return new.TrumpfTrickValue() > old.TrumpfTrickValue()
+	}
+	// none trumpf
+	return newSuit == oldSuit && new.FehlTrickValue() > old.FehlTrickValue()
 }

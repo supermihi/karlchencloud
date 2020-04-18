@@ -1,4 +1,4 @@
-package game
+package core
 
 import "testing"
 
@@ -50,7 +50,7 @@ func TestSticht(t *testing.T) {
 		{Card{Kreuz, Zehn}, Card{Kreuz, Koenig}},
 	}
 	for _, neuAlt := range sticht {
-		if !NormalTakesTrick(neuAlt.neu, neuAlt.alt) {
+		if !TakesTrickFrom(neuAlt.neu, neuAlt.alt, Normalspiel) {
 			t.Errorf("%v sticht %v", neuAlt.neu, neuAlt.alt)
 		}
 	}

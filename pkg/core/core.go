@@ -1,10 +1,10 @@
-package game
+package core
 
 import "fmt"
 
 const NumPlayers = 4
-const HandSize = 12
-const DeckSize = NumPlayers * HandSize
+const NumHandCards = 12
+const DeckSize = NumPlayers * NumHandCards
 
 type Suit int
 
@@ -39,8 +39,12 @@ type Card struct {
 	Rank Rank
 }
 
-func (c Card) IsDulle() bool {
-	return c.Suit == Herz && c.Rank == Zehn
+func Dulle() Card {
+	return Card{Herz, Zehn}
+}
+
+func Alte() Card {
+	return Card{Kreuz, Dame}
 }
 
 func (c Card) String() string {

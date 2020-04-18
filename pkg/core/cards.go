@@ -1,4 +1,4 @@
-package game
+package core
 
 import "math/rand"
 
@@ -39,6 +39,20 @@ func (h Hand) ContainsCard(c Card) bool {
 	return AnyCard(h, func(card Card) bool { return c == card })
 }
 
+func (h Hand) NumberOfCards(c Card) int {
+	ans := 0
+	for _, card := range h {
+		if card == c {
+			ans += 1
+		}
+	}
+	return ans
+}
+
+func (h Hand) NumAlte() int {
+	return h.NumberOfCards(Alte())
+}
+
 func CreateDeck() []Card {
 	ans := make([]Card, DeckSize)
 	pos := 0
@@ -58,7 +72,7 @@ func DealCards(seed int64) [NumPlayers]Hand {
 	random.Shuffle(len(deck), func(i int, j int) { deck[i], deck[j] = deck[j], deck[i] })
 	var ans [NumPlayers]Hand
 	for i := 0; i < NumPlayers; i++ {
-		ans[i] = deck[i*HandSize : (i+1)*HandSize]
+		ans[i] = deck[i*NumHandCards : (i+1)*NumHandCards]
 	}
 	return ans
 }
@@ -77,4 +91,22 @@ func (cards BySuitAndRank) Less(i, j int) bool {
 
 func (cards BySuitAndRank) Swap(i, j int) {
 	cards[i], cards[j] = cards[j], cards[i]
+}
+
+func (c Card) FehlTrickValue() int {
+	return c.Rank.Value()
+}
+
+func (c Card) TrumpfTrickValue() int {
+	if c == Dulle() {
+		return 100
+	}
+	switch c.Rank {
+	case Dame:
+		return 20 + int(c.Suit)
+	case Bube:
+		return 10 + int(c.Suit)
+	default:
+		return c.Rank.Value()
+	}
 }
