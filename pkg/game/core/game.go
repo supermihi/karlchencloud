@@ -1,14 +1,14 @@
 package core
 
 type Game struct {
-	HandCards      [NumPlayers]Hand
+	HandCards      Cards
 	CompleteTricks []Trick
 	CurrentTrick   IncompleteTrick
 	Mode           Mode
 }
 
-func CreateGame(handCards [NumPlayers]Hand, forehand Player, mode Mode) *Game {
-	game := Game{handCards, make([]Trick, 0, NumHandCards), NewIncompleteTrick(forehand), mode}
+func NewGame(dealtCards Cards, forehand Player, mode Mode) *Game {
+	game := Game{dealtCards, make([]Trick, 0, NumHandCards), NewIncompleteTrick(forehand), mode}
 	return &game
 }
 

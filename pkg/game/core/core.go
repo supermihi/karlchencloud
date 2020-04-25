@@ -4,7 +4,9 @@ import "fmt"
 
 const NumPlayers = 4
 const NumHandCards = 12
+const NumTricks = NumHandCards
 const DeckSize = NumPlayers * NumHandCards
+const TotalScore = 240
 
 type Suit int
 
@@ -52,10 +54,10 @@ func (c Card) String() string {
 		"%s", c.Suit, c.Rank)
 }
 
-func (c Card) Value() int {
-	return c.Rank.Value()
+func (c Card) Score() int {
+	return c.Rank.Score()
 }
 
-func (s Rank) Value() int {
+func (s Rank) Score() int {
 	return [...]int{0, 2, 3, 4, 10, 11}[s]
 }

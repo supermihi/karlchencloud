@@ -11,10 +11,33 @@ func NormalGameSuit(c Card) GameSuit {
 	return c.Suit.AsFehl()
 }
 
-type NormalspielMode struct{}
+type NormalspielMode struct {
+	Parties [NumPlayers]Party
+}
+
+func NewNormalspiel(dealtCards Cards) NormalspielMode {
+	var parties [NumPlayers]Party
+	for _, p := range Players() {
+		if dealtCards[p].NumAlte() == 1 {
+			parties[p] = Re
+		} else {
+			parties[p] = Contra
+		}
+	}
+	return NormalspielMode{parties}
+}
+
+func (n NormalspielMode) OnCompletedTrick(Trick, int) {
+}
+
+func (NormalspielMode) Klaerungsstich() int {
+	return -1
+}
 
 func (n NormalspielMode) GameSuit(k Card) GameSuit {
 	return NormalGameSuit(k)
 }
 
-var Normalspiel = NormalspielMode{}
+func (n NormalspielMode) PartyOf(p Player) Party {
+	return n.Parties[p]
+}

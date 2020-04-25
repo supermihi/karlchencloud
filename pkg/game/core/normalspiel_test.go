@@ -50,7 +50,7 @@ func TestSticht(t *testing.T) {
 		{Card{Kreuz, Zehn}, Card{Kreuz, Koenig}},
 	}
 	for _, neuAlt := range sticht {
-		if !TakesTrickFrom(neuAlt.neu, neuAlt.alt, Normalspiel) {
+		if !TakesTrickFrom(neuAlt.neu, neuAlt.alt, someNormalspiel) {
 			t.Errorf("%v sticht %v", neuAlt.neu, neuAlt.alt)
 		}
 	}

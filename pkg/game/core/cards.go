@@ -14,17 +14,17 @@ func (h Hand) CardIndex(card Card) int {
 	return -1
 }
 
-func (h Hand) RemoveCard(c Card) Hand {
-	ans := make([]Card, 0, len(h)-1)
+func (h *Hand) RemoveCard(c Card) {
+	ans := make([]Card, 0, len(*h)-1)
 	removed := false
-	for _, card := range h {
+	for _, card := range *h {
 		if !removed && card == c {
 			removed = true
 		} else {
 			ans = append(ans, card)
 		}
 	}
-	return ans
+	*h = ans
 }
 
 func AnyCard(cards []Card, predicate func(Card) bool) bool {
@@ -48,6 +48,10 @@ func (h Hand) NumberOfCards(c Card) int {
 		}
 	}
 	return ans
+}
+
+func (h Hand) NumPlayedCards() int {
+	return NumHandCards - len(h)
 }
 
 func (h Hand) NumAlte() int {
@@ -98,7 +102,7 @@ func (cards BySuitAndRank) Swap(i, j int) {
 }
 
 func (c Card) FehlTrickValue() int {
-	return c.Rank.Value()
+	return c.Rank.Score()
 }
 
 func (c Card) TrumpfTrickValue() int {
@@ -111,6 +115,6 @@ func (c Card) TrumpfTrickValue() int {
 	case Bube:
 		return 10 + int(c.Suit)
 	default:
-		return c.Rank.Value()
+		return c.Rank.Score()
 	}
 }

@@ -3,7 +3,12 @@ package modes
 import "github.com/supermihi/doppelgopf/pkg/game/core"
 
 type Farbsolo struct {
-	Trumpf core.Suit
+	Trumpf  core.Suit
+	Soloist core.Player
+}
+
+func NewFarbsolo(trump core.Suit, soloist core.Player) Farbsolo {
+	return Farbsolo{trump, soloist}
 }
 
 func (f Farbsolo) GameSuit(card core.Card) core.GameSuit {
@@ -11,4 +16,18 @@ func (f Farbsolo) GameSuit(card core.Card) core.GameSuit {
 		return core.Trumpf
 	}
 	return card.Suit.AsFehl()
+}
+
+func (f Farbsolo) PartyOf(p core.Player) core.Party {
+	if p == f.Soloist {
+		return core.Re
+	}
+	return core.Contra
+}
+
+func (Farbsolo) Klaerungsstich() int {
+	return -1
+}
+
+func (Farbsolo) OnCompletedTrick(core.Trick, int) {
 }

@@ -6,15 +6,6 @@ import (
 	"github.com/supermihi/doppelgopf/pkg/game/core"
 )
 
-type Phase int
-
-const (
-	AuctionAbfrage Phase = iota
-	AuctionSpezifikation
-	Game
-	Finished
-)
-
 type Match struct {
 	auction *auction.Auction
 	game    *core.Game
@@ -24,6 +15,15 @@ func NewMatch(forehand core.Player, sonderspiele auction.Sonderspiele, cards cor
 	auct := auction.NewAuction(forehand, cards, sonderspiele)
 	return Match{auct, nil}
 }
+
+type Phase int
+
+const (
+	AuctionAbfrage Phase = iota
+	AuctionSpezifikation
+	Game
+	Finished
+)
 
 func (m Match) Phase() Phase {
 	switch m.auction.Phase() {
@@ -38,18 +38,22 @@ func (m Match) Phase() Phase {
 	return Finished
 }
 
+func (m Match) DealtCards() core.Cards {
+	return m.auction.Cards
+}
+
 func (m Match) ProceedToGame() {
 	result := m.auction.GetResult()
 	if result.IsSonderspiel {
-		m.game = core.CreateGame(m.auction.Cards, result.Forehand, result.Sonderspiel)
+		m.game = core.NewGame(m.DealtCards(), result.Forehand, result.Sonderspiel)
 	} else {
-		var spiel core.Mode = core.Normalspiel
+		var spiel core.Mode = core.NewNormalspiel(m.DealtCards())
 		for _, player := range core.Players() {
 			if m.auction.Cards[player].NumAlte() == 2 {
 				spiel = core.StilleHochzeit{Soloist: player}
 			}
 		}
-		m.game = core.CreateGame(m.auction.Cards, m.auction.Forehand, spiel)
+		m.game = core.NewGame(m.DealtCards(), m.auction.Forehand, spiel)
 	}
 }
 

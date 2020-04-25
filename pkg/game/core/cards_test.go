@@ -24,7 +24,8 @@ func TestHand_RemoveCard(t *testing.T) {
 		{Pik, Dame},
 		{Herz, Zehn},
 	}
-	newHand := hand.RemoveCard(Card{Herz, Zehn})
+	newHand := hand[:]
+	newHand.RemoveCard(Card{Herz, Zehn})
 	var expected Hand = []Card{
 		{Karo, Koenig},
 		{Pik, Dame},

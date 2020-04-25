@@ -5,11 +5,16 @@ type Trick struct {
 	CardsOf  [NumPlayers]Card
 }
 
-func (t Trick) NthCard(n int) Card {
+func (t *Trick) NthCard(n int) Card {
 	return t.CardsOf[t.Forehand.NthNext(n)]
 }
-func (t Trick) FirstCard() Card {
-	return t.NthCard(0)
+
+func (t *Trick) Score() int {
+	result := 0
+	for _, card := range t.CardsOf {
+		result += card.Score()
+	}
+	return result
 }
 
 type IncompleteTrick struct {
