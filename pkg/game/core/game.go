@@ -26,16 +26,26 @@ func (g *Game) WhoseTurn() Player {
 	return g.CurrentTrick.WhoseTurn()
 }
 
-func (g *Game) IsValidMove(player Player, card Card) bool {
-	if g.WhoseTurn() != player || !g.PlayerHasCard(player, card) {
-		return false
+func (g *Game) CanPlayCard(player Player, card Card) PlayCardResult {
+	if g.IsFinished() {
+		return GameFinished
+	}
+	if g.WhoseTurn() != player {
+		return WrongPlayer
+
+	}
+	if !g.PlayerHasCard(player, card) {
+		return PlayerDoesNotHaveCard
 	}
 	trick := g.CurrentTrick
 	if len(trick.CardsInOrder) == 0 {
-		return true
+		return CardPlayed
 	}
 	trickSuit := g.Mode.GameSuit(trick.NthCard(0))
-	return g.Mode.GameSuit(card) == trickSuit || !g.PlayerHasCardOfSuit(player, trickSuit)
+	if g.Mode.GameSuit(card) == trickSuit || !g.PlayerHasCardOfSuit(player, trickSuit) {
+		return CardPlayed
+	}
+	return InvalidCard
 }
 
 func (g *Game) playCard(player Player, card Card) {
@@ -43,13 +53,23 @@ func (g *Game) playCard(player Player, card Card) {
 	g.CurrentTrick.CardsInOrder = append(g.CurrentTrick.CardsInOrder, card)
 }
 
-func (g *Game) TryPlayCard(player Player, card Card) bool {
-	if !g.IsValidMove(player, card) {
-		return false
+type PlayCardResult int
+
+const (
+	CardPlayed PlayCardResult = iota
+	PlayerDoesNotHaveCard
+	WrongPlayer
+	InvalidCard
+	GameFinished
+)
+
+func (g *Game) TryPlayCard(player Player, card Card) PlayCardResult {
+	canResult := g.CanPlayCard(player, card)
+	if canResult == CardPlayed {
+		g.playCard(player, card)
+		g.finishOpenTrickIfComplete()
 	}
-	g.playCard(player, card)
-	g.finishOpenTrickIfComplete()
-	return true
+	return canResult
 }
 
 func (g *Game) finishOpenTrickIfComplete() {

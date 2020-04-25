@@ -151,7 +151,7 @@ func (m Match) performActionGame(act PlayerAction) ActionResult {
 	if m.game.WhoseTurn() != act.Player {
 		return WrongPlayerResult(m.game.WhoseTurn())
 	}
-	if m.game.TryPlayCard(act.Player, act.DealtCard) {
+	if m.game.TryPlayCard(act.Player, act.DealtCard) == core.CardPlayed {
 		return OkResult
 	} else {
 		return ActionResult{InvalidCard, fmt.Sprintf("could not play card")}

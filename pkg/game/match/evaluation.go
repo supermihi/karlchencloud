@@ -9,23 +9,35 @@ type GameEvaluation struct {
 	GameValue        int
 }
 
-func EvaluateGame(g *core.Game, b *Bids) GameEvaluation {
-	if !g.IsFinished() {
-		panic("cannot evaluate unfinished game")
-	}
+func CountReScoreAndTricks(game *core.Game) (int, int) {
 	reScore, contraScore := 0, 0
 	reTricks, contraTricks := 0, 0
-	for _, trick := range g.CompleteTricks {
-		winner := g.WinnerOfTrick(trick)
-		if g.Mode.PartyOf(winner) == core.Re {
+	for _, trick := range game.CompleteTricks {
+		winner := game.WinnerOfTrick(trick)
+		if game.Mode.PartyOf(winner) == core.Re {
 			reScore += trick.Score()
 			reTricks += 1
 		} else {
 			contraScore += trick.Score()
 			contraTricks += 1
+
 		}
 	}
-	winningParty := b.WinnerOfGame(reScore, reTricks)
+	if reScore+contraScore != core.TotalScore {
+		panic("total score != 240")
+	}
+	if reTricks+contraTricks != core.NumTricks {
+		panic("total tricks != 12")
+	}
+	return reScore, reTricks
+}
+
+func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
+	if !game.IsFinished() {
+		panic("cannot evaluate unfinished game")
+	}
+	reScore, reTricks := CountReScoreAndTricks(game)
+	winningParty := WinnerOfGame(reScore, reTricks, bids)
 	return GameEvaluation{
 		winningParty,
 		reScore,
