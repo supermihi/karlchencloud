@@ -19,9 +19,9 @@ func NewNormalspiel(dealtCards Cards) NormalspielMode {
 	var parties [NumPlayers]Party
 	for _, p := range Players() {
 		if dealtCards[p].NumAlte() == 1 {
-			parties[p] = Re
+			parties[p] = ReParty
 		} else {
-			parties[p] = Contra
+			parties[p] = ContraParty
 		}
 	}
 	return NormalspielMode{parties}

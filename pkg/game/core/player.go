@@ -51,3 +51,11 @@ func (p Player) NthNext(i int) Player {
 	}
 	return r
 }
+
+func (p Player) HopsTo(other Player) int {
+	for i := 0; ; i++ {
+		if p.NthNext(i) == other {
+			return i
+		}
+	}
+}

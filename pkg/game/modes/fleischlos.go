@@ -19,7 +19,7 @@ func (FleischlosMode) OnCompletedTrick(core.Trick, int) {
 
 func (f FleischlosMode) PartyOf(p core.Player) core.Party {
 	if p == f.Soloist {
-		return core.Re
+		return core.ReParty
 	}
-	return core.Contra
+	return core.ContraParty
 }

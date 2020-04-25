@@ -20,9 +20,9 @@ const (
 
 func (bid Bid) Party() core.Party {
 	if bid <= ReSchwarz {
-		return core.Re
+		return core.ReParty
 	}
-	return core.Contra
+	return core.ContraParty
 }
 
 func (bid Bid) MaxPlayedCardsAfterKlaerung() int {
@@ -45,6 +45,18 @@ func (bid Bid) MaxPlayedCardsAfterKlaerung() int {
 type Bids struct {
 	bids      [core.NumPlayers][]Bid
 	partyBids map[core.Party][]Bid
+}
+
+func NewBids() Bids {
+	bids := [core.NumPlayers][]Bid{
+		{}, {}, {}, {},
+	}
+	partyBids := map[core.Party][]Bid{
+		core.ReParty:     {},
+		core.ContraParty: {},
+	}
+	return Bids{bids, partyBids}
+
 }
 
 func (bids *Bids) placeBid(player core.Player, party core.Party, bid Bid) {

@@ -34,8 +34,11 @@ func (t IncompleteTrick) IsComplete() bool {
 	return len(t.CardsInOrder) == NumPlayers
 }
 
+func (t IncompleteTrick) CardOf(player Player) Card {
+	return t.CardsInOrder[t.Forehand.HopsTo(player)]
+}
 func (t IncompleteTrick) cardsByPlayer() [NumPlayers]Card {
-	return [NumPlayers]Card{t.NthCard(0), t.NthCard(1), t.NthCard(2), t.NthCard(3)}
+	return [...]Card{t.CardOf(Player1), t.CardOf(Player2), t.CardOf(Player3), t.CardOf(Player4)}
 }
 
 func (t IncompleteTrick) AsCompleteTrick() Trick {

@@ -61,3 +61,11 @@ func (c Card) Score() int {
 func (s Rank) Score() int {
 	return [...]int{0, 2, 3, 4, 10, 11}[s]
 }
+
+type Party int
+
+const (
+	ReParty Party = iota
+	ContraParty
+	NoParty
+)

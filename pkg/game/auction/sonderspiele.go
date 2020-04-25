@@ -21,3 +21,11 @@ func (r *Sonderspiele) FindSonderspiel(id ModeId) SonderspielMode {
 	}
 	return result
 }
+
+func MakeSonderspiele(modes ...SonderspielMode) Sonderspiele {
+	result := make(Sonderspiele)
+	for _, m := range modes {
+		result[m.Identifier()] = m
+	}
+	return result
+}

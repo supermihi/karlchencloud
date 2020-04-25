@@ -41,15 +41,15 @@ func (h Hochzeit) OnCompletedTrick(t core.Trick, numTrick int) {
 
 func (h Hochzeit) PartyOf(p core.Player) core.Party {
 	if p == h.announcer {
-		return core.Re
+		return core.ReParty
 	}
 	if !h.PartnerFound() {
 		return core.NoParty
 	}
 	if p == h.partner {
-		return core.Re
+		return core.ReParty
 	}
-	return core.Contra
+	return core.ContraParty
 }
 
 func (h Hochzeit) PartnerFound() bool {
@@ -82,4 +82,8 @@ func (v VorbehaltHochzeit) Priority() int {
 
 func (v VorbehaltHochzeit) CreateMode(announcer core.Player) core.Mode {
 	return NewHochzeit(announcer)
+}
+
+func (v VorbehaltHochzeit) AnnouncerTakesForehand() bool {
+	return false
 }

@@ -9,9 +9,9 @@ func (StilleHochzeit) OnCompletedTrick(Trick, int) {
 
 func (h StilleHochzeit) PartyOf(p Player) Party {
 	if p == h.Soloist {
-		return Re
+		return ReParty
 	}
-	return Contra
+	return ContraParty
 }
 
 func (StilleHochzeit) GameSuit(c Card) GameSuit {

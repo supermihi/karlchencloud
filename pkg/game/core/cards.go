@@ -118,3 +118,31 @@ func (c Card) TrumpfTrickValue() int {
 		return c.Rank.Score()
 	}
 }
+
+var Karo9 = Card{Karo, Neun}
+var KaroB = Card{Karo, Bube}
+var KaroD = Card{Karo, Dame}
+var KaroK = Card{Karo, Koenig}
+var Karo10 = Card{Karo, Zehn}
+var KaroA = Card{Karo, Ass}
+
+var Herz9 = Card{Herz, Neun}
+var HerzB = Card{Herz, Bube}
+var HerzD = Card{Herz, Dame}
+var HerzK = Card{Herz, Koenig}
+var Herz10 = Card{Herz, Zehn}
+var HerzA = Card{Herz, Ass}
+
+var Pik9 = Card{Pik, Neun}
+var PikB = Card{Pik, Bube}
+var PikD = Card{Pik, Dame}
+var PikK = Card{Pik, Koenig}
+var Pik10 = Card{Pik, Zehn}
+var PikA = Card{Pik, Ass}
+
+var Kreuz9 = Card{Kreuz, Neun}
+var KreuzB = Card{Kreuz, Bube}
+var KreuzD = Card{Kreuz, Dame}
+var KreuzK = Card{Kreuz, Koenig}
+var Kreuz10 = Card{Kreuz, Zehn}
+var KreuzA = Card{Kreuz, Ass}

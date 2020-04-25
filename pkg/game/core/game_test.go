@@ -2,7 +2,7 @@ package core
 
 import "testing"
 
-var someNormalspiel = NormalspielMode{[...]Party{Re, Re, Contra, Contra}}
+var someNormalspiel = NormalspielMode{[...]Party{ReParty, ReParty, ContraParty, ContraParty}}
 
 func TestWinnerOfTrick(t *testing.T) {
 	if WinnerOfTrick(Trick{Player1, [4]Card{

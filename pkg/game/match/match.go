@@ -9,40 +9,42 @@ import (
 type Match struct {
 	auction *auction.Auction
 	game    *core.Game
+	bids    *Bids
 }
 
 func NewMatch(forehand core.Player, sonderspiele auction.Sonderspiele, cards core.Cards) Match {
 	auct := auction.NewAuction(forehand, cards, sonderspiele)
-	return Match{auct, nil}
+	bids := NewBids()
+	return Match{auct, nil, &bids}
 }
 
 type Phase int
 
 const (
-	AuctionAbfrage Phase = iota
-	AuctionSpezifikation
-	Game
-	Finished
+	AuctionAbfragePhase Phase = iota
+	AuctionSpezifikationPhase
+	GamePhase
+	MatchFinished
 )
 
-func (m Match) Phase() Phase {
+func (m *Match) Phase() Phase {
 	switch m.auction.Phase() {
 	case auction.VorbehaltAbfrage:
-		return AuctionAbfrage
+		return AuctionAbfragePhase
 	case auction.VorbehaltSpezifikation:
-		return AuctionSpezifikation
+		return AuctionSpezifikationPhase
 	}
 	if !m.game.IsFinished() {
-		return Game
+		return GamePhase
 	}
-	return Finished
+	return MatchFinished
 }
 
-func (m Match) DealtCards() core.Cards {
+func (m *Match) DealtCards() core.Cards {
 	return m.auction.Cards
 }
 
-func (m Match) ProceedToGame() {
+func (m *Match) ProceedToGame() {
 	result := m.auction.GetResult()
 	if result.IsSonderspiel {
 		m.game = core.NewGame(m.DealtCards(), result.Forehand, result.Sonderspiel)
@@ -63,14 +65,24 @@ const (
 	AnnounceGesund ActionType = iota
 	AnnounceVorbehalt
 	SpecifyVorbehalt
-	DealCard
+	PlayCard
 )
 
 type PlayerAction struct {
 	Player      core.Player
 	Type        ActionType
 	VorbehaltId auction.ModeId
-	DealtCard   core.Card
+	Card        core.Card
+}
+
+func PlayCardAction(player core.Player, card core.Card) PlayerAction {
+	return PlayerAction{Player: player, Type: PlayCard, Card: card}
+}
+func AnnounceGesundAction(player core.Player) PlayerAction {
+	return PlayerAction{Player: player, Type: AnnounceGesund}
+}
+func AnnounceVorbehaltAction(player core.Player) PlayerAction {
+	return PlayerAction{Player: player, Type: AnnounceVorbehalt}
 }
 
 type ActionResultType int
@@ -78,8 +90,8 @@ type ActionResultType int
 const (
 	Ok ActionResultType = iota
 	WrongPhase
-	WrongPlayer
-	InvalidCard
+	WrongPlayerTurn
+	CannotPlayCard
 	OtherError
 )
 
@@ -91,24 +103,24 @@ type ActionResult struct {
 var OkResult = ActionResult{Ok, ""}
 
 func WrongPlayerResult(actual core.Player) ActionResult {
-	return ActionResult{WrongPlayer, fmt.Sprintf("it's %v's turn", actual)}
+	return ActionResult{WrongPlayerTurn, fmt.Sprintf("it's %v's turn", actual)}
 }
-func (m Match) PerformAction(act PlayerAction) ActionResult {
+func (m *Match) PerformAction(act PlayerAction) ActionResult {
 	switch m.Phase() {
-	case AuctionAbfrage:
+	case AuctionAbfragePhase:
 		return m.performActionAbfrage(act)
-	case AuctionSpezifikation:
+	case AuctionSpezifikationPhase:
 		return m.performActionSpezifikation(act)
-	case Game:
+	case GamePhase:
 		return m.performActionGame(act)
-	case Finished:
+	case MatchFinished:
 		return m.performActionFinished()
 	default:
 		panic("unknown match phase")
 	}
 }
 
-func (m Match) performActionAbfrage(act PlayerAction) ActionResult {
+func (m *Match) performActionAbfrage(act PlayerAction) ActionResult {
 	if act.Type != AnnounceGesund && act.Type != AnnounceVorbehalt {
 		return ActionResult{WrongPhase, "expected gesund/vorbehalt"}
 	}
@@ -122,7 +134,7 @@ func (m Match) performActionAbfrage(act PlayerAction) ActionResult {
 	return OkResult
 }
 
-func (m Match) performActionSpezifikation(act PlayerAction) ActionResult {
+func (m *Match) performActionSpezifikation(act PlayerAction) ActionResult {
 	if act.Type != SpecifyVorbehalt {
 		return ActionResult{WrongPhase, "expected vorbehalt specification"}
 	}
@@ -144,21 +156,21 @@ func (m Match) performActionSpezifikation(act PlayerAction) ActionResult {
 	panic("should not be here in performActionSpezifikation")
 }
 
-func (m Match) performActionGame(act PlayerAction) ActionResult {
-	if act.Type != DealCard {
+func (m *Match) performActionGame(act PlayerAction) ActionResult {
+	if act.Type != PlayCard {
 		return ActionResult{WrongPhase, "expected card"}
 	}
 	if m.game.WhoseTurn() != act.Player {
 		return WrongPlayerResult(m.game.WhoseTurn())
 	}
-	if m.game.TryPlayCard(act.Player, act.DealtCard) == core.CardPlayed {
+	if m.game.TryPlayCard(act.Player, act.Card) == core.CardPlayed {
 		return OkResult
 	} else {
-		return ActionResult{InvalidCard, fmt.Sprintf("could not play card")}
+		return ActionResult{CannotPlayCard, fmt.Sprintf("could not play card")}
 	}
 
 }
 
-func (m Match) performActionFinished() ActionResult {
+func (m *Match) performActionFinished() ActionResult {
 	return ActionResult{WrongPhase, "match has finished"}
 }
