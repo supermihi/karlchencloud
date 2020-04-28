@@ -69,3 +69,14 @@ const (
 	ContraParty
 	NoParty
 )
+
+func (p Party) Other() Party {
+	switch p {
+	case ReParty:
+		return ContraParty
+	case ContraParty:
+		return ReParty
+	default:
+		panic("Other() not valid for NoParty")
+	}
+}

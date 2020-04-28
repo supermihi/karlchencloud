@@ -64,6 +64,11 @@ func (bids *Bids) placeBid(player core.Player, party core.Party, bid Bid) {
 	bids.partyBids[party] = append(bids.partyBids[party], bid)
 }
 
+func (bids *Bids) AllBids() []Bid {
+	ans := bids.partyBids[core.ReParty]
+	return append(ans, bids.partyBids[core.ContraParty]...)
+}
+
 func (bids *Bids) MaxPartyBid(p core.Party) Bid {
 	max := NoBid
 	for _, bid := range bids.partyBids[p] {

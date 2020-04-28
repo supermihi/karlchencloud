@@ -15,8 +15,8 @@ func NewGame(dealtCards Cards, forehand Player, mode Mode) *Game {
 func (g *Game) IsFinished() bool {
 	return len(g.CompleteTricks) == NumHandCards
 }
-func (g *Game) WinnerOfTrick(t Trick) Player {
-	return WinnerOfTrick(t, g.Mode)
+func (g *Game) WinnerOfTrick(cardsOf [NumPlayers]Card, forehand Player) Player {
+	return WinnerOfTrick(cardsOf, forehand, g.Mode)
 }
 
 func (g *Game) WhoseTurn() Player {
@@ -77,9 +77,11 @@ func (g *Game) finishOpenTrickIfComplete() {
 	if !currentTrick.IsComplete() {
 		return
 	}
-	finishedTrick := currentTrick.AsCompleteTrick()
+	winner := g.WinnerOfTrick(currentTrick.cardsByPlayer(), currentTrick.Forehand)
+	finishedTrick := currentTrick.AsCompleteTrick(winner)
+	g.Mode.OnCompletedTrick(finishedTrick, len(g.CompleteTricks))
 	g.CompleteTricks = append(g.CompleteTricks, finishedTrick)
-	g.CurrentTrick = NewIncompleteTrick(g.WinnerOfTrick(finishedTrick))
+	g.CurrentTrick = NewIncompleteTrick(winner)
 }
 
 func (g *Game) PlayerHasCard(p Player, c Card) bool {
@@ -90,11 +92,11 @@ func (g *Game) PlayerHasCardOfSuit(p Player, suit GameSuit) bool {
 	return AnyCard(g.HandCards[p], func(c Card) bool { return g.Mode.GameSuit(c) == suit })
 }
 
-func WinnerOfTrick(t Trick, m Mode) Player {
-	winner := t.Forehand
+func WinnerOfTrick(cardsOf [NumPlayers]Card, forehand Player, m Mode) Player {
+	winner := forehand
 	for i := 1; i < NumPlayers; i++ {
-		player := t.Forehand.NthNext(i)
-		if TakesTrickFrom(t.CardsOf[player], t.CardsOf[winner], m) {
+		player := forehand.NthNext(i)
+		if TakesTrickFrom(cardsOf[player], cardsOf[winner], m) {
 			winner = player
 		}
 	}

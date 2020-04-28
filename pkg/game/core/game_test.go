@@ -5,12 +5,12 @@ import "testing"
 var someNormalspiel = NormalspielMode{[...]Party{ReParty, ReParty, ContraParty, ContraParty}}
 
 func TestWinnerOfTrick(t *testing.T) {
-	if WinnerOfTrick(Trick{Player1, [4]Card{
+	if WinnerOfTrick([4]Card{
 		{Kreuz, Ass},
 		{Kreuz, Ass},
 		{Kreuz, Zehn},
 		{Kreuz, Neun},
-	}}, someNormalspiel) != Player1 {
+	}, Player1, someNormalspiel) != Player1 {
 		t.Error("player1 sollte gewinnen")
 	}
 }

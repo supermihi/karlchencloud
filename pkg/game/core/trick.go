@@ -3,6 +3,7 @@ package core
 type Trick struct {
 	Forehand Player
 	CardsOf  [NumPlayers]Card
+	Winner   Player
 }
 
 func (t *Trick) NthCard(n int) Card {
@@ -41,8 +42,8 @@ func (t IncompleteTrick) cardsByPlayer() [NumPlayers]Card {
 	return [...]Card{t.CardOf(Player1), t.CardOf(Player2), t.CardOf(Player3), t.CardOf(Player4)}
 }
 
-func (t IncompleteTrick) AsCompleteTrick() Trick {
-	return Trick{t.Forehand, t.cardsByPlayer()}
+func (t IncompleteTrick) AsCompleteTrick(winner Player) Trick {
+	return Trick{t.Forehand, t.cardsByPlayer(), winner}
 }
 
 func (t IncompleteTrick) WhoseTurn() Player {

@@ -2,7 +2,36 @@ package match
 
 import "github.com/supermihi/doppelgopf/pkg/game/core"
 
-type ExtraPointType int
+func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
+	if !game.IsFinished() {
+		panic("cannot evaluate unfinished game")
+	}
+	reScore, reTricks := countReScoreAndTricks(game)
+	winningParty := WinnerOfGame(reScore, reTricks, bids)
+	gamePoints := getGamePoints(bids, winningParty, reScore, reTricks)
+	extraPoints := findExtraPoints(game)
+	totalValue := len(extraPoints)
+	for _, p := range gamePoints {
+		totalValue += p.Value
+	}
+	return GameEvaluation{
+		winningParty,
+		reScore,
+		core.TotalScore - reScore,
+		gamePoints,
+		extraPoints,
+		totalValue,
+	}
+}
+
+type GameEvaluation struct {
+	Winner           core.Party
+	TrickScoreRe     int
+	TrickScoreContra int
+	GamePoints       []GamePoint
+	ExtraPoints      []ExtraPoint
+	TotalValue       int
+}
 
 const (
 	Karlchen ExtraPointType = iota
@@ -10,25 +39,11 @@ const (
 	FuchsGefangen
 )
 
-type ExtraPoint struct {
-	Type   ExtraPointType
-	Player core.Player
-	Trick  int
-}
-type GameEvaluation struct {
-	Winner           core.Party
-	TrickScoreRe     int
-	TrickScoreContra int
-	GameValue        int
-	ExtraPoints      []ExtraPoint
-}
-
-func CountReScoreAndTricks(game *core.Game) (int, int) {
+func countReScoreAndTricks(game *core.Game) (int, int) {
 	reScore, contraScore := 0, 0
 	reTricks, contraTricks := 0, 0
 	for _, trick := range game.CompleteTricks {
-		winner := game.WinnerOfTrick(trick)
-		if game.Mode.PartyOf(winner) == core.ReParty {
+		if game.Mode.PartyOf(trick.Winner) == core.ReParty {
 			reScore += trick.Score()
 			reTricks += 1
 		} else {
@@ -44,18 +59,4 @@ func CountReScoreAndTricks(game *core.Game) (int, int) {
 		panic("total tricks != 12")
 	}
 	return reScore, reTricks
-}
-
-func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
-	if !game.IsFinished() {
-		panic("cannot evaluate unfinished game")
-	}
-	reScore, reTricks := CountReScoreAndTricks(game)
-	winningParty := WinnerOfGame(reScore, reTricks, bids)
-	return GameEvaluation{
-		winningParty,
-		reScore,
-		core.TotalScore - reScore,
-		1,
-	}
 }

@@ -3,7 +3,6 @@ package match
 import (
 	"github.com/supermihi/doppelgopf/pkg/game/auction"
 	. "github.com/supermihi/doppelgopf/pkg/game/core"
-	"github.com/supermihi/doppelgopf/pkg/game/modes"
 	"testing"
 )
 
@@ -22,7 +21,7 @@ func TestSampleMatch(t *testing.T) {
 			HerzA, Pik9, Pik9, PikA, KreuzK, KreuzA, KreuzA, Karo9, Karo10, HerzB, PikB, KreuzB,
 		},
 	}
-	sonderspiele := auction.MakeSonderspiele(modes.VorbehaltHochzeit{})
+	sonderspiele := auction.MakeSonderspiele(auction.VorbehaltHochzeit{})
 	match := NewMatch(Player3, sonderspiele, cards)
 	play := func(player Player, card Card) {
 		ans := match.PerformAction(PlayCardAction(player, card))
@@ -39,7 +38,7 @@ func TestSampleMatch(t *testing.T) {
 	}
 	expectTrickWinner := func(player Player) {
 		tricks := match.game.CompleteTricks
-		winner := match.game.WinnerOfTrick(tricks[len(tricks)-1])
+		winner := tricks[len(tricks)-1].Winner
 		if winner != player {
 			t.Errorf("expecting %v to win 1st trick instead of %v", player, winner)
 			t.FailNow()
@@ -132,8 +131,14 @@ func TestSampleMatch(t *testing.T) {
 	if result.TrickScoreRe != 134 {
 		t.Error("Expecting score 134 for Re")
 	}
-	if result.GameValue != 1 {
-		t.Errorf("Expecting game value of 1")
+	if len(result.GamePoints) != 1 || result.GamePoints[0].Type != Gewonnen {
+		t.Errorf("unexpected game points")
+	}
+	if result.TotalValue != 3 {
+		t.Errorf("Expecting game value of 3, not %v", result.TotalValue)
+	}
+	if len(result.ExtraPoints) != 2 {
+		t.Errorf("Expecting 2 extra points instead of %v", len(result.ExtraPoints))
 	}
 
 }
