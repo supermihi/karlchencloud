@@ -66,6 +66,7 @@ const (
 	AnnounceVorbehalt
 	SpecifyVorbehalt
 	PlayCard
+	PlaceBid
 )
 
 type PlayerAction struct {
@@ -73,16 +74,23 @@ type PlayerAction struct {
 	Type        ActionType
 	VorbehaltId auction.ModeId
 	Card        core.Card
+	Bid         Bid
 }
 
 func PlayCardAction(player core.Player, card core.Card) PlayerAction {
 	return PlayerAction{Player: player, Type: PlayCard, Card: card}
 }
+
 func AnnounceGesundAction(player core.Player) PlayerAction {
 	return PlayerAction{Player: player, Type: AnnounceGesund}
 }
+
 func AnnounceVorbehaltAction(player core.Player) PlayerAction {
 	return PlayerAction{Player: player, Type: AnnounceVorbehalt}
+}
+
+func PlaceBidAction(player core.Player, bid Bid) PlayerAction {
+	return PlayerAction{Player: player, Type: PlaceBid, Bid: bid}
 }
 
 type ActionResultType int
@@ -92,6 +100,8 @@ const (
 	WrongPhase
 	WrongPlayerTurn
 	CannotPlayCard
+	CannotPlaceBid
+	UnknownAction
 	OtherError
 )
 
@@ -157,18 +167,23 @@ func (m *Match) performActionSpezifikation(act PlayerAction) ActionResult {
 }
 
 func (m *Match) performActionGame(act PlayerAction) ActionResult {
-	if act.Type != PlayCard {
-		return ActionResult{WrongPhase, "expected card"}
-	}
-	if m.game.WhoseTurn() != act.Player {
-		return WrongPlayerResult(m.game.WhoseTurn())
-	}
-	if m.game.TryPlayCard(act.Player, act.Card) == core.CardPlayed {
-		return OkResult
-	} else {
+	switch act.Type {
+	case PlayCard:
+		if m.game.WhoseTurn() != act.Player {
+			return WrongPlayerResult(m.game.WhoseTurn())
+		}
+		if m.game.TryPlayCard(act.Player, act.Card) == core.CardPlayed {
+			return OkResult
+		}
 		return ActionResult{CannotPlayCard, fmt.Sprintf("could not play card")}
-	}
+	case PlaceBid:
+		if TryPlaceBid(act.Player, act.Bid, m.bids, m.game) {
+			return OkResult
+		}
+		return ActionResult{CannotPlaceBid, fmt.Sprintf("could not place bid")}
 
+	}
+	return ActionResult{WrongPhase, "Expected card or bid"}
 }
 
 func (m *Match) performActionFinished() ActionResult {

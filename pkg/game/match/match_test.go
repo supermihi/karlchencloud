@@ -66,6 +66,11 @@ func TestSampleMatch(t *testing.T) {
 	play(Player1, KreuzD)
 	play(Player2, Karo10)
 	expectTrickWinner(Player1)
+	match.PerformAction(PlaceBidAction(Player1, Re))
+	bidAns := match.PerformAction(PlaceBidAction(Player4, Re))
+	if bidAns.Type != CannotPlaceBid {
+		t.Error("player 4 is not re party")
+	}
 	play(Player1, PikA)
 	play(Player2, Pik10)
 	play(Player3, KaroA)
@@ -131,10 +136,13 @@ func TestSampleMatch(t *testing.T) {
 	if result.TrickScoreRe != 134 {
 		t.Error("Expecting score 134 for Re")
 	}
-	if len(result.GamePoints) != 1 || result.GamePoints[0].Type != Gewonnen {
+	if len(result.GamePoints) != 2 {
+		t.Errorf("expected 2 game points (won and re), got %v", result.GamePoints)
+	}
+	if result.GamePoints[0].Type != Gewonnen || result.GamePoints[1].Type != ReAngesagt {
 		t.Errorf("unexpected game points")
 	}
-	if result.TotalValue != 3 {
+	if result.TotalValue != 5 {
 		t.Errorf("Expecting game value of 3, not %v", result.TotalValue)
 	}
 	if len(result.ExtraPoints) != 2 {
