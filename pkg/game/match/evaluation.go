@@ -1,6 +1,6 @@
 package match
 
-import "github.com/supermihi/doppelgopf/pkg/game/core"
+import "github.com/supermihi/karlchencloud/pkg/game/core"
 
 func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
 	if !game.IsFinished() {

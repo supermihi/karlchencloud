@@ -1,6 +1,6 @@
 package match
 
-import "github.com/supermihi/doppelgopf/pkg/game/core"
+import "github.com/supermihi/karlchencloud/pkg/game/core"
 
 type ExtraPointType int
 

@@ -2,7 +2,7 @@ package auction
 
 import (
 	"fmt"
-	"github.com/supermihi/doppelgopf/pkg/game/core"
+	"github.com/supermihi/karlchencloud/pkg/game/core"
 )
 
 type Auction struct {

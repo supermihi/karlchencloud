@@ -1,7 +1,7 @@
 package match
 
 import (
-	"github.com/supermihi/doppelgopf/pkg/game/core"
+	"github.com/supermihi/karlchencloud/pkg/game/core"
 	"testing"
 )
 
