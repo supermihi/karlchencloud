@@ -1,6 +1,8 @@
 package match
 
 import (
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/supermihi/karlchencloud/pkg/game/auction"
 	. "github.com/supermihi/karlchencloud/pkg/game/core"
 	"testing"
@@ -24,129 +26,113 @@ func TestSampleMatch(t *testing.T) {
 	sonderspiele := auction.MakeSonderspiele(auction.VorbehaltHochzeit{})
 	match := NewMatch(Player3, sonderspiele, cards)
 	play := func(player Player, card Card) {
-		ans := match.PerformAction(PlayCardAction(player, card))
-		if ans.Type != Ok {
-			t.Errorf("error playing %v as %v: %v", card, player, ans.ErrorMsg)
-			t.FailNow()
+		for _, otherPlayer := range Players() {
+			if otherPlayer != player {
+				assert.NotEqual(t, otherPlayer, match.game.WhoseTurn())
+			}
 		}
+		ans := match.PerformAction(PlayCardAction(player, card))
+		require.Equalf(t, Ok, ans.Type, "error playing %v as %v: %v", card, player, ans.ErrorMsg)
 	}
 	sayGesund := func(player Player) {
 		ans := match.PerformAction(AnnounceGesundAction(player))
-		if ans.Type != Ok {
-			t.Errorf("error announcing gesund as %v: %v", player, ans.ErrorMsg)
-		}
+		assert.Equalf(t, Ok, ans.Type, "error announcing gesund as %v: %v", player, ans.ErrorMsg)
 	}
 	expectTrickWinner := func(player Player) {
 		tricks := match.game.CompleteTricks
 		winner := tricks[len(tricks)-1].Winner
-		if winner != player {
-			t.Errorf("expecting %v to win 1st trick instead of %v", player, winner)
-			t.FailNow()
-		}
-		if !match.game.IsFinished() && match.game.WhoseTurn() != player {
-			t.Errorf("expecting winner of trick to be next on turn")
-		}
+		require.Equalf(t, player, winner, "expecting %v to win 1st trick instead of %v", player, winner)
+		assert.True(t, match.game.IsFinished() || match.game.WhoseTurn() == player)
 	}
 	sayGesund(Player3)
 	sayGesund(Player4)
 	sayGesund(Player1)
 	sayGesund(Player2)
-	if match.Phase() != GamePhase {
-		t.Error("expecting game phase after four 'gesund'")
-	}
+	assert.Equal(t, GamePhase, match.Phase())
 	mode := match.game.Mode
-	if mode.PartyOf(Player1) != ReParty || mode.PartyOf(Player2) != ReParty || mode.PartyOf(Player3) != ContraParty || mode.PartyOf(Player4) != ContraParty {
-		t.Error("unexpected parties")
-	}
-	if match.PerformAction(PlayCardAction(Player2, KreuzD)).Type != WrongPlayerTurn {
-		t.Errorf("not Player2's turn")
-	}
+	assert.Equal(t, ReParty, mode.PartyOf(Player1))
+	assert.Equal(t, ReParty, mode.PartyOf(Player2))
+	assert.Equal(t, ContraParty, mode.PartyOf(Player3))
+	assert.Equal(t, ContraParty, mode.PartyOf(Player4))
+	// trick 0
 	play(Player3, PikB)
 	play(Player4, Karo9)
 	play(Player1, KreuzD)
 	play(Player2, Karo10)
 	expectTrickWinner(Player1)
 	match.PerformAction(PlaceBidAction(Player1, Re))
-	bidAns := match.PerformAction(PlaceBidAction(Player4, Re))
-	if bidAns.Type != CannotPlaceBid {
-		t.Error("player 4 is not re party")
-	}
+	assert.Equal(t, CannotPlaceBid, match.PerformAction(PlaceBidAction(Player4, Re)).Type)
+	// trick 1
 	play(Player1, PikA)
 	play(Player2, Pik10)
 	play(Player3, KaroA)
 	play(Player4, PikA) // doppelkopf
 	expectTrickWinner(Player3)
+	// trick 2
 	play(Player3, Kreuz9)
 	play(Player4, KreuzA)
 	play(Player1, KreuzK)
 	play(Player2, Kreuz10)
 	expectTrickWinner(Player4)
+	// trick 3
 	play(Player4, HerzA)
 	play(Player1, HerzK)
 	play(Player2, KaroB)
 	play(Player3, Herz9)
 	expectTrickWinner(Player2)
+	// trick 4
 	play(Player2, PikD)
 	play(Player3, Herz10)
 	play(Player4, Karo10)
 	play(Player1, KaroK)
 	expectTrickWinner(Player3)
+	// trick 5
 	play(Player3, Karo9)
 	play(Player4, PikB)
 	play(Player1, KaroA)
 	play(Player2, HerzD)
 	expectTrickWinner(Player2)
+	// trick 6
 	play(Player2, PikD)
 	play(Player3, KaroK)
 	play(Player4, HerzB)
 	play(Player1, HerzB)
 	expectTrickWinner(Player2)
+	// trick 7
 	play(Player2, PikK)
 	play(Player3, KaroD)
 	play(Player4, Pik9)
 	play(Player1, PikK)
 	expectTrickWinner(Player3)
+	// trick 8
 	play(Player3, Herz9)
 	play(Player4, Pik9)
 	play(Player1, HerzA)
 	play(Player2, Kreuz10)
 	expectTrickWinner(Player1)
+	// trick 9
 	play(Player1, Pik10)
 	play(Player2, KreuzD)
 	play(Player3, Kreuz9)
 	play(Player4, KreuzK)
 	expectTrickWinner(Player2)
+	// trick 10
 	play(Player2, HerzD)
 	play(Player3, KaroD)
 	play(Player4, KreuzB)
 	play(Player1, Herz10)
 	expectTrickWinner(Player1)
+	// trick 11
 	play(Player1, KreuzB)
 	play(Player2, KaroB)
 	play(Player3, HerzK)
 	play(Player4, KreuzA) // karlchen
 	expectTrickWinner(Player1)
-	if match.Phase() != MatchFinished {
-		t.Errorf("expecting match finish after last card played")
-	}
+	assert.Equal(t, MatchFinished, match.Phase())
 	result := EvaluateGame(match.game, match.bids)
-	if result.Winner != ReParty {
-		t.Error("expecting Re has won")
-	}
-	if result.TrickScoreRe != 134 {
-		t.Error("Expecting score 134 for Re")
-	}
-	if len(result.GamePoints) != 2 {
-		t.Errorf("expected 2 game points (won and re), got %v", result.GamePoints)
-	}
-	if result.GamePoints[0].Type != Gewonnen || result.GamePoints[1].Type != ReAngesagt {
-		t.Errorf("unexpected game points")
-	}
-	if result.TotalValue != 5 {
-		t.Errorf("Expecting game value of 3, not %v", result.TotalValue)
-	}
-	if len(result.ExtraPoints) != 2 {
-		t.Errorf("Expecting 2 extra points instead of %v", len(result.ExtraPoints))
-	}
-
+	assert.Equal(t, ReParty, result.Winner)
+	assert.Equal(t, 134, result.TrickScoreRe)
+	assert.ElementsMatch(t, [2]GamePoint{{Gewonnen, 1}, {ReAngesagt, 2}}, result.GamePoints)
+	assert.Equal(t, 5, result.TotalValue)
+	assert.ElementsMatch(t, [2]ExtraPoint{{Doppelkopf, Player3, 1}, {Karlchen, Player1, 11}}, result.ExtraPoints)
 }

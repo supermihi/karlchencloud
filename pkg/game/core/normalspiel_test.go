@@ -1,57 +1,57 @@
 package core
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func TestSpielFarbeTrumpf(t *testing.T) {
-	truempfe := []Card{
-		{Herz, Zehn},
-		{Kreuz, Dame},
-		{Karo, Ass},
-		{Herz, Bube},
-	}
-	for _, trumpf := range truempfe {
-		if NormalGameSuit(trumpf) != Trumpf {
-			t.Errorf("not trumpf as expected: %v", trumpf)
-		}
+	cards := []Card{Herz10, KreuzD, KaroA, HerzB}
+	for _, card := range cards {
+		assert.Equal(t, NormalGameSuit(card), Trumpf)
 	}
 }
 
 func TestSpielFarbeKaro(t *testing.T) {
 	for _, card := range CreateDeck() {
-		if NormalGameSuit(card) == KaroFehl {
-			t.Error("karo fehl gibt es im NormalspielMode nicht")
-		}
+		assert.NotEqual(t, NormalGameSuit(card), KaroFehl)
 	}
 }
 
 func TestSpielFarbeHerz(t *testing.T) {
-	keinHerz := []Card{{Herz, Zehn}, {Herz, Bube}, {Kreuz, Ass}}
+	keinHerz := []Card{Herz10, HerzB, KreuzA}
 	for _, card := range keinHerz {
-		if NormalGameSuit(card) == HerzFehl {
-			t.Errorf("kein Herz fehl: %v", card)
-		}
+		assert.NotEqual(t, NormalGameSuit(card), HerzFehl)
 	}
-	herz := []Card{{Herz, Neun}, {Herz, Koenig}, {Herz, Ass}}
+	herz := []Card{Herz9, HerzK, HerzA}
 	for _, card := range herz {
-		if NormalGameSuit(card) != HerzFehl {
-			t.Errorf("ist Herz fehl: %v", card)
-		}
+		assert.Equal(t, NormalGameSuit(card), HerzFehl)
 	}
 }
 
-func TestSticht(t *testing.T) {
+func TestTakesTrickFrom(t *testing.T) {
 	sticht := []struct {
 		neu Card
 		alt Card
 	}{
-		{Card{Herz, Zehn}, Card{Kreuz, Dame}},
-		{Card{Herz, Ass}, Card{Herz, Koenig}},
-		{Card{Karo, Neun}, Card{Pik, Ass}},
-		{Card{Kreuz, Zehn}, Card{Kreuz, Koenig}},
+		{Herz10, KreuzD},
+		{HerzA, HerzK},
+		{Karo9, PikA},
+		{Kreuz10, KreuzK},
 	}
 	for _, neuAlt := range sticht {
-		if !TakesTrickFrom(neuAlt.neu, neuAlt.alt, someNormalspiel) {
-			t.Errorf("%v sticht %v", neuAlt.neu, neuAlt.alt)
-		}
+		assert.True(t, TakesTrickFrom(neuAlt.neu, neuAlt.alt, someNormalspiel))
+	}
+	stichtNicht := []struct {
+		neu Card
+		alt Card
+	}{
+		{Herz10, Herz10},
+		{HerzA, HerzA},
+		{Kreuz10, Karo9},
+		{HerzA, Herz10},
+	}
+	for _, neuAlt := range stichtNicht {
+		assert.False(t, TakesTrickFrom(neuAlt.neu, neuAlt.alt, someNormalspiel))
 	}
 }

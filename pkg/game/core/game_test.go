@@ -1,33 +1,26 @@
 package core
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 var someNormalspiel = NormalspielMode{[...]Party{ReParty, ReParty, ContraParty, ContraParty}}
 
 func TestWinnerOfTrick(t *testing.T) {
-	if WinnerOfTrick([4]Card{
-		{Kreuz, Ass},
-		{Kreuz, Ass},
-		{Kreuz, Zehn},
-		{Kreuz, Neun},
-	}, Player1, someNormalspiel) != Player1 {
-		t.Error("player1 sollte gewinnen")
-	}
+	winner := WinnerOfTrick([4]Card{KreuzA, KreuzA, Kreuz10, Kreuz9}, Player1, someNormalspiel)
+	assert.Equal(t, winner, Player1)
 }
 
 func TestGame_IsValidMove(t *testing.T) {
 	cards := DealCards(1487)
 	game := NewGame(cards, Player3, someNormalspiel)
 	for _, card := range game.HandCards[Player3] {
-		if game.CanPlayCard(Player3, card) != CardPlayed {
-			t.Error("forehand player not allowed to play card but should")
-		}
+		assert.Equal(t, game.CanPlayCard(Player3, card), CardPlayed)
 	}
 	for _, player := range []Player{Player1, Player2, Player4} {
 		for _, card := range game.HandCards[player] {
-			if game.CanPlayCard(player, card) != WrongPlayer {
-				t.Errorf("non-forehand %v allowed to play %v but not her turn", player, card)
-			}
+			assert.Equal(t, game.CanPlayCard(player, card), WrongPlayer)
 		}
 	}
 }
