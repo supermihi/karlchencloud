@@ -1,7 +1,6 @@
 package match
 
 import (
-	"fmt"
 	"github.com/supermihi/karlchencloud/pkg/game/auction"
 	"github.com/supermihi/karlchencloud/pkg/game/core"
 )
@@ -44,7 +43,7 @@ func (m *Match) DealtCards() core.Cards {
 	return m.auction.Cards
 }
 
-func (m *Match) ProceedToGame() {
+func (m *Match) proceedToGame() {
 	result := m.auction.GetResult()
 	if result.IsSonderspiel {
 		m.game = core.NewGame(m.DealtCards(), result.Forehand, result.Sonderspiel)
@@ -59,133 +58,42 @@ func (m *Match) ProceedToGame() {
 	}
 }
 
-type ActionType int
-
-const (
-	AnnounceGesund ActionType = iota
-	AnnounceVorbehalt
-	SpecifyVorbehalt
-	PlayCard
-	PlaceBid
-)
-
-type PlayerAction struct {
-	Player      core.Player
-	Type        ActionType
-	VorbehaltId auction.ModeId
-	Card        core.Card
-	Bid         Bid
-}
-
-func PlayCardAction(player core.Player, card core.Card) PlayerAction {
-	return PlayerAction{Player: player, Type: PlayCard, Card: card}
-}
-
-func AnnounceGesundAction(player core.Player) PlayerAction {
-	return PlayerAction{Player: player, Type: AnnounceGesund}
-}
-
-func AnnounceVorbehaltAction(player core.Player) PlayerAction {
-	return PlayerAction{Player: player, Type: AnnounceVorbehalt}
-}
-
-func PlaceBidAction(player core.Player, bid Bid) PlayerAction {
-	return PlayerAction{Player: player, Type: PlaceBid, Bid: bid}
-}
-
-type ActionResultType int
-
-const (
-	Ok ActionResultType = iota
-	WrongPhase
-	WrongPlayerTurn
-	CannotPlayCard
-	CannotPlaceBid
-	UnknownAction
-	OtherError
-)
-
-type ActionResult struct {
-	Type     ActionResultType
-	ErrorMsg string
-}
-
-var OkResult = ActionResult{Ok, ""}
-
-func WrongPlayerResult(actual core.Player) ActionResult {
-	return ActionResult{WrongPlayerTurn, fmt.Sprintf("it's %v's turn", actual)}
-}
-func (m *Match) PerformAction(act PlayerAction) ActionResult {
-	switch m.Phase() {
-	case AuctionAbfragePhase:
-		return m.performActionAbfrage(act)
-	case AuctionSpezifikationPhase:
-		return m.performActionSpezifikation(act)
-	case GamePhase:
-		return m.performActionGame(act)
-	case MatchFinished:
-		return m.performActionFinished()
-	default:
-		panic("unknown match phase")
+func (m *Match) AnnounceGesundOrVorbehalt(player core.Player, vorbehalt bool) bool {
+	if m.Phase() != AuctionAbfragePhase {
+		return false
 	}
-}
-
-func (m *Match) performActionAbfrage(act PlayerAction) ActionResult {
-	if act.Type != AnnounceGesund && act.Type != AnnounceVorbehalt {
-		return ActionResult{WrongPhase, "expected gesund/vorbehalt"}
+	if m.auction.WhoseTurn() != player {
+		return false
 	}
-	if m.auction.WhoseTurn() != act.Player {
-		return WrongPlayerResult(m.auction.WhoseTurn())
-	}
-	m.auction.Announce(act.Player, act.Type == AnnounceVorbehalt)
+	m.auction.Announce(player, vorbehalt)
 	if m.auction.Phase() == auction.Finished {
-		m.ProceedToGame()
+		m.proceedToGame()
 	}
-	return OkResult
+	return true
 }
 
-func (m *Match) performActionSpezifikation(act PlayerAction) ActionResult {
-	if act.Type != SpecifyVorbehalt {
-		return ActionResult{WrongPhase, "expected vorbehalt specification"}
+func (m *Match) SpecifyVorbehalt(player core.Player, id auction.ModeId) bool {
+	if m.Phase() != AuctionSpezifikationPhase {
+		return false
 	}
-	if m.auction.WhoseTurn() != act.Player {
-		return WrongPlayerResult(m.auction.WhoseTurn())
+	if m.auction.WhoseTurn() != player {
+		return false
 	}
-	result := m.auction.SpecifyVorbehalt(act.Player, act.VorbehaltId)
-	switch result {
-	case auction.UnknownSonderspielId:
-		return ActionResult{OtherError, fmt.Sprintf("unknown sonderspiel id: %v", act.VorbehaltId)}
-	case auction.SonderspielRequirementsUnmet:
-		return ActionResult{OtherError, fmt.Sprintf("cannot play %v with your cards", act.VorbehaltId)}
-	case auction.Ok:
-		if m.auction.Phase() == auction.Finished {
-			m.ProceedToGame()
-		}
-		return OkResult
+	result := m.auction.SpecifyVorbehalt(player, id)
+	if result != auction.Ok {
+		return false
 	}
-	panic("should not be here in performActionSpezifikation")
+	if m.auction.Phase() == auction.Finished {
+		m.proceedToGame()
+	}
+	return true
 }
 
-func (m *Match) performActionGame(act PlayerAction) ActionResult {
-	switch act.Type {
-	case PlayCard:
-		if m.game.WhoseTurn() != act.Player {
-			return WrongPlayerResult(m.game.WhoseTurn())
-		}
-		if m.game.TryPlayCard(act.Player, act.Card) == core.CardPlayed {
-			return OkResult
-		}
-		return ActionResult{CannotPlayCard, fmt.Sprintf("could not play card")}
-	case PlaceBid:
-		if TryPlaceBid(act.Player, act.Bid, m.bids, m.game) {
-			return OkResult
-		}
-		return ActionResult{CannotPlaceBid, fmt.Sprintf("could not place bid")}
-
-	}
-	return ActionResult{WrongPhase, "Expected card or bid"}
+func (m *Match) PlayCard(player core.Player, card core.Card) bool {
+	result := m.game.TryPlayCard(player, card)
+	return result == core.CardPlayed
 }
 
-func (m *Match) performActionFinished() ActionResult {
-	return ActionResult{WrongPhase, "match has finished"}
+func (m *Match) PlaceBid(player core.Player, bid Bid) bool {
+	return TryPlaceBid(player, bid, m.bids, m.game)
 }

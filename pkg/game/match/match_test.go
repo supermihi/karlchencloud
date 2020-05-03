@@ -31,12 +31,12 @@ func TestSampleMatch(t *testing.T) {
 				assert.NotEqual(t, otherPlayer, match.game.WhoseTurn())
 			}
 		}
-		ans := match.PerformAction(PlayCardAction(player, card))
-		require.Equalf(t, Ok, ans.Type, "error playing %v as %v: %v", card, player, ans.ErrorMsg)
+		ans := match.PlayCard(player, card)
+		require.Truef(t, ans, "error playing %v as %v", card, player)
 	}
 	sayGesund := func(player Player) {
-		ans := match.PerformAction(AnnounceGesundAction(player))
-		assert.Equalf(t, Ok, ans.Type, "error announcing gesund as %v: %v", player, ans.ErrorMsg)
+		ans := match.AnnounceGesundOrVorbehalt(player, false)
+		assert.Truef(t, ans, "error announcing gesund as %v", player)
 	}
 	expectTrickWinner := func(player Player) {
 		tricks := match.game.CompleteTricks
@@ -60,8 +60,8 @@ func TestSampleMatch(t *testing.T) {
 	play(Player1, KreuzD)
 	play(Player2, Karo10)
 	expectTrickWinner(Player1)
-	match.PerformAction(PlaceBidAction(Player1, Re))
-	assert.Equal(t, CannotPlaceBid, match.PerformAction(PlaceBidAction(Player4, Re)).Type)
+	match.PlaceBid(Player1, Re)
+	assert.False(t, match.PlaceBid(Player4, Re))
 	// trick 1
 	play(Player1, PikA)
 	play(Player2, Pik10)
