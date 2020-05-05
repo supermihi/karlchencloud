@@ -33,6 +33,22 @@ type GameEvaluation struct {
 	TotalValue       int
 }
 
+func PointsByPlayer(eval *GameEvaluation, mode core.Mode) [core.NumPlayers]int {
+	var ans [core.NumPlayers]int
+	for _, p := range core.Players() {
+		value := eval.TotalValue
+		if mode.PartyOf(p) != eval.Winner {
+			value = -value
+		}
+		if core.IsSolo(mode) && mode.PartyOf(p) == core.ReParty {
+			// soloist
+			value = value * 3
+		}
+		ans[p] = value
+	}
+	return ans
+}
+
 const (
 	Karlchen ExtraPointType = iota
 	Doppelkopf

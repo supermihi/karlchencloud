@@ -97,3 +97,14 @@ func (m *Match) PlayCard(player core.Player, card core.Card) bool {
 func (m *Match) PlaceBid(player core.Player, bid Bid) bool {
 	return TryPlaceBid(player, bid, m.bids, m.game)
 }
+
+func (m *Match) Evaluate() GameEvaluation {
+	if m.Phase() != MatchFinished {
+		panic("cannot get points of unfinished match")
+	}
+	return EvaluateGame(m.game, m.bids)
+}
+
+func (m *Match) Mode() core.Mode {
+	return m.game.Mode
+}

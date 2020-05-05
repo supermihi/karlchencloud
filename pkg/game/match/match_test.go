@@ -129,10 +129,16 @@ func TestSampleMatch(t *testing.T) {
 	play(Player4, KreuzA) // karlchen
 	expectTrickWinner(Player1)
 	assert.Equal(t, MatchFinished, match.Phase())
-	result := EvaluateGame(match.game, match.bids)
+	result := match.Evaluate()
 	assert.Equal(t, ReParty, result.Winner)
 	assert.Equal(t, 134, result.TrickScoreRe)
 	assert.ElementsMatch(t, [2]GamePoint{{Gewonnen, 1}, {ReAngesagt, 2}}, result.GamePoints)
 	assert.Equal(t, 5, result.TotalValue)
 	assert.ElementsMatch(t, [2]ExtraPoint{{Doppelkopf, Player3, 1}, {Karlchen, Player1, 11}}, result.ExtraPoints)
+	points := PointsByPlayer(&result, match.Mode())
+	assert.Equal(t, 5, points[Player1])
+	assert.Equal(t, 5, points[Player2])
+	assert.Equal(t, -5, points[Player3])
+	assert.Equal(t, -5, points[Player4])
+
 }
