@@ -43,36 +43,33 @@ func (bid Bid) MaxPlayedCardsAfterKlaerung() int {
 }
 
 type Bids struct {
-	bids      [core.NumPlayers][]Bid
-	partyBids map[core.Party][]Bid
+	bids [core.NumPlayers][]Bid
 }
 
 func NewBids() Bids {
 	bids := [core.NumPlayers][]Bid{
 		{}, {}, {}, {},
 	}
-	partyBids := map[core.Party][]Bid{
-		core.ReParty:     {},
-		core.ContraParty: {},
-	}
-	return Bids{bids, partyBids}
+	return Bids{bids}
 
 }
 
 func (bids *Bids) placeBid(player core.Player, party core.Party, bid Bid) {
 	bids.bids[player] = append(bids.bids[player], bid)
-	bids.partyBids[party] = append(bids.partyBids[party], bid)
 }
 
 func (bids *Bids) AllBids() []Bid {
-	ans := bids.partyBids[core.ReParty]
-	return append(ans, bids.partyBids[core.ContraParty]...)
+	var ans []Bid
+	for _, p := range core.Players() {
+		ans = append(ans, bids.bids[p]...)
+	}
+	return ans
 }
 
 func (bids *Bids) MaxPartyBid(p core.Party) Bid {
 	max := NoBid
-	for _, bid := range bids.partyBids[p] {
-		if bid > max {
+	for _, bid := range bids.AllBids() {
+		if bid.Party() == p && bid > max {
 			max = bid
 		}
 	}
