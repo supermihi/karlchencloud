@@ -1,18 +1,17 @@
 package match
 
 import (
-	"github.com/supermihi/karlchencloud/pkg/game/auction"
 	"github.com/supermihi/karlchencloud/pkg/game/core"
 )
 
 type Match struct {
-	auction *auction.Auction
+	auction *Auction
 	game    *core.Game
 	bids    *Bids
 }
 
-func NewMatch(forehand core.Player, sonderspiele auction.Sonderspiele, cards core.Cards) Match {
-	auct := auction.NewAuction(forehand, cards, sonderspiele)
+func NewMatch(forehand core.Player, sonderspiele Sonderspiele, cards core.Cards) Match {
+	auct := NewAuction(forehand, cards, sonderspiele)
 	bids := NewBids()
 	return Match{auct, nil, &bids}
 }
@@ -28,9 +27,9 @@ const (
 
 func (m *Match) Phase() Phase {
 	switch m.auction.Phase() {
-	case auction.VorbehaltAbfrage:
+	case VorbehaltAbfrage:
 		return AuctionAbfragePhase
-	case auction.VorbehaltSpezifikation:
+	case VorbehaltSpezifikation:
 		return AuctionSpezifikationPhase
 	}
 	if !m.game.IsFinished() {
@@ -66,13 +65,13 @@ func (m *Match) AnnounceGesundOrVorbehalt(player core.Player, vorbehalt bool) bo
 		return false
 	}
 	m.auction.Announce(player, vorbehalt)
-	if m.auction.Phase() == auction.Finished {
+	if m.auction.Phase() == Finished {
 		m.proceedToGame()
 	}
 	return true
 }
 
-func (m *Match) SpecifyVorbehalt(player core.Player, id auction.ModeId) bool {
+func (m *Match) SpecifyVorbehalt(player core.Player, id ModeId) bool {
 	if m.Phase() != AuctionSpezifikationPhase {
 		return false
 	}
@@ -80,10 +79,10 @@ func (m *Match) SpecifyVorbehalt(player core.Player, id auction.ModeId) bool {
 		return false
 	}
 	result := m.auction.SpecifyVorbehalt(player, id)
-	if result != auction.Ok {
+	if result != Ok {
 		return false
 	}
-	if m.auction.Phase() == auction.Finished {
+	if m.auction.Phase() == Finished {
 		m.proceedToGame()
 	}
 	return true

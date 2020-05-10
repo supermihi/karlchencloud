@@ -2,6 +2,14 @@ package match
 
 import "github.com/supermihi/karlchencloud/pkg/game/core"
 
+func getParties(mode core.Mode) [core.NumPlayers]core.Party {
+	var result [core.NumPlayers]core.Party
+	for i, p := range core.Players() {
+		result[i] = mode.PartyOf(p)
+	}
+	return result
+}
+
 func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
 	if !game.IsFinished() {
 		panic("cannot evaluate unfinished game")
@@ -14,6 +22,7 @@ func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
 	for _, p := range gamePoints {
 		totalValue += p.Value
 	}
+	parties := getParties(game.Mode)
 	return GameEvaluation{
 		winningParty,
 		reScore,
@@ -21,6 +30,8 @@ func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
 		gamePoints,
 		extraPoints,
 		totalValue,
+		parties,
+		core.IsSolo(game.Mode),
 	}
 }
 
@@ -31,6 +42,8 @@ type GameEvaluation struct {
 	GamePoints       []GamePoint
 	ExtraPoints      []ExtraPoint
 	TotalValue       int
+	Parties          [core.NumPlayers]core.Party
+	SoloGame         bool
 }
 
 func PointsByPlayer(eval *GameEvaluation, mode core.Mode) [core.NumPlayers]int {

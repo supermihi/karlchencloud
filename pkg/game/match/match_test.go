@@ -3,7 +3,6 @@ package match
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/supermihi/karlchencloud/pkg/game/auction"
 	. "github.com/supermihi/karlchencloud/pkg/game/core"
 	"testing"
 )
@@ -23,7 +22,7 @@ func TestSampleMatch(t *testing.T) {
 			HerzA, Pik9, Pik9, PikA, KreuzK, KreuzA, KreuzA, Karo9, Karo10, HerzB, PikB, KreuzB,
 		},
 	}
-	sonderspiele := auction.MakeSonderspiele(auction.VorbehaltHochzeit{})
+	sonderspiele := MakeSonderspiele(VorbehaltHochzeit{})
 	match := NewMatch(Player3, sonderspiele, cards)
 	play := func(player Player, card Card) {
 		for _, otherPlayer := range Players() {

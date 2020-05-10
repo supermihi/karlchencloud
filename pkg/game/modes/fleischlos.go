@@ -1,6 +1,9 @@
 package modes
 
-import "github.com/supermihi/karlchencloud/pkg/game/core"
+import (
+	"github.com/supermihi/karlchencloud/pkg/game/core"
+	"github.com/supermihi/karlchencloud/pkg/game/match"
+)
 
 type FleischlosMode struct {
 	Soloist core.Player
@@ -22,4 +25,26 @@ func (f FleischlosMode) PartyOf(p core.Player) core.Party {
 		return core.ReParty
 	}
 	return core.ContraParty
+}
+
+type VorbehaltFleischlos struct{}
+
+func (v VorbehaltFleischlos) CanAnnounceWith(handCards core.Hand) bool {
+	return true
+}
+
+func (v VorbehaltFleischlos) Identifier() match.ModeId {
+	return "FLEISCHLOS"
+}
+
+func (v VorbehaltFleischlos) Priority() int {
+	return match.VORBEHALT_PRIORITY_HOCHZEIT + 1
+}
+
+func (v VorbehaltFleischlos) CreateMode(announcer core.Player) core.Mode {
+	return FleischlosMode{announcer}
+}
+
+func (v VorbehaltFleischlos) AnnouncerTakesForehand() bool {
+	return false
 }

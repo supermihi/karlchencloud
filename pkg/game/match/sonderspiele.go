@@ -1,4 +1,4 @@
-package auction
+package match
 
 import "github.com/supermihi/karlchencloud/pkg/game/core"
 

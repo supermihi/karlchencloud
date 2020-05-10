@@ -1,4 +1,4 @@
-package auction
+package match
 
 import (
 	"fmt"
@@ -23,15 +23,15 @@ func NewAuction(forehand core.Player, cards core.Cards, sonderspiele Sonderspiel
 	}
 }
 
-type Phase int
+type AuctionPhase int
 
 const (
-	VorbehaltAbfrage Phase = iota
+	VorbehaltAbfrage AuctionPhase = iota
 	VorbehaltSpezifikation
 	Finished
 )
 
-func (a Auction) Phase() Phase {
+func (a Auction) Phase() AuctionPhase {
 	if len(a.Vorbehalte) < core.NumPlayers {
 		return VorbehaltAbfrage
 	}

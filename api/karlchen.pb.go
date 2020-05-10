@@ -4,7 +4,7 @@
 // 	protoc        v3.11.4
 // source: karlchen.proto
 
-package grpc_api
+package api
 
 import (
 	context "context"
@@ -67,7 +67,7 @@ func (*EmptyRequest) Descriptor() ([]byte, []int) {
 	return file_karlchen_proto_rawDescGZIP(), []int{0}
 }
 
-type Bool struct {
+type OkOrNot struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -75,8 +75,8 @@ type Bool struct {
 	Value bool `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
-func (x *Bool) Reset() {
-	*x = Bool{}
+func (x *OkOrNot) Reset() {
+	*x = OkOrNot{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_karlchen_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -84,13 +84,13 @@ func (x *Bool) Reset() {
 	}
 }
 
-func (x *Bool) String() string {
+func (x *OkOrNot) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Bool) ProtoMessage() {}
+func (*OkOrNot) ProtoMessage() {}
 
-func (x *Bool) ProtoReflect() protoreflect.Message {
+func (x *OkOrNot) ProtoReflect() protoreflect.Message {
 	mi := &file_karlchen_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -102,12 +102,12 @@ func (x *Bool) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Bool.ProtoReflect.Descriptor instead.
-func (*Bool) Descriptor() ([]byte, []int) {
+// Deprecated: Use OkOrNot.ProtoReflect.Descriptor instead.
+func (*OkOrNot) Descriptor() ([]byte, []int) {
 	return file_karlchen_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Bool) GetValue() bool {
+func (x *OkOrNot) GetValue() bool {
 	if x != nil {
 		return x.Value
 	}
@@ -216,14 +216,16 @@ func (x *RegisterReply) GetSecret() string {
 	return ""
 }
 
-type ListTablesParams struct {
+type TableId struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
-func (x *ListTablesParams) Reset() {
-	*x = ListTablesParams{}
+func (x *TableId) Reset() {
+	*x = TableId{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_karlchen_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -231,13 +233,13 @@ func (x *ListTablesParams) Reset() {
 	}
 }
 
-func (x *ListTablesParams) String() string {
+func (x *TableId) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListTablesParams) ProtoMessage() {}
+func (*TableId) ProtoMessage() {}
 
-func (x *ListTablesParams) ProtoReflect() protoreflect.Message {
+func (x *TableId) ProtoReflect() protoreflect.Message {
 	mi := &file_karlchen_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -249,9 +251,16 @@ func (x *ListTablesParams) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListTablesParams.ProtoReflect.Descriptor instead.
-func (*ListTablesParams) Descriptor() ([]byte, []int) {
+// Deprecated: Use TableId.ProtoReflect.Descriptor instead.
+func (*TableId) Descriptor() ([]byte, []int) {
 	return file_karlchen_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *TableId) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
 }
 
 type TableList struct {
@@ -301,37 +310,84 @@ func (x *TableList) GetIds() []string {
 	return nil
 }
 
+type EmptyReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *EmptyReply) Reset() {
+	*x = EmptyReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_karlchen_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *EmptyReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EmptyReply) ProtoMessage() {}
+
+func (x *EmptyReply) ProtoReflect() protoreflect.Message {
+	mi := &file_karlchen_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EmptyReply.ProtoReflect.Descriptor instead.
+func (*EmptyReply) Descriptor() ([]byte, []int) {
+	return file_karlchen_proto_rawDescGZIP(), []int{6}
+}
+
 var File_karlchen_proto protoreflect.FileDescriptor
 
 var file_karlchen_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x6b, 0x61, 0x72, 0x6c, 0x63, 0x68, 0x65, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x12, 0x08, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x22, 0x0e, 0x0a, 0x0c, 0x45, 0x6d,
-	0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x1c, 0x0a, 0x04, 0x42, 0x6f,
-	0x6f, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x08, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x25, 0x0a, 0x0f, 0x52, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22,
-	0x37, 0x0a, 0x0d, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x70, 0x6c, 0x79,
-	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
-	0x12, 0x16, 0x0a, 0x06, 0x73, 0x65, 0x63, 0x72, 0x65, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x06, 0x73, 0x65, 0x63, 0x72, 0x65, 0x74, 0x22, 0x12, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74,
-	0x54, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x22, 0x1d, 0x0a, 0x09,
+	0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x1f, 0x0a, 0x07, 0x4f, 0x6b,
+	0x4f, 0x72, 0x4e, 0x6f, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x25, 0x0a, 0x0f, 0x52,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12,
+	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x22, 0x37, 0x0a, 0x0d, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65,
+	0x70, 0x6c, 0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x02, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x65, 0x63, 0x72, 0x65, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x65, 0x63, 0x72, 0x65, 0x74, 0x22, 0x1f, 0x0a, 0x07, 0x54,
+	0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x1d, 0x0a, 0x09,
 	0x54, 0x61, 0x62, 0x6c, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x69, 0x64, 0x73,
-	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x69, 0x64, 0x73, 0x32, 0xca, 0x01, 0x0a, 0x0d,
-	0x4b, 0x61, 0x72, 0x6c, 0x63, 0x68, 0x65, 0x6e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x12, 0x40, 0x0a,
-	0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x19, 0x2e, 0x67, 0x72, 0x70, 0x63,
-	0x5f, 0x61, 0x70, 0x69, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e,
-	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12,
-	0x36, 0x0a, 0x0a, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x16, 0x2e,
-	0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0e, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69,
-	0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x22, 0x00, 0x12, 0x3f, 0x0a, 0x0a, 0x4c, 0x69, 0x73, 0x74, 0x54,
-	0x61, 0x62, 0x6c, 0x65, 0x73, 0x12, 0x1a, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69,
-	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x1a, 0x13, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62,
-	0x6c, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x00, 0x42, 0x0c, 0x5a, 0x0a, 0x2e, 0x3b, 0x67, 0x72,
-	0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x69, 0x64, 0x73, 0x22, 0x0c, 0x0a, 0x0a, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x32, 0xbe, 0x02, 0x0a, 0x0d, 0x4b, 0x61,
+	0x72, 0x6c, 0x63, 0x68, 0x65, 0x6e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x12, 0x40, 0x0a, 0x08, 0x52,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x19, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61,
+	0x70, 0x69, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x17, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12, 0x39, 0x0a,
+	0x0a, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x16, 0x2e, 0x67, 0x72,
+	0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x11, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x4f,
+	0x6b, 0x4f, 0x72, 0x4e, 0x6f, 0x74, 0x22, 0x00, 0x12, 0x3b, 0x0a, 0x0a, 0x4c, 0x69, 0x73, 0x74,
+	0x54, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x12, 0x16, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70,
+	0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13,
+	0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x4c,
+	0x69, 0x73, 0x74, 0x22, 0x00, 0x12, 0x3a, 0x0a, 0x0b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54,
+	0x61, 0x62, 0x6c, 0x65, 0x12, 0x16, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e,
+	0x45, 0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x11, 0x2e, 0x67,
+	0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x22,
+	0x00, 0x12, 0x37, 0x0a, 0x0a, 0x53, 0x74, 0x61, 0x72, 0x74, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x12,
+	0x11, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65,
+	0x49, 0x64, 0x1a, 0x14, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d,
+	0x70, 0x74, 0x79, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x3b,
+	0x61, 0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -346,24 +402,29 @@ func file_karlchen_proto_rawDescGZIP() []byte {
 	return file_karlchen_proto_rawDescData
 }
 
-var file_karlchen_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_karlchen_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_karlchen_proto_goTypes = []interface{}{
-	(*EmptyRequest)(nil),     // 0: grpc_api.EmptyRequest
-	(*Bool)(nil),             // 1: grpc_api.Bool
-	(*RegisterRequest)(nil),  // 2: grpc_api.RegisterRequest
-	(*RegisterReply)(nil),    // 3: grpc_api.RegisterReply
-	(*ListTablesParams)(nil), // 4: grpc_api.ListTablesParams
-	(*TableList)(nil),        // 5: grpc_api.TableList
+	(*EmptyRequest)(nil),    // 0: grpc_api.EmptyRequest
+	(*OkOrNot)(nil),         // 1: grpc_api.OkOrNot
+	(*RegisterRequest)(nil), // 2: grpc_api.RegisterRequest
+	(*RegisterReply)(nil),   // 3: grpc_api.RegisterReply
+	(*TableId)(nil),         // 4: grpc_api.TableId
+	(*TableList)(nil),       // 5: grpc_api.TableList
+	(*EmptyReply)(nil),      // 6: grpc_api.EmptyReply
 }
 var file_karlchen_proto_depIdxs = []int32{
 	2, // 0: grpc_api.Karlchencloud.Register:input_type -> grpc_api.RegisterRequest
 	0, // 1: grpc_api.Karlchencloud.CheckLogin:input_type -> grpc_api.EmptyRequest
-	4, // 2: grpc_api.Karlchencloud.ListTables:input_type -> grpc_api.ListTablesParams
-	3, // 3: grpc_api.Karlchencloud.Register:output_type -> grpc_api.RegisterReply
-	1, // 4: grpc_api.Karlchencloud.CheckLogin:output_type -> grpc_api.Bool
-	5, // 5: grpc_api.Karlchencloud.ListTables:output_type -> grpc_api.TableList
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	0, // 2: grpc_api.Karlchencloud.ListTables:input_type -> grpc_api.EmptyRequest
+	0, // 3: grpc_api.Karlchencloud.CreateTable:input_type -> grpc_api.EmptyRequest
+	4, // 4: grpc_api.Karlchencloud.StartTable:input_type -> grpc_api.TableId
+	3, // 5: grpc_api.Karlchencloud.Register:output_type -> grpc_api.RegisterReply
+	1, // 6: grpc_api.Karlchencloud.CheckLogin:output_type -> grpc_api.OkOrNot
+	5, // 7: grpc_api.Karlchencloud.ListTables:output_type -> grpc_api.TableList
+	4, // 8: grpc_api.Karlchencloud.CreateTable:output_type -> grpc_api.TableId
+	6, // 9: grpc_api.Karlchencloud.StartTable:output_type -> grpc_api.EmptyReply
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -388,7 +449,7 @@ func file_karlchen_proto_init() {
 			}
 		}
 		file_karlchen_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Bool); i {
+			switch v := v.(*OkOrNot); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -424,7 +485,7 @@ func file_karlchen_proto_init() {
 			}
 		}
 		file_karlchen_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListTablesParams); i {
+			switch v := v.(*TableId); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -447,6 +508,18 @@ func file_karlchen_proto_init() {
 				return nil
 			}
 		}
+		file_karlchen_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*EmptyReply); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -454,7 +527,7 @@ func file_karlchen_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_karlchen_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -481,8 +554,10 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type KarlchencloudClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
-	CheckLogin(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*Bool, error)
-	ListTables(ctx context.Context, in *ListTablesParams, opts ...grpc.CallOption) (*TableList, error)
+	CheckLogin(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*OkOrNot, error)
+	ListTables(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*TableList, error)
+	CreateTable(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*TableId, error)
+	StartTable(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*EmptyReply, error)
 }
 
 type karlchencloudClient struct {
@@ -502,8 +577,8 @@ func (c *karlchencloudClient) Register(ctx context.Context, in *RegisterRequest,
 	return out, nil
 }
 
-func (c *karlchencloudClient) CheckLogin(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*Bool, error) {
-	out := new(Bool)
+func (c *karlchencloudClient) CheckLogin(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*OkOrNot, error) {
+	out := new(OkOrNot)
 	err := c.cc.Invoke(ctx, "/grpc_api.Karlchencloud/CheckLogin", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -511,9 +586,27 @@ func (c *karlchencloudClient) CheckLogin(ctx context.Context, in *EmptyRequest, 
 	return out, nil
 }
 
-func (c *karlchencloudClient) ListTables(ctx context.Context, in *ListTablesParams, opts ...grpc.CallOption) (*TableList, error) {
+func (c *karlchencloudClient) ListTables(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*TableList, error) {
 	out := new(TableList)
 	err := c.cc.Invoke(ctx, "/grpc_api.Karlchencloud/ListTables", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *karlchencloudClient) CreateTable(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*TableId, error) {
+	out := new(TableId)
+	err := c.cc.Invoke(ctx, "/grpc_api.Karlchencloud/CreateTable", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *karlchencloudClient) StartTable(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
+	err := c.cc.Invoke(ctx, "/grpc_api.Karlchencloud/StartTable", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -523,8 +616,10 @@ func (c *karlchencloudClient) ListTables(ctx context.Context, in *ListTablesPara
 // KarlchencloudServer is the server API for Karlchencloud service.
 type KarlchencloudServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
-	CheckLogin(context.Context, *EmptyRequest) (*Bool, error)
-	ListTables(context.Context, *ListTablesParams) (*TableList, error)
+	CheckLogin(context.Context, *EmptyRequest) (*OkOrNot, error)
+	ListTables(context.Context, *EmptyRequest) (*TableList, error)
+	CreateTable(context.Context, *EmptyRequest) (*TableId, error)
+	StartTable(context.Context, *TableId) (*EmptyReply, error)
 }
 
 // UnimplementedKarlchencloudServer can be embedded to have forward compatible implementations.
@@ -534,11 +629,17 @@ type UnimplementedKarlchencloudServer struct {
 func (*UnimplementedKarlchencloudServer) Register(context.Context, *RegisterRequest) (*RegisterReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (*UnimplementedKarlchencloudServer) CheckLogin(context.Context, *EmptyRequest) (*Bool, error) {
+func (*UnimplementedKarlchencloudServer) CheckLogin(context.Context, *EmptyRequest) (*OkOrNot, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckLogin not implemented")
 }
-func (*UnimplementedKarlchencloudServer) ListTables(context.Context, *ListTablesParams) (*TableList, error) {
+func (*UnimplementedKarlchencloudServer) ListTables(context.Context, *EmptyRequest) (*TableList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTables not implemented")
+}
+func (*UnimplementedKarlchencloudServer) CreateTable(context.Context, *EmptyRequest) (*TableId, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTable not implemented")
+}
+func (*UnimplementedKarlchencloudServer) StartTable(context.Context, *TableId) (*EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartTable not implemented")
 }
 
 func RegisterKarlchencloudServer(s *grpc.Server, srv KarlchencloudServer) {
@@ -582,7 +683,7 @@ func _Karlchencloud_CheckLogin_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _Karlchencloud_ListTables_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListTablesParams)
+	in := new(EmptyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -594,7 +695,43 @@ func _Karlchencloud_ListTables_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/grpc_api.Karlchencloud/ListTables",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).ListTables(ctx, req.(*ListTablesParams))
+		return srv.(KarlchencloudServer).ListTables(ctx, req.(*EmptyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Karlchencloud_CreateTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KarlchencloudServer).CreateTable(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_api.Karlchencloud/CreateTable",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KarlchencloudServer).CreateTable(ctx, req.(*EmptyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Karlchencloud_StartTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TableId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KarlchencloudServer).StartTable(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_api.Karlchencloud/StartTable",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KarlchencloudServer).StartTable(ctx, req.(*TableId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -614,6 +751,14 @@ var _Karlchencloud_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListTables",
 			Handler:    _Karlchencloud_ListTables_Handler,
+		},
+		{
+			MethodName: "CreateTable",
+			Handler:    _Karlchencloud_CreateTable_Handler,
+		},
+		{
+			MethodName: "StartTable",
+			Handler:    _Karlchencloud_StartTable_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

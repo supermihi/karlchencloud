@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package grpc_api;
+// option go_package = "github.com/supermihi/karlchencloud/api";
+option go_package = ".;api";
+
+service Karlchencloud {
+    rpc Register (RegisterRequest) returns (RegisterReply) {
+    }
+
+    rpc CheckLogin (EmptyRequest) returns (OkOrNot) {
+    }
+
+    rpc ListTables (EmptyRequest) returns (TableList) {
+    }
+
+    rpc CreateTable (EmptyRequest) returns (TableId) {
+    }
+
+    rpc StartTable (TableId) returns (EmptyReply) {
+    }
+}
+
+message EmptyRequest {
+
+}
+
+message OkOrNot {
+    bool value = 1;
+}
+
+message RegisterRequest {
+    string name = 1;
+}
+
+message RegisterReply {
+    string id = 1;
+    string secret = 2;
+}
+
+message TableId {
+    string value = 1;
+}
+
+message TableList {
+    repeated string ids = 1;
+}
+
+message EmptyReply {
+}
