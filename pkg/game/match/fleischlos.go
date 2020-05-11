@@ -1,8 +1,7 @@
-package modes
+package match
 
 import (
 	"github.com/supermihi/karlchencloud/pkg/game/core"
-	"github.com/supermihi/karlchencloud/pkg/game/match"
 )
 
 type FleischlosMode struct {
@@ -33,12 +32,12 @@ func (v VorbehaltFleischlos) CanAnnounceWith(handCards core.Hand) bool {
 	return true
 }
 
-func (v VorbehaltFleischlos) Identifier() match.ModeId {
+func (v VorbehaltFleischlos) Identifier() ModeId {
 	return "FLEISCHLOS"
 }
 
 func (v VorbehaltFleischlos) Priority() int {
-	return match.VORBEHALT_PRIORITY_HOCHZEIT + 1
+	return VORBEHALT_PRIORITY_HOCHZEIT + 1
 }
 
 func (v VorbehaltFleischlos) CreateMode(announcer core.Player) core.Mode {

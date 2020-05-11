@@ -5,7 +5,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/supermihi/karlchencloud/pkg/game/core"
 	"github.com/supermihi/karlchencloud/pkg/game/match"
-	"github.com/supermihi/karlchencloud/pkg/game/modes"
 	"math/rand"
 )
 
@@ -69,7 +68,7 @@ func (t *Table) Start() error {
 	rand.Shuffle(len(t.players), func(i int, j int) {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
 	})
-	t.round = match.NewRound(len(t.players), modes.StandardSonderspiele(), rand.Int63())
+	t.round = match.NewRound(len(t.players), match.StandardSonderspiele(), rand.Int63())
 	t.phase = WaitingForNextGame
 	return t.StartMatch()
 }

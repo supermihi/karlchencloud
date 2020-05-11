@@ -1,8 +1,7 @@
-package modes
+package match
 
 import (
 	"github.com/supermihi/karlchencloud/pkg/game/core"
-	"github.com/supermihi/karlchencloud/pkg/game/match"
 )
 
 type Farbsolo struct {
@@ -43,7 +42,7 @@ func (v VorbehaltFarbsolo) CanAnnounceWith(handCards core.Hand) bool {
 	return true
 }
 
-func (v VorbehaltFarbsolo) Identifier() match.ModeId {
+func (v VorbehaltFarbsolo) Identifier() ModeId {
 	switch v.suit {
 	case core.Karo:
 		return "KARO_SOLO"
@@ -60,7 +59,7 @@ func (v VorbehaltFarbsolo) Identifier() match.ModeId {
 }
 
 func (v VorbehaltFarbsolo) Priority() int {
-	return match.VORBEHALT_PRIORITY_HOCHZEIT + 1
+	return VORBEHALT_PRIORITY_HOCHZEIT + 1
 }
 
 func (v VorbehaltFarbsolo) CreateMode(announcer core.Player) core.Mode {
@@ -69,4 +68,13 @@ func (v VorbehaltFarbsolo) CreateMode(announcer core.Player) core.Mode {
 
 func (v VorbehaltFarbsolo) AnnouncerTakesForehand() bool {
 	return false
+}
+
+func AllFarbsolos() []SonderspielMode {
+	ans := make([]SonderspielMode, 4)
+	ans[0] = VorbehaltFarbsolo{core.Karo}
+	ans[1] = VorbehaltFarbsolo{core.Herz}
+	ans[2] = VorbehaltFarbsolo{core.Pik}
+	ans[3] = VorbehaltFarbsolo{core.Kreuz}
+	return ans
 }
