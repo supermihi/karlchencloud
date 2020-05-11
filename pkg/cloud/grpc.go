@@ -2,9 +2,12 @@ package cloud
 
 import (
 	"context"
+	"fmt"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	uuid "github.com/satori/go.uuid"
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/pkg/game/core"
+	"github.com/supermihi/karlchencloud/pkg/game/match"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -117,5 +120,103 @@ func StartServer(users Users, port string) {
 	api.RegisterKarlchencloudServer(grpcServer, &serv)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
+	}
+}
+
+func toPlayer(p core.Player, mapNoPlayerToPlayer1 bool) api.Player {
+	switch p {
+	case core.Player1:
+		return api.Player_PLAYER_1
+	case core.Player2:
+		return api.Player_PLAYER_2
+	case core.Player3:
+		return api.Player_PLAYER_3
+	case core.Player4:
+		return api.Player_PLAYER_4
+	default:
+		if mapNoPlayerToPlayer1 {
+			return api.Player_PLAYER_1
+		}
+		panic("unexpected NoPlayer in toPlayer")
+	}
+}
+
+func toAuctionPhase(p match.AuctionPhase) api.AuctionPhase {
+	switch p {
+	case match.VorbehaltAbfrage:
+		return api.AuctionPhase_DECLARATION
+	case match.VorbehaltSpezifikation:
+		return api.AuctionPhase_SPECIFICATION
+	}
+	panic("unsupported auction phase")
+}
+
+func toAuctionState(a *match.Auction) *api.AuctionState {
+	declarations := make([]*api.Declaration, 0)
+	for _, p := range core.Players() {
+		decl := a.DeclarationOf(p)
+		if decl != match.NotDeclared {
+			apiDecl := &api.Declaration{Player: toPlayer(p, false), Vorbehalt: decl == match.Vorbehalt}
+			declarations = append(declarations, apiDecl)
+		}
+	}
+	return &api.AuctionState{Phase: toAuctionPhase(a.Phase()), Declarations: declarations}
+}
+func toSoloType()
+func toApiMode(mode core.Mode) *api.Mode {
+	var gameType api.GameType
+	var soloInfo *api.SoloInfo
+	switch mode.(type) {
+	case core.NormalspielMode:
+		gameType = api.GameType_NORMAL_GAME
+	case core.Hochzeit:
+		gameType = api.GameType_MARRIAGE
+	default:
+		gameType = api.GameType_VOLUNTARY_SOLO
+		soloInfo = &api.SoloInfo{Soloist: toPlayer(core.Soloist(mode), false), SoloType: toSoloType()}
+	}
+	return &api.Mode{Type: gameType}
+}
+func toGameState(m *match.Match) *api.GameState {
+	return &api.GameState{Mode: m.Mode().}
+}
+func toMatchState(m *match.Match) *api.MatchState {
+	turn := toPlayer(m.WhoseTurn(), true)
+	switch m.Phase() {
+	case match.InAuction:
+		auctionState := toAuctionState(m.Auction())
+		return &api.MatchState{Phase: api.MatchPhase_AUCTION,
+			Turn:    turn,
+			Details: &api.MatchState_AuctionState{AuctionState: auctionState}}
+	case match.InGame:
+		gameState = toGameState(m.Game())
+
+	}
+
+}
+func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*api.MatchState, error) {
+	table, err := s.tryGetTable(tableId.Value)
+	if err != nil {
+		return nil, err
+	}
+	m := table.currentMatch
+	if m == nil {
+		return nil, status.Error(codes.Internal, "no active match at table")
+	}
+
+}
+
+func toMatchPhase(phase match.Phase) api.MatchPhase {
+	switch phase {
+	case match.AuctionAbfragePhase:
+		return api.MatchPhase_AUCTION_DECLARATION
+	case match.AuctionSpezifikationPhase:
+		return api.MatchPhase_AUCTION_SPECIFICATION
+	case match.InGame:
+		return api.MatchPhase_GAME
+	case match.MatchFinished:
+		return api.MatchPhase_FINISHED
+	default:
+		panic(fmt.Sprintf("unexpected phase %v in toMatchPhase", phase))
 	}
 }

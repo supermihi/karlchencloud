@@ -26,24 +26,28 @@ func (f FleischlosMode) PartyOf(p core.Player) core.Party {
 	return core.ContraParty
 }
 
+func (FleischlosMode) Type() core.AnnouncedGameType {
+	return core.FleischlosType
+}
+
 type VorbehaltFleischlos struct{}
 
-func (v VorbehaltFleischlos) CanAnnounceWith(handCards core.Hand) bool {
+func (VorbehaltFleischlos) CanAnnounceWith(handCards core.Hand) bool {
 	return true
 }
 
-func (v VorbehaltFleischlos) Identifier() ModeId {
+func (VorbehaltFleischlos) Identifier() ModeId {
 	return "FLEISCHLOS"
 }
 
-func (v VorbehaltFleischlos) Priority() int {
+func (VorbehaltFleischlos) Priority() int {
 	return VORBEHALT_PRIORITY_HOCHZEIT + 1
 }
 
-func (v VorbehaltFleischlos) CreateMode(announcer core.Player) core.Mode {
+func (VorbehaltFleischlos) CreateMode(announcer core.Player) core.Mode {
 	return FleischlosMode{announcer}
 }
 
-func (v VorbehaltFleischlos) AnnouncerTakesForehand() bool {
+func (VorbehaltFleischlos) AnnouncerTakesForehand() bool {
 	return false
 }

@@ -34,6 +34,20 @@ func (Farbsolo) Klaerungsstich() int {
 func (Farbsolo) OnCompletedTrick(core.Trick, int) {
 }
 
+func (f Farbsolo) Type() core.AnnouncedGameType {
+	switch f.Trumpf {
+	case core.Karo:
+		return core.KaroSoloType
+	case core.Herz:
+		return core.HerzSoloType
+	case core.Pik:
+		return core.PikSoloType
+	case core.Kreuz:
+		return core.KreuzSoloType
+	}
+	panic("unexpected solo suit")
+}
+
 type VorbehaltFarbsolo struct {
 	suit core.Suit
 }

@@ -31,7 +31,7 @@ func EvaluateGame(game *core.Game, bids *Bids) GameEvaluation {
 		extraPoints,
 		totalValue,
 		parties,
-		core.IsSolo(game.Mode),
+		core.IsCountedSolo(game.Mode),
 	}
 }
 
@@ -53,7 +53,7 @@ func PointsByPlayer(eval *GameEvaluation, mode core.Mode) [core.NumPlayers]int {
 		if mode.PartyOf(p) != eval.Winner {
 			value = -value
 		}
-		if core.IsSolo(mode) && mode.PartyOf(p) == core.ReParty {
+		if core.IsCountedSolo(mode) && mode.PartyOf(p) == core.ReParty {
 			// soloist
 			value = value * 3
 		}

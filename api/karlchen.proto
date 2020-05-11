@@ -8,23 +8,182 @@ service Karlchencloud {
     rpc Register (RegisterRequest) returns (RegisterReply) {
     }
 
-    rpc CheckLogin (EmptyRequest) returns (OkOrNot) {
+    rpc CheckLogin (Empty) returns (OkOrNot) {
     }
 
-    rpc ListTables (EmptyRequest) returns (TableList) {
+    rpc ListTables (Empty) returns (TableList) {
     }
 
-    rpc CreateTable (EmptyRequest) returns (TableData) {
+    rpc CreateTable (Empty) returns (TableData) {
     }
 
-    rpc StartTable (TableId) returns (EmptyReply) {
+    rpc StartTable (TableId) returns (Empty) {
     }
 
-    rpc JoinTable (JoinTableRequest) returns (EmptyReply) {
+    rpc JoinTable (JoinTableRequest) returns (Empty) {
+    }
+
+    rpc SubscribeMatchEvents (TableId) returns (stream MatchEvent) {
+    }
+
+    rpc GetMatchState (TableId) returns (MyMatchState) {
     }
 }
 
-message EmptyRequest {
+enum MatchPhase {
+    AUCTION = 0;
+    GAME = 1;
+    FINISHED = 2;
+}
+enum Suit {
+    DIAMONDS = 0;
+    HEARTS = 1;
+    SPADS = 2;
+    CLUBS = 3;
+}
+
+enum Rank {
+    NINE = 0;
+    JACK = 1;
+    QUEEN = 2;
+    KING = 3;
+    TEN = 4;
+    ACE = 5;
+}
+message Card {
+    Suit suit = 1;
+    Rank rank = 2;
+}
+
+enum Player {
+    PLAYER_1 = 0;
+    PLAYER_2 = 1;
+    PLAYER_3 = 2;
+    PLAYER_4 = 3;
+}
+
+enum Party {
+    RE = 0;
+    CONTRA = 1;
+}
+
+enum BidType {
+    RE_BID = 0;
+    CONTRA_BID = 1;
+    RE_NO_NINETY = 2;
+    RE_NO_SIXTY = 3;
+    RE_NO_THIRTY = 4;
+    RE_SCHWARZ = 5;
+    CONTRA_NO_NINETY = 6;
+    CONTRA_NO_SIXTY = 7;
+    CONTRA_NO_THIRTY = 8;
+    CONTRA_SCHWARZ = 9;
+}
+
+message Declaration {
+    Player player = 1;
+    bool vorbehalt = 2;
+}
+
+message PlayedCard {
+    Player player = 1;
+    Card card = 2;
+}
+
+message Bid {
+    Player player = 1;
+    BidType bid = 3;
+}
+
+message EndOfGame {
+    Party winner = 1;
+    int32 value = 2;
+}
+
+message MatchEvent {
+    oneof event {
+        Declaration declared = 1;
+        Specification specified = 2;
+        PlayedCard played_card = 3;
+        Bid placed_bid = 4;
+        EndOfGame ended = 5;
+    }
+    MatchState new_state = 10;
+    int32 serial_no = 11;
+}
+message PlayerParty {
+    Player player = 1;
+    Party party = 2;
+}
+enum AuctionPhase {
+    DECLARATION = 0;
+    SPECIFICATION = 1;
+}
+
+message AuctionState {
+    AuctionPhase phase = 1;
+    repeated Declaration declarations = 2;
+}
+
+enum GameType {
+    NORMAL_GAME = 0;
+    MARRIAGE = 1;
+    VOLUNTARY_SOLO = 2;
+    COMPULSORY_SOLO = 3;
+}
+enum SoloType {
+    DIAMONDS_SOLO = 0;
+    HEARTS_SOLO = 1;
+    SPADES_SOLO = 2;
+    CLUBS_SOLO = 3;
+    MEATLESS = 4;
+}
+
+message SoloInfo {
+    Player soloist = 1;
+    SoloType solo_type = 2;
+}
+message Mode {
+    GameType type = 1;
+    SoloInfo solo_info = 2;
+}
+
+message Trick {
+    Card card_player_1 = 1;
+    Card card_player_2 = 2;
+    Card card_player_3 = 3;
+    Card card_player_4 = 4;
+    Player forehand = 5;
+    Player winner = 6;
+}
+
+message GameState {
+    repeated Bid bids = 1;
+    int32 CompletedTricks = 2;
+    Trick current_trick = 3;
+    Trick previous_trick = 4;
+    Mode mode = 5;
+}
+
+message MatchState {
+    MatchPhase phase = 1;
+    Player turn = 2;
+    oneof details {
+        AuctionState auction_state = 3;
+        GameState game_state = 4;
+    }
+}
+
+message MyMatchState {
+    MatchState match_state = 1;
+    oneof role {
+        Player my_plader = 2;
+        Empty not_playing = 3;
+    }
+    repeated Card hand_cards = 4;
+}
+
+message Empty {
 
 }
 
@@ -46,9 +205,9 @@ message TableId {
 }
 
 message TableData {
-    string tableId = 1;
+    string table_id = 1;
     string owner = 2;
-    string inviteCode = 3;
+    string invite_code = 3;
 }
 
 message TableList {
@@ -56,8 +215,7 @@ message TableList {
 }
 
 message JoinTableRequest {
-    string tableId = 1;
-    string inviteCode = 2;
+    string table_id = 1;
+    string invite_code = 2;
 }
-message EmptyReply {
-}
+

@@ -47,7 +47,7 @@ func TestSampleMatch(t *testing.T) {
 	sayGesund(Player4)
 	sayGesund(Player1)
 	sayGesund(Player2)
-	assert.Equal(t, GamePhase, match.Phase())
+	assert.Equal(t, InGame, match.Phase())
 	mode := match.game.Mode
 	assert.Equal(t, ReParty, mode.PartyOf(Player1))
 	assert.Equal(t, ReParty, mode.PartyOf(Player2))

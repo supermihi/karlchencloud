@@ -19,27 +19,29 @@ func NewMatch(forehand core.Player, sonderspiele Sonderspiele, cards core.Cards)
 type Phase int
 
 const (
-	AuctionAbfragePhase Phase = iota
-	AuctionSpezifikationPhase
-	GamePhase
+	InAuction Phase = iota
+	InGame
 	MatchFinished
 )
 
 func (m *Match) Phase() Phase {
 	switch m.auction.Phase() {
 	case VorbehaltAbfrage:
-		return AuctionAbfragePhase
 	case VorbehaltSpezifikation:
-		return AuctionSpezifikationPhase
+		return InAuction
 	}
 	if !m.game.IsFinished() {
-		return GamePhase
+		return InGame
 	}
 	return MatchFinished
 }
 
 func (m *Match) DealtCards() core.Cards {
-	return m.auction.Cards
+	return m.auction.cards
+}
+
+func (m *Match) Auction() *Auction {
+	return m.auction
 }
 
 func (m *Match) proceedToGame() {
@@ -47,32 +49,27 @@ func (m *Match) proceedToGame() {
 	if result.IsSonderspiel {
 		m.game = core.NewGame(m.DealtCards(), result.Forehand, result.Sonderspiel)
 	} else {
-		var spiel core.Mode = core.NewNormalspiel(m.DealtCards())
-		for _, player := range core.Players() {
-			if m.auction.Cards[player].NumAlte() == 2 {
-				spiel = core.StilleHochzeit{Soloist: player}
-			}
-		}
-		m.game = core.NewGame(m.DealtCards(), m.auction.Forehand, spiel)
+		spiel := core.NewNormalspiel(m.DealtCards())
+		m.game = core.NewGame(m.DealtCards(), m.auction.forehand, spiel)
 	}
 }
 
 func (m *Match) AnnounceGesundOrVorbehalt(player core.Player, vorbehalt bool) bool {
-	if m.Phase() != AuctionAbfragePhase {
+	if m.Phase() != InAuction || m.auction.Phase() != VorbehaltAbfrage {
 		return false
 	}
 	if m.auction.WhoseTurn() != player {
 		return false
 	}
 	m.auction.Announce(player, vorbehalt)
-	if m.auction.Phase() == Finished {
+	if m.auction.Phase() == AuctionFinished {
 		m.proceedToGame()
 	}
 	return true
 }
 
 func (m *Match) SpecifyVorbehalt(player core.Player, id ModeId) bool {
-	if m.Phase() != AuctionSpezifikationPhase {
+	if m.Phase() != InAuction || m.auction.Phase() != VorbehaltSpezifikation {
 		return false
 	}
 	if m.auction.WhoseTurn() != player {
@@ -82,7 +79,7 @@ func (m *Match) SpecifyVorbehalt(player core.Player, id ModeId) bool {
 	if result != Ok {
 		return false
 	}
-	if m.auction.Phase() == Finished {
+	if m.auction.Phase() == AuctionFinished {
 		m.proceedToGame()
 	}
 	return true
@@ -95,6 +92,18 @@ func (m *Match) PlayCard(player core.Player, card core.Card) bool {
 
 func (m *Match) PlaceBid(player core.Player, bid Bid) bool {
 	return TryPlaceBid(player, bid, m.bids, m.game)
+}
+
+func (m *Match) WhoseTurn() core.Player {
+	switch m.Phase() {
+	case InAuction:
+		return m.auction.WhoseTurn()
+	case InGame:
+		return m.game.WhoseTurn()
+	case MatchFinished:
+		return core.NoPlayer
+	}
+	panic("unexpected match phase")
 }
 
 func (m *Match) Evaluate() GameEvaluation {

@@ -60,24 +60,6 @@ func (h Hochzeit) Klaerungsstich() int {
 	return h.klaerungsstich
 }
 
-type StilleHochzeit struct {
-	Soloist Player
-}
-
-func (StilleHochzeit) OnCompletedTrick(Trick, int) {
-}
-
-func (h StilleHochzeit) PartyOf(p Player) Party {
-	if p == h.Soloist {
-		return ReParty
-	}
-	return ContraParty
-}
-
-func (StilleHochzeit) GameSuit(c Card) GameSuit {
-	return NormalGameSuit(c)
-}
-
-func (StilleHochzeit) Klaerungsstich() int {
-	return -1
+func (h Hochzeit) Type() AnnouncedGameType {
+	return HochzeitType
 }
