@@ -5,6 +5,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/supermihi/karlchencloud/pkg/game/core"
 	"github.com/supermihi/karlchencloud/pkg/game/match"
+	"github.com/supermihi/karlchencloud/pkg/game/round"
 	"math/rand"
 )
 
@@ -38,7 +39,7 @@ type Table struct {
 	phase          TablePhase
 	players        []UserId
 	playersInOrder []UserId
-	round          *match.Round
+	round          *round.Round
 	currentMatch   *TableMatch
 }
 
@@ -68,7 +69,7 @@ func (t *Table) Start() error {
 	rand.Shuffle(len(t.players), func(i int, j int) {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
 	})
-	t.round = match.NewRound(len(t.players), match.StandardSonderspiele(), rand.Int63())
+	t.round = round.NewRound(len(t.players), match.StandardSonderspiele(), rand.Int63())
 	t.phase = WaitingForNextGame
 	return t.StartMatch()
 }
@@ -95,8 +96,8 @@ func (t *Table) Join(user UserId) error {
 	if t.phase != BeforeFirstGame {
 		return Error("cannot join a started table")
 	}
-	if len(t.players) > match.MaxPlayersPerRound {
-		return Error(fmt.Sprintf("only %v players supported per table", match.MaxPlayersPerRound))
+	if len(t.players) > round.MaxPlayersPerRound {
+		return Error(fmt.Sprintf("only %v players supported per table", round.MaxPlayersPerRound))
 	}
 	if t.ContainsPlayer(user) {
 		return Error("user already at table")
@@ -105,7 +106,7 @@ func (t *Table) Join(user UserId) error {
 	return nil
 }
 
-func playerIds(playersInOrder []UserId, pa match.PlayerAssignment) [core.NumPlayers]UserId {
+func playerIds(playersInOrder []UserId, pa round.PlayerAssignment) [core.NumPlayers]UserId {
 	var ans [core.NumPlayers]UserId
 	for inGamePlayerNumber, playerIndex := range pa.Playing() {
 		ans[inGamePlayerNumber] = playersInOrder[playerIndex]

@@ -1,7 +1,8 @@
-package match
+package round
 
 import (
 	"github.com/supermihi/karlchencloud/pkg/game/core"
+	"github.com/supermihi/karlchencloud/pkg/game/match"
 )
 
 const MaxPlayersPerRound = 6
@@ -22,32 +23,32 @@ func (p *PlayerAssignment) Playing() [core.NumPlayers]int {
 }
 
 type MatchStats struct {
-	evaluation *GameEvaluation
+	evaluation *match.GameEvaluation
 	players    *PlayerAssignment
 }
 
-func NewMatchStats(evaluation *GameEvaluation, assignment *PlayerAssignment) MatchStats {
+func NewMatchStats(evaluation *match.GameEvaluation, assignment *PlayerAssignment) MatchStats {
 	return MatchStats{evaluation, assignment}
 }
 
 type Round struct {
 	numPlayers int
 	scores     []MatchStats
-	rules      Sonderspiele
+	rules      match.Sonderspiele
 	cardSeed   int64
 }
 
-func NewRound(numPlayers int, rules Sonderspiele, cardSeed int64) *Round {
+func NewRound(numPlayers int, rules match.Sonderspiele, cardSeed int64) *Round {
 	return &Round{numPlayers, make([]MatchStats, 0), rules, cardSeed}
 }
 func (r *Round) CurrentPlayerAssignment() PlayerAssignment {
 	return NewPlayerAssignment(r.numPlayers, r.NumFinishedGames())
 }
 
-func (r *Round) NextMatch() *Match {
+func (r *Round) NextMatch() *match.Match {
 	index := r.NumFinishedGames()
 	assignment := NewPlayerAssignment(r.numPlayers, index)
-	ans := NewMatch(assignment.Forehand(r.numPlayers), r.rules, core.DealCards(r.cardSeed+int64(index)))
+	ans := match.NewMatch(assignment.Forehand(r.numPlayers), r.rules, core.DealCards(r.cardSeed+int64(index)))
 	return &ans
 }
 
