@@ -3,7 +3,8 @@ package cloud
 import (
 	"context"
 	"encoding/base64"
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpcAuth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"strings"
@@ -16,9 +17,6 @@ type Auth struct {
 func NewAuth(users Users) Auth {
 	return Auth{users}
 }
-
-const userIdHeader = "auth_user"
-const secretHeader = "auth_secret"
 
 type userMDKey struct{}
 type userMetadata struct {
@@ -40,7 +38,11 @@ func parseUserIdSecret(auth string) (string, string, error) {
 }
 
 func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err error) {
-	basic, err := grpc_auth.AuthFromMD(ctx, "basic")
+	meth, ok := grpc.Method(ctx)
+	if ok && meth == "/api.Karlchencloud/Register" {
+		return ctx, nil // ok to call register without auth
+	}
+	basic, err := grpcAuth.AuthFromMD(ctx, "basic")
 	if err != nil {
 		return nil, err
 	}
@@ -72,14 +74,24 @@ type ClientCredentials struct {
 	secret string
 }
 
-func NewClientCredentials(userId string, secret string) ClientCredentials {
-	return ClientCredentials{userId, secret}
+func NewClientCredentials(userId string, secret string) *ClientCredentials {
+	return &ClientCredentials{userId, secret}
 }
-func (r ClientCredentials) RequireTransportSecurity() bool {
+
+func EmptyClientCredentials() *ClientCredentials {
+	return &ClientCredentials{"", ""}
+}
+
+func (c *ClientCredentials) UpdateLogin(userId string, secret string) {
+	c.userId = userId
+	c.secret = secret
+}
+
+func (r *ClientCredentials) RequireTransportSecurity() bool {
 	return false
 }
 
-func (r ClientCredentials) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
+func (r *ClientCredentials) GetRequestMetadata(_ context.Context, _ ...string) (map[string]string, error) {
 	auth := r.userId + ":" + r.secret
 	enc := base64.StdEncoding.EncodeToString([]byte(auth))
 	return map[string]string{

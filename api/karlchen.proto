@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package grpc_api;
+package api;
 // option go_package = "github.com/supermihi/karlchencloud/api";
 option go_package = ".;api";
 
@@ -14,10 +14,13 @@ service Karlchencloud {
     rpc ListTables (EmptyRequest) returns (TableList) {
     }
 
-    rpc CreateTable (EmptyRequest) returns (TableId) {
+    rpc CreateTable (EmptyRequest) returns (TableData) {
     }
 
     rpc StartTable (TableId) returns (EmptyReply) {
+    }
+
+    rpc JoinTable (JoinTableRequest) returns (EmptyReply) {
     }
 }
 
@@ -42,9 +45,19 @@ message TableId {
     string value = 1;
 }
 
-message TableList {
-    repeated string ids = 1;
+message TableData {
+    string tableId = 1;
+    string owner = 2;
+    string inviteCode = 3;
 }
 
+message TableList {
+    repeated TableData tables = 1;
+}
+
+message JoinTableRequest {
+    string tableId = 1;
+    string inviteCode = 2;
+}
 message EmptyReply {
 }

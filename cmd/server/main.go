@@ -12,6 +12,5 @@ const (
 
 func main() {
 	users := cloud.NewMemoryUserDb()
-	users.Add(cloud.UserId("6ba7b810-9dad-11d1-80b4-00c04fd430c8"), "Woldemar", "geheim")
 	cloud.StartServer(users, port)
 }

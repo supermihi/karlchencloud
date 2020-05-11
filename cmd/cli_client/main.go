@@ -14,13 +14,10 @@ const (
 	address = "localhost:50051"
 )
 
-type Cred struct {
-}
-
 func main() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	defer cancel()
-	creds := cloud.NewClientCredentials("6ba7b810-9dad-11d1-80b4-00c04fd430c8", "geheim")
+	creds := cloud.NewClientCredentials("", "")
 	conn, err := grpc.DialContext(ctx, address, grpc.WithInsecure(), grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(creds))
 	if err != nil {
@@ -28,23 +25,30 @@ func main() {
 	}
 	defer conn.Close()
 	c := api.NewKarlchencloudClient(conn)
-
+	ans, err := c.Register(ctx, &api.RegisterRequest{Name: "michael"})
+	if err != nil {
+		log.Fatalf("could not register: %v", err)
+	} else {
+		log.Printf("registered with id %v", ans.Id)
+	}
+	creds.UpdateLogin(ans.Id, ans.Secret)
 	_, err = c.CheckLogin(ctx, &api.EmptyRequest{})
 	if err != nil {
 		log.Fatalf("could not login: %v", err)
 	}
 	log.Print("login ok!")
-	tableId, err := c.CreateTable(ctx, &api.EmptyRequest{})
+	table, err := c.CreateTable(ctx, &api.EmptyRequest{})
 	if err != nil {
 		log.Fatalf("could not create table: %v", err)
 	}
-	log.Printf("created table with id %v", tableId.Value)
+	log.Printf("created table with id %v", table.TableId)
 	tables, _ := c.ListTables(ctx, &api.EmptyRequest{})
-	log.Printf("there are %v tables:", len(tables.Ids))
-	for _, tableId := range tables.Ids {
-		log.Printf("- one with id %v", tableId)
+	log.Printf("there are %v tables:", len(tables.Tables))
+	for _, t := range tables.Tables {
+		log.Printf("- one with Id %v and owner %v", t.TableId, t.Owner)
 	}
-	_, err = c.StartTable(ctx, tableId)
+	id := &api.TableId{Value: table.TableId}
+	_, err = c.StartTable(ctx, id)
 	if err != nil {
 		log.Fatalf("could not start table: %v", err)
 	}

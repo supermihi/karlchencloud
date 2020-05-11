@@ -9,12 +9,8 @@ func NewRoom(users Users) Room {
 	return Room{users, NewTables()}
 }
 
-func (c *Room) CreateTable(owner UserId) string {
+func (c *Room) CreateTable(owner UserId) *Table {
 	return c.tables.CreateTable(owner)
-}
-
-func (c *Room) ListTables() []string {
-	return c.tables.List()
 }
 
 func (c *Room) TablePlayers(id string) []UserId {

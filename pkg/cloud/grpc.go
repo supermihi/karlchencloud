@@ -18,14 +18,15 @@ type grpcserver struct {
 	auth Auth
 }
 
-func (s *grpcserver) Register(ctx context.Context, in *api.RegisterRequest) (*api.RegisterReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	id := uuid.NewV4()
-	s.room.Users.Add(UserId(id.String()), in.GetName(), RandomSecret())
-	return &api.RegisterReply{Id: id.String(), Secret: "oh my"}, nil
+func (s *grpcserver) Register(_ context.Context, req *api.RegisterRequest) (*api.RegisterReply, error) {
+	id := uuid.NewV4().String()
+	secret := RandomSecret()
+	s.room.Users.Add(UserId(id), req.GetName(), secret)
+	log.Printf("Registered user %v with id %v", req.GetName(), id)
+	return &api.RegisterReply{Id: id, Secret: secret}, nil
 }
 
-func (s *grpcserver) CheckLogin(ctx context.Context, request *api.EmptyRequest) (*api.OkOrNot, error) {
+func (s *grpcserver) CheckLogin(ctx context.Context, _ *api.EmptyRequest) (*api.OkOrNot, error) {
 	user, ok := GetAuthenticatedUser(ctx)
 	if !ok {
 		log.Print("check login failed")
@@ -35,37 +36,72 @@ func (s *grpcserver) CheckLogin(ctx context.Context, request *api.EmptyRequest) 
 	return &api.OkOrNot{Value: true}, nil
 }
 
-func (s *grpcserver) CreateTable(ctx context.Context, params *api.EmptyRequest) (*api.TableId, error) {
-	user, ok := GetAuthenticatedUser(ctx)
-	if !ok {
-		panic("should not be here")
-	}
-	id := s.room.CreateTable(user)
-	log.Printf("user %v created new table with id %v", s.room.Users.GetName(user), id)
-	return &api.TableId{Value: id}, nil
+func (s *grpcserver) CreateTable(ctx context.Context, _ *api.EmptyRequest) (*api.TableData, error) {
+	user, _ := GetAuthenticatedUser(ctx)
+	table := s.room.CreateTable(user)
+	log.Printf("user %v created new table %v", s.room.Users.GetName(user), table)
+	return toTableData(table, user), nil
 }
 
-func (s *grpcserver) ListTables(context.Context, *api.EmptyRequest) (*api.TableList, error) {
+func toTableData(table *Table, user UserId) *api.TableData {
+	exposedInviteCode := ""
+	if table.Owner() == user {
+		exposedInviteCode = table.inviteCode
+	}
+	return &api.TableData{TableId: table.id, Owner: string(table.Owner()), InviteCode: exposedInviteCode}
+}
+
+func (s *grpcserver) ListTables(ctx context.Context, _ *api.EmptyRequest) (*api.TableList, error) {
+	user, _ := GetAuthenticatedUser(ctx)
 	tables := s.room.tables.List()
-	return &api.TableList{Ids: tables}, nil
+	result := make([]*api.TableData, len(tables))
+	for i, table := range tables {
+		result[i] = toTableData(table, user)
+	}
+	return &api.TableList{Tables: result}, nil
 }
 
 func (s *grpcserver) StartTable(ctx context.Context, id *api.TableId) (*api.EmptyReply, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	table, ok := s.room.tables.GetTable(id.Value)
-	if !ok {
-		return nil, status.Error(codes.InvalidArgument, "table does not exist")
+	table, err := s.tryGetTable(id.Value)
+	if err != nil {
+		return nil, err
 	}
 	if table.Owner() != user {
 		return nil, status.Error(codes.PermissionDenied, "you are not owner of the table")
 	}
-	err := table.Start()
+	err = table.Start()
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &api.EmptyReply{}, nil
 
 }
+
+func (s *grpcserver) tryGetTable(id string) (*Table, error) {
+	table, ok := s.room.tables.GetTable(id)
+	if !ok {
+		return nil, status.Error(codes.InvalidArgument, "table does not exist")
+	}
+	return table, nil
+}
+
+func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (*api.EmptyReply, error) {
+	user, _ := GetAuthenticatedUser(ctx)
+	table, err := s.tryGetTable(req.TableId)
+	if err != nil {
+		return nil, err
+	}
+	if table.inviteCode != req.InviteCode {
+		return nil, status.Error(codes.PermissionDenied, "invalid invite code")
+	}
+	err = table.Join(user)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &api.EmptyReply{}, nil
+}
+
 func StartServer(users Users, port string) {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {

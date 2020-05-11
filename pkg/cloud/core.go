@@ -35,6 +35,7 @@ const (
 
 type Table struct {
 	id             string
+	inviteCode     string
 	phase          TablePhase
 	players        []UserId
 	playersInOrder []UserId
@@ -46,9 +47,14 @@ func (t *Table) Owner() UserId {
 	return t.players[0]
 }
 
+func (t *Table) String() string {
+	return fmt.Sprintf("Table %v", t.id)
+}
+
 func NewTable(owner UserId) *Table {
 	id := uuid.NewV4().String()
-	table := Table{id, BeforeFirstGame, []UserId{owner}, nil, nil, nil}
+	inviteCode := uuid.NewV4().String()
+	table := Table{id, inviteCode, BeforeFirstGame, []UserId{owner}, nil, nil, nil}
 	return &table
 }
 
@@ -78,6 +84,28 @@ func (t *Table) StartMatch() error {
 	return nil
 }
 
+func (t *Table) ContainsPlayer(player UserId) bool {
+	for _, p := range t.players {
+		if p == player {
+			return true
+		}
+	}
+	return false
+}
+func (t *Table) Join(user UserId) error {
+	if t.phase != BeforeFirstGame {
+		return Error("cannot join a started table")
+	}
+	if len(t.players) > match.MaxPlayersPerRound {
+		return Error(fmt.Sprintf("only %v players supported per table", match.MaxPlayersPerRound))
+	}
+	if t.ContainsPlayer(user) {
+		return Error("user already at table")
+	}
+	t.players = append(t.players, user)
+	return nil
+}
+
 func playerIds(playersInOrder []UserId, pa match.PlayerAssignment) [core.NumPlayers]UserId {
 	var ans [core.NumPlayers]UserId
 	for inGamePlayerNumber, playerIndex := range pa.Playing() {
@@ -95,16 +123,16 @@ func NewTables() *Tables {
 	return &result
 }
 
-func (t *Tables) CreateTable(owner UserId) string {
+func (t *Tables) CreateTable(owner UserId) *Table {
 	table := NewTable(owner)
 	t.tables[table.id] = table
-	return table.id
+	return table
 }
 
-func (t *Tables) List() []string {
-	ids := make([]string, 0, len(t.tables))
-	for k := range t.tables {
-		ids = append(ids, k)
+func (t *Tables) List() []*Table {
+	ids := make([]*Table, 0, len(t.tables))
+	for _, v := range t.tables {
+		ids = append(ids, v)
 	}
 	return ids
 }

@@ -4,6 +4,8 @@ import (
 	"github.com/supermihi/karlchencloud/pkg/game/core"
 )
 
+const MaxPlayersPerRound = 6
+
 type PlayerAssignment struct {
 	playing [core.NumPlayers]int // core.Player->round-player index
 	dealer  int
