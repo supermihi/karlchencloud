@@ -3,7 +3,8 @@ package main
 //go:generate protoc -I ../../api ../../api/karlchen.proto --go_out=plugins=grpc:../../api
 
 import (
-	"github.com/supermihi/karlchencloud/pkg/cloud"
+	"github.com/supermihi/karlchencloud/cloud"
+	"github.com/supermihi/karlchencloud/server"
 )
 
 const (
@@ -12,5 +13,5 @@ const (
 
 func main() {
 	users := cloud.NewMemoryUserDb()
-	cloud.StartServer(users, port)
+	server.StartServer(users, port)
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/supermihi/karlchencloud/api"
-	"github.com/supermihi/karlchencloud/pkg/cloud"
+	"github.com/supermihi/karlchencloud/server"
 	"log"
 	"time"
 
@@ -17,7 +17,7 @@ const (
 func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	defer cancel()
-	creds := cloud.NewClientCredentials("", "")
+	creds := server.NewClientCredentials("", "")
 	conn, err := grpc.DialContext(ctx, address, grpc.WithInsecure(), grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(creds))
 	if err != nil {
@@ -32,17 +32,17 @@ func main() {
 		log.Printf("registered with id %v", ans.Id)
 	}
 	creds.UpdateLogin(ans.Id, ans.Secret)
-	_, err = c.CheckLogin(ctx, &api.EmptyRequest{})
+	_, err = c.CheckLogin(ctx, &api.Empty{})
 	if err != nil {
 		log.Fatalf("could not login: %v", err)
 	}
 	log.Print("login ok!")
-	table, err := c.CreateTable(ctx, &api.EmptyRequest{})
+	table, err := c.CreateTable(ctx, &api.Empty{})
 	if err != nil {
 		log.Fatalf("could not create table: %v", err)
 	}
 	log.Printf("created table with id %v", table.TableId)
-	tables, _ := c.ListTables(ctx, &api.EmptyRequest{})
+	tables, _ := c.ListTables(ctx, &api.Empty{})
 	log.Printf("there are %v tables:", len(tables.Tables))
 	for _, t := range tables.Tables {
 		log.Printf("- one with Id %v and owner %v", t.TableId, t.Owner)
