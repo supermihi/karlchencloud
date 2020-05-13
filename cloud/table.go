@@ -64,7 +64,7 @@ func (t *Table) StartMatch() error {
 	nextMatch := t.round.NextMatch()
 	pa := t.round.CurrentPlayerAssignment()
 
-	t.currentMatch = &TableMatch{nextMatch, playerIds(t.playersInOrder, pa)}
+	t.CurrentMatch = &TableMatch{nextMatch, playerIds(t.playersInOrder, pa)}
 	return nil
 }
 

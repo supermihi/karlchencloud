@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var someNormalspiel = NormalspielMode{[...]Party{ReParty, ReParty, ContraParty, ContraParty}}
+var someNormalspiel = NormalspielMode{[...]Party{ReParty, ReParty, ContraParty, ContraParty}, false}
 
 func TestWinnerOfTrick(t *testing.T) {
 	winner := WinnerOfTrick([4]Card{KreuzA, KreuzA, Kreuz10, Kreuz9}, Player1, someNormalspiel)

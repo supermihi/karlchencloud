@@ -10,19 +10,19 @@ func getParties(mode game.Mode) [game.NumPlayers]game.Party {
 	return result
 }
 
-func EvaluateGame(game *game.Game, bids *Bids) GameEvaluation {
-	if !game.IsFinished() {
+func EvaluateGame(g *game.Game, bids *Bids) GameEvaluation {
+	if !g.IsFinished() {
 		panic("cannot evaluate unfinished game")
 	}
-	reScore, reTricks := countReScoreAndTricks(game)
+	reScore, reTricks := countReScoreAndTricks(g)
 	winningParty := WinnerOfGame(reScore, reTricks, bids)
 	gamePoints := getGamePoints(bids, winningParty, reScore, reTricks)
-	extraPoints := findExtraPoints(game)
+	extraPoints := findExtraPoints(g)
 	totalValue := len(extraPoints)
 	for _, p := range gamePoints {
 		totalValue += p.Value
 	}
-	parties := getParties(game.Mode)
+	parties := getParties(g.Mode)
 	return GameEvaluation{
 		winningParty,
 		reScore,
@@ -31,7 +31,7 @@ func EvaluateGame(game *game.Game, bids *Bids) GameEvaluation {
 		extraPoints,
 		totalValue,
 		parties,
-		game.IsCountedSolo(game.Mode),
+		game.IsCountedSolo(g.Mode),
 	}
 }
 
@@ -68,11 +68,11 @@ const (
 	FuchsGefangen
 )
 
-func countReScoreAndTricks(game *game.Game) (int, int) {
+func countReScoreAndTricks(g *game.Game) (int, int) {
 	reScore, contraScore := 0, 0
 	reTricks, contraTricks := 0, 0
-	for _, trick := range game.CompleteTricks {
-		if game.Mode.PartyOf(trick.Winner) == game.ReParty {
+	for _, trick := range g.CompleteTricks {
+		if g.Mode.PartyOf(trick.Winner) == game.ReParty {
 			reScore += trick.Score()
 			reTricks += 1
 		} else {

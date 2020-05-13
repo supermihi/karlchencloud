@@ -27,6 +27,7 @@ const (
 func (m *Match) Phase() Phase {
 	switch m.Auction.Phase() {
 	case VorbehaltAbfrage:
+		fallthrough
 	case VorbehaltSpezifikation:
 		return InAuction
 	}

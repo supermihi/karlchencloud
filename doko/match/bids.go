@@ -58,6 +58,10 @@ func (bids *Bids) placeBid(player game.Player, party game.Party, bid Bid) {
 	bids.bids[player] = append(bids.bids[player], bid)
 }
 
+func (bids *Bids) BidsOf(p game.Player) []Bid {
+	return bids.bids[p]
+}
+
 func (bids *Bids) AllBids() []Bid {
 	var ans []Bid
 	for _, p := range game.Players() {

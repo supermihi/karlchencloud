@@ -123,37 +123,8 @@ func StartServer(users cloud.Users, port string) {
 	}
 }
 
-func toAuctionState(a *match.Auction) *api.AuctionState {
-	declarations := make([]*api.Declaration, 0)
-	for _, p := range game.Players() {
-		decl := a.DeclarationOf(p)
-		if decl != match.NotDeclared {
-			apiDecl := &api.Declaration{Player: common.ToApiPlayer(p, false), Vorbehalt: decl == match.Vorbehalt}
-			declarations = append(declarations, apiDecl)
-		}
-	}
-	return &api.AuctionState{Phase: common.ToAuctionPhase(a.Phase()), Declarations: declarations}
-}
-func toGameState(m *match.Match) *api.GameState {
-	return &api.GameState{Mode: common.ToApiMode(m.Mode()), Bids:, CompletedTricks: m.Game.NumCompletedTricks(),
-		CurrentTrick: common.ToApiTrick(m.Game.CurrentTrick, m.Mode())}
-}
-func toMatchState(m *match.Match) *api.MatchState {
-	turn := common.ToApiPlayer(m.WhoseTurn(), true)
-	switch m.Phase() {
-	case match.InAuction:
-		auctionState := toAuctionState(m.Auction)
-		return &api.MatchState{Phase: api.MatchPhase_AUCTION,
-			Turn:    turn,
-			Details: &api.MatchState_AuctionState{AuctionState: auctionState}}
-	case match.InGame:
-		gameState := toGameState(m)
-		return &api.GameState{}
-
-	}
-
-}
 func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*api.MyMatchState, error) {
+	user, _ := GetAuthenticatedUser(ctx)
 	table, err := s.tryGetTable(tableId.Value)
 	if err != nil {
 		return nil, err
@@ -162,5 +133,28 @@ func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*
 	if m == nil {
 		return nil, status.Error(codes.Internal, "no active match at table")
 	}
+	matchState := common.ToMatchState(m.Match)
+	for p, playerUser := range m.Players {
+		if user == playerUser {
+			private := &api.PlayerPrivateState{
+				HandCards: GetHandCards(m.Match, game.Player(p)),
+				Me:        common.ToApiPlayer(game.Player(p), false)}
+			return &api.MyMatchState{
+				MatchState: matchState,
+				Role:       &api.MyMatchState_PlayerState{PlayerState: private}}, nil
+		}
+	}
+	return &api.MyMatchState{MatchState: matchState, Role: &api.MyMatchState_Spectator{Spectator: &api.Empty{}}}, nil
+}
 
+func GetHandCards(m *match.Match, p game.Player) []*api.Card {
+	if m.Phase() != match.InGame {
+		return nil
+	}
+	cards := m.Game.HandCards[p]
+	ans := make([]*api.Card, len(cards))
+	for i, card := range cards {
+		ans[i] = common.ToApiCard(card)
+	}
+	return ans
 }

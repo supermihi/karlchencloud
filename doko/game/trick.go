@@ -20,33 +20,36 @@ func (t *Trick) Score() int {
 
 type IncompleteTrick struct {
 	Forehand     Player
-	CardsInOrder []Card
+	cardByPlayer map[Player]Card
 }
 
 func NewIncompleteTrick(forehand Player) *IncompleteTrick {
-	return &IncompleteTrick{forehand, make(Hand, 0, NumPlayers)}
+	return &IncompleteTrick{forehand, make(map[Player]Card, NumPlayers)}
+}
+
+func (t *IncompleteTrick) NumCardsPlayed() int {
+	return len(t.cardByPlayer)
 }
 
 func (t *IncompleteTrick) NthCard(i int) Card {
-	return t.CardsInOrder[i]
+	return t.cardByPlayer[t.Forehand.NthNext(i)]
 }
 
 func (t *IncompleteTrick) IsComplete() bool {
-	return len(t.CardsInOrder) == NumPlayers
+	return len(t.cardByPlayer) == NumPlayers
 }
 
-func (t *IncompleteTrick) CardOf(player Player) Card {
-	return t.CardsInOrder[t.Forehand.HopsTo(player)]
+func (t *IncompleteTrick) CardOf(player Player) (c Card, ok bool) {
+	c, ok = t.cardByPlayer[player]
+	return
 }
 
-func (t *IncompleteTrick) TryCardOf(player Player) (c Card, ok bool) {
-	if t.Forehand.HopsTo(player) >= len(t.CardsInOrder) {
-		return Card{}, false
-	}
-	return t.CardOf(player), true
+func (t *IncompleteTrick) Play(player Player, card Card) {
+	t.cardByPlayer[player] = card
 }
+
 func (t *IncompleteTrick) CardsByPlayer() [NumPlayers]Card {
-	return [...]Card{t.CardOf(Player1), t.CardOf(Player2), t.CardOf(Player3), t.CardOf(Player4)}
+	return [...]Card{t.cardByPlayer[Player1], t.cardByPlayer[Player2], t.cardByPlayer[Player3], t.cardByPlayer[Player4]}
 }
 
 func (t *IncompleteTrick) AsCompleteTrick(winner Player) Trick {
@@ -54,6 +57,6 @@ func (t *IncompleteTrick) AsCompleteTrick(winner Player) Trick {
 }
 
 func (t *IncompleteTrick) WhoseTurn() Player {
-	playedCards := len(t.CardsInOrder)
+	playedCards := len(t.cardByPlayer)
 	return t.Forehand.NthNext(playedCards)
 }

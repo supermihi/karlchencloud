@@ -42,7 +42,7 @@ func (g *Game) CanPlayCard(player Player, card Card) PlayCardResult {
 		return PlayerDoesNotHaveCard
 	}
 	trick := g.CurrentTrick
-	if len(trick.CardsInOrder) == 0 {
+	if trick.NumCardsPlayed() == 0 {
 		return CardPlayed
 	}
 	trickSuit := g.Mode.GameSuit(trick.NthCard(0))
@@ -54,7 +54,7 @@ func (g *Game) CanPlayCard(player Player, card Card) PlayCardResult {
 
 func (g *Game) playCard(player Player, card Card) {
 	g.HandCards[player].RemoveCard(card)
-	g.CurrentTrick.CardsInOrder = append(g.CurrentTrick.CardsInOrder, card)
+	g.CurrentTrick.Play(player, card)
 }
 
 type PlayCardResult int

@@ -22,8 +22,7 @@ func TestSampleMatch(t *testing.T) {
 			HerzA, Pik9, Pik9, PikA, KreuzK, KreuzA, KreuzA, Karo9, Karo10, HerzB, PikB, KreuzB,
 		},
 	}
-	sonderspiele := MakeSonderspiele(VorbehaltHochzeit{})
-	match := NewMatch(Player3, sonderspiele, cards)
+	match := NewMatch(Player3, StandardSonderspiele(), cards)
 	play := func(player Player, card Card) {
 		for _, otherPlayer := range Players() {
 			if otherPlayer != player {

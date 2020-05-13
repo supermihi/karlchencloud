@@ -25,6 +25,33 @@ func ToApiPlayer(p game.Player, mapNoPlayerToPlayer1 bool) api.Player {
 	}
 }
 
+func ToApiBid(b match.Bid) api.BidType {
+	switch b {
+	case match.Re:
+		return api.BidType_RE_BID
+	case match.ReKeine90:
+		return api.BidType_RE_NO_NINETY
+	case match.ReKeine60:
+		return api.BidType_CONTRA_NO_SIXTY
+	case match.ReKeine30:
+		return api.BidType_RE_NO_THIRTY
+	case match.ReSchwarz:
+		return api.BidType_RE_SCHWARZ
+	case match.Contra:
+		return api.BidType_CONTRA_BID
+	case match.ContraKeine90:
+		return api.BidType_CONTRA_NO_NINETY
+	case match.ContraKeine60:
+		return api.BidType_CONTRA_NO_SIXTY
+	case match.ContraKeine30:
+		return api.BidType_CONTRA_NO_THIRTY
+	case match.ContraSchwarz:
+		return api.BidType_CONTRA_SCHWARZ
+	default:
+		panic(fmt.Sprintf("unexpected bid %v in ToApiBid", b))
+	}
+}
+
 func ToAuctionPhase(p match.AuctionPhase) api.AuctionPhase {
 	switch p {
 	case match.VorbehaltAbfrage:
@@ -114,20 +141,70 @@ func ToApiCard(c game.Card) *api.Card {
 
 func ToApiTrick(t *game.IncompleteTrick, m game.Mode) *api.Trick {
 	result := &api.Trick{Forehand: ToApiPlayer(t.Forehand, false)}
-	if c, ok := t.TryCardOf(game.Player1); ok {
+	if c, ok := t.CardOf(game.Player1); ok {
 		result.CardPlayer_1 = ToApiCard(c)
 	}
-	if c, ok := t.TryCardOf(game.Player2); ok {
+	if c, ok := t.CardOf(game.Player2); ok {
 		result.CardPlayer_2 = ToApiCard(c)
 	}
-	if c, ok := t.TryCardOf(game.Player3); ok {
+	if c, ok := t.CardOf(game.Player3); ok {
 		result.CardPlayer_3 = ToApiCard(c)
 	}
-	if c, ok := t.TryCardOf(game.Player4); ok {
+	if c, ok := t.CardOf(game.Player4); ok {
 		result.CardPlayer_4 = ToApiCard(c)
 	}
 	if t.IsComplete() {
 		result.Winner = ToApiPlayer(game.WinnerOfTrick(t.CardsByPlayer(), t.Forehand, m), false)
 	}
 	return result
+}
+
+func toAuctionState(a *match.Auction) *api.AuctionState {
+	declarations := make([]*api.Declaration, 0)
+	for _, p := range game.Players() {
+		decl := a.DeclarationOf(p)
+		if decl != match.NotDeclared {
+			apiDecl := &api.Declaration{Player: ToApiPlayer(p, false), Vorbehalt: decl == match.Vorbehalt}
+			declarations = append(declarations, apiDecl)
+		}
+	}
+	return &api.AuctionState{Phase: ToAuctionPhase(a.Phase()), Declarations: declarations}
+}
+
+func toApiBids(bids *match.Bids) []*api.Bid {
+	var ans []*api.Bid
+	for _, player := range game.Players() {
+		bidsOf := bids.BidsOf(player)
+		apiBidsOf := make([]*api.Bid, len(bidsOf))
+		for i, b := range bidsOf {
+			apiBidsOf[i] = &api.Bid{Player: ToApiPlayer(player, false), Bid: ToApiBid(b)}
+		}
+		ans = append(ans, apiBidsOf...)
+	}
+	return ans
+}
+
+func ToGameState(m *match.Match) *api.GameState {
+	return &api.GameState{Mode: ToApiMode(m.Mode()),
+		Bids:            toApiBids(m.Bids),
+		CompletedTricks: int32(m.Game.NumCompletedTricks()),
+		CurrentTrick:    ToApiTrick(m.Game.CurrentTrick, m.Mode())}
+}
+func ToMatchState(m *match.Match) *api.MatchState {
+	turn := ToApiPlayer(m.WhoseTurn(), true)
+	switch m.Phase() {
+	case match.InAuction:
+		auctionState := toAuctionState(m.Auction)
+		return &api.MatchState{Phase: api.MatchPhase_AUCTION,
+			Turn:    turn,
+			Details: &api.MatchState_AuctionState{AuctionState: auctionState}}
+	case match.InGame:
+		gameState := ToGameState(m)
+		return &api.MatchState{Phase: api.MatchPhase_GAME,
+			Turn:    turn,
+			Details: &api.MatchState_GameState{GameState: gameState}}
+	case match.MatchFinished:
+		return &api.MatchState{Phase: api.MatchPhase_FINISHED}
+	}
+	panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", m.Phase()))
 }

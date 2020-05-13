@@ -17,8 +17,8 @@ type Users interface {
 }
 
 type TableMatch struct {
-	match   *match.Match
-	players [game.NumPlayers]UserId
+	Match   *match.Match
+	Players [game.NumPlayers]UserId
 }
 
 func playerIds(playersInOrder []UserId, pa round.PlayerAssignment) [game.NumPlayers]UserId {

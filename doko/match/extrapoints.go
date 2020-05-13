@@ -10,14 +10,14 @@ type ExtraPoint struct {
 	Trick  int
 }
 
-func findExtraPoints(game *game.Game) []ExtraPoint {
+func findExtraPoints(g *game.Game) []ExtraPoint {
 	var ans []ExtraPoint
-	if !game.IsNormalspiel(game.Mode) {
+	if !game.IsNormalspiel(g.Mode) {
 		return ans
 	}
-	ans = append(ans, doppelkoepfe(game)...)
-	ans = append(ans, fuechse(game)...)
-	ans = append(ans, karlchen(game)...)
+	ans = append(ans, doppelkoepfe(g)...)
+	ans = append(ans, fuechse(g)...)
+	ans = append(ans, karlchen(g)...)
 	return ans
 }
 
@@ -32,11 +32,11 @@ func doppelkoepfe(game *game.Game) []ExtraPoint {
 	return ans
 }
 
-func fuechse(game *game.Game) []ExtraPoint {
+func fuechse(g *game.Game) []ExtraPoint {
 	var ans []ExtraPoint
-	for i, trick := range game.CompleteTricks {
+	for i, trick := range g.CompleteTricks {
 		for _, player := range game.Players() {
-			if trick.CardsOf[player] == game.KaroA && game.Mode.PartyOf(player) != game.Mode.PartyOf(trick.Winner) {
+			if trick.CardsOf[player] == game.KaroA && g.Mode.PartyOf(player) != g.Mode.PartyOf(trick.Winner) {
 				ans = append(ans, ExtraPoint{FuchsGefangen, trick.Winner, i})
 			}
 		}
@@ -44,8 +44,8 @@ func fuechse(game *game.Game) []ExtraPoint {
 	return ans
 }
 
-func karlchen(game *game.Game) []ExtraPoint {
-	lastTrick := game.CompleteTricks[game.NumTricks-1]
+func karlchen(g *game.Game) []ExtraPoint {
+	lastTrick := g.CompleteTricks[game.NumTricks-1]
 	if lastTrick.CardsOf[lastTrick.Winner] == game.KreuzB {
 		ans := [1]ExtraPoint{{Karlchen, lastTrick.Winner, game.NumTricks - 1}}
 		return ans[:]
