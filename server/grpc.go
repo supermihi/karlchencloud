@@ -133,12 +133,10 @@ func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*
 	if m == nil {
 		return nil, status.Error(codes.Internal, "no active match at table")
 	}
-	matchState := common.ToMatchState(m.Match)
+	matchState := common.ToMatchState(m)
 	for p, playerUser := range m.Players {
 		if user == playerUser {
-			private := &api.PlayerPrivateState{
-				HandCards: GetHandCards(m.Match, game.Player(p)),
-				Me:        common.ToApiPlayer(game.Player(p), false)}
+			private := &api.PlayerPrivateState{HandCards: GetHandCards(m.Match, game.Player(p))}
 			return &api.MyMatchState{
 				MatchState: matchState,
 				Role:       &api.MyMatchState_PlayerState{PlayerState: private}}, nil

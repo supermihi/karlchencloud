@@ -108,12 +108,19 @@ message GameState {
 message MatchState {
     MatchPhase phase = 1;
     Player turn = 2;
+    Players players = 3;
     oneof details {
-        AuctionState auction_state = 3;
-        GameState game_state = 4;
+        AuctionState auction_state = 4;
+        GameState game_state = 5;
     }
 }
 
+message Players {
+    string player_1 = 1;
+    string player_2 = 2;
+    string player_3 = 3;
+    string player_4 = 4;
+}
 message MyMatchState {
     MatchState match_state = 1;
     oneof role {
@@ -123,8 +130,7 @@ message MyMatchState {
 }
 
 message PlayerPrivateState {
-    Player me = 1;
-    repeated Card hand_cards = 2;
+    repeated Card hand_cards = 1;
 }
 
 message Empty {

@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/cloud"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 )
@@ -88,19 +89,6 @@ func ToApiMode(mode game.Mode) *api.Mode {
 		soloInfo = &api.SoloInfo{Soloist: ToApiPlayer(game.Soloist(mode), false), SoloType: toSoloType(mode.Type())}
 	}
 	return &api.Mode{Type: gameType, SoloInfo: soloInfo}
-}
-
-func ToMatchPhase(phase match.Phase) api.MatchPhase {
-	switch phase {
-	case match.InAuction:
-		return api.MatchPhase_AUCTION
-	case match.InGame:
-		return api.MatchPhase_GAME
-	case match.MatchFinished:
-		return api.MatchPhase_FINISHED
-	default:
-		panic(fmt.Sprintf("unexpected phase %v in toMatchPhase", phase))
-	}
 }
 
 func ToApiSuit(s game.Suit) api.Suit {
@@ -190,21 +178,30 @@ func ToGameState(m *match.Match) *api.GameState {
 		CompletedTricks: int32(m.Game.NumCompletedTricks()),
 		CurrentTrick:    ToApiTrick(m.Game.CurrentTrick, m.Mode())}
 }
-func ToMatchState(m *match.Match) *api.MatchState {
+func ToMatchState(tm *cloud.TableMatch) *api.MatchState {
+	m := tm.Match
 	turn := ToApiPlayer(m.WhoseTurn(), true)
+	players := &api.Players{
+		Player_1: string(tm.Players[game.Player1]),
+		Player_2: string(tm.Players[game.Player2]),
+		Player_3: string(tm.Players[game.Player3]),
+		Player_4: string(tm.Players[game.Player4]),
+	}
 	switch m.Phase() {
 	case match.InAuction:
 		auctionState := toAuctionState(m.Auction)
 		return &api.MatchState{Phase: api.MatchPhase_AUCTION,
 			Turn:    turn,
+			Players: players,
 			Details: &api.MatchState_AuctionState{AuctionState: auctionState}}
 	case match.InGame:
 		gameState := ToGameState(m)
 		return &api.MatchState{Phase: api.MatchPhase_GAME,
 			Turn:    turn,
+			Players: players,
 			Details: &api.MatchState_GameState{GameState: gameState}}
 	case match.MatchFinished:
-		return &api.MatchState{Phase: api.MatchPhase_FINISHED}
+		return &api.MatchState{Phase: api.MatchPhase_FINISHED, Players: players}
 	}
 	panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", m.Phase()))
 }
