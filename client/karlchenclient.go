@@ -5,31 +5,43 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"google.golang.org/grpc"
 	"log"
-	"time"
 )
 
 type Client struct {
 	Kc         api.KarlchencloudClient
-	Ctx        context.Context
-	Cancel     context.CancelFunc
 	Connection *grpc.ClientConn
 }
 
-func GetConnectedService(addr string, name string, timeout time.Duration) *Client {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+func (c *Client) Close() {
+	_ = c.Connection.Close()
+}
+
+type ConnectData struct {
+	DisplayName    string
+	ExistingUserId *string
+	ExistingSecret *string
+	Address        string
+}
+
+func GetConnectedService(c ConnectData, ctx context.Context) (*Client, error) {
 	creds := EmptyClientCredentials()
-	conn, err := grpc.DialContext(ctx, addr, grpc.WithInsecure(), grpc.WithBlock(),
+	if c.ExistingUserId != nil {
+		creds.UpdateLogin(*c.ExistingUserId, *c.ExistingUserId)
+	}
+	conn, err := grpc.DialContext(ctx, c.Address, grpc.WithInsecure(), grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(creds))
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		return nil, err
 	}
 	kc := api.NewKarlchencloudClient(conn)
-	ans, err := kc.Register(ctx, &api.RegisterRequest{Name: name})
-	if err != nil {
-		log.Fatalf("could not register: %v", err)
-	} else {
-		log.Printf("registered %v with id %v", name, ans.Id)
+	_, loginErr := kc.CheckLogin(ctx, &api.Empty{})
+	if c.ExistingUserId == nil || loginErr != nil {
+		ans, err := kc.Register(ctx, &api.RegisterRequest{Name: c.DisplayName})
+		if err != nil {
+			return nil, err
+		}
+		creds.UpdateLogin(ans.Id, ans.Secret)
+		log.Printf("registered %v with id %v", c.DisplayName, ans.Id)
 	}
-	creds.UpdateLogin(ans.Id, ans.Secret)
-	return &Client{kc, ctx, cancel, conn}
+	return &Client{kc, conn}, nil
 }
