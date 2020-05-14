@@ -64,7 +64,7 @@ func (t *Table) StartMatch() error {
 	nextMatch := t.round.NextMatch()
 	pa := t.round.CurrentPlayerAssignment()
 
-	t.CurrentMatch = &TableMatch{nextMatch, playerIds(t.playersInOrder, pa)}
+	t.CurrentMatch = &TableMatch{nextMatch, getActivePlayerIds(t.playersInOrder, pa)}
 	return nil
 }
 
@@ -76,6 +76,11 @@ func (t *Table) ContainsPlayer(player UserId) bool {
 	}
 	return false
 }
+
+func (t *Table) Users() []UserId {
+	return t.players
+}
+
 func (t *Table) Join(user UserId) error {
 	if t.Phase != BeforeFirstGame {
 		return Error("cannot join a started table")

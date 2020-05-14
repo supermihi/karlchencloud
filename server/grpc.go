@@ -13,12 +13,40 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
+	"sync"
 )
 
 type grpcserver struct {
 	api.UnimplementedKarlchencloudServer
-	room cloud.Room
-	auth Auth
+	room               cloud.Room
+	auth               Auth
+	TableBroadcasts    map[string]chan *api.MatchEventStream
+	ClientTableStreams map[cloud.UserId]chan *api.MatchEventStream
+	brdMutex, cltMutex sync.RWMutex
+}
+
+func NewServer(room cloud.Room, auth Auth) *grpcserver {
+	return &grpcserver{
+		room: room, auth: auth,
+		TableBroadcasts:    make(map[string]chan *api.MatchEventStream, 10),
+		ClientTableStreams: make(map[cloud.UserId]chan *api.MatchEventStream),
+	}
+}
+func StartServer(users cloud.Users, port string) {
+	lis, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	room := cloud.NewRoom(users)
+	auth := NewAuth(users)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcauth.UnaryServerInterceptor(auth.Authenticate)),
+		grpc.StreamInterceptor(grpcauth.StreamServerInterceptor(auth.Authenticate)))
+	serv := NewServer(room, auth)
+	api.RegisterKarlchencloudServer(grpcServer, serv)
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
 
 func (s *grpcserver) Register(_ context.Context, req *api.RegisterRequest) (*api.RegisterReply, error) {
@@ -89,7 +117,7 @@ func (s *grpcserver) tryGetTable(id string) (*cloud.Table, error) {
 	return table, nil
 }
 
-func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (*api.Empty, error) {
+func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (*api.MyTableState, error) {
 	user, _ := GetAuthenticatedUser(ctx)
 	table, err := s.tryGetTable(req.TableId)
 	if err != nil {
@@ -102,30 +130,22 @@ func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &api.Empty{}, nil
+	log.Printf("user %v joined table %v", user, table.Id)
+	state := &api.MyTableState{Users: common.ToApiUsers(table.Users(), s.room.Users)}
+	if table.CurrentMatch == nil {
+		state.State = &api.MyTableState_NoMatch{NoMatch: &api.Empty{}}
+	} else {
+		matchState, err := s.getMyMatchState(table.Id, user)
+		if err != nil {
+			return nil, err
+		}
+		state.State = &api.MyTableState_InMatch{InMatch: matchState}
+	}
+	return state, nil
 }
 
-func StartServer(users cloud.Users, port string) {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-
-	room := cloud.NewRoom(users)
-	auth := NewAuth(users)
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcauth.UnaryServerInterceptor(auth.Authenticate)),
-		grpc.StreamInterceptor(grpcauth.StreamServerInterceptor(auth.Authenticate)))
-
-	serv := grpcserver{room: room, auth: auth}
-	api.RegisterKarlchencloudServer(grpcServer, &serv)
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
-}
-
-func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*api.MyMatchState, error) {
-	user, _ := GetAuthenticatedUser(ctx)
-	table, err := s.tryGetTable(tableId.Value)
+func (s *grpcserver) getMyMatchState(tableId string, user cloud.UserId) (*api.MyMatchState, error) {
+	table, err := s.tryGetTable(tableId)
 	if err != nil {
 		return nil, err
 	}
@@ -144,6 +164,10 @@ func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*
 	}
 	return &api.MyMatchState{MatchState: matchState, Role: &api.MyMatchState_Spectator{Spectator: &api.Empty{}}}, nil
 }
+func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*api.MyMatchState, error) {
+	user, _ := GetAuthenticatedUser(ctx)
+	return s.getMyMatchState(tableId.Value, user)
+}
 
 func GetHandCards(m *match.Match, p game.Player) []*api.Card {
 	if m.Phase() != match.InGame {
@@ -155,4 +179,56 @@ func GetHandCards(m *match.Match, p game.Player) []*api.Card {
 		ans[i] = common.ToApiCard(card)
 	}
 	return ans
+}
+
+func (s *grpcserver) SubscribeMatchEvents(tableId *api.TableId, srv api.Karlchencloud_SubscribeMatchEventsServer) error {
+	user, _ := GetAuthenticatedUser(srv.Context())
+	go s.sendTableBroadcasts(srv, user)
+	<-srv.Context().Done()
+	return srv.Context().Err()
+}
+
+func (s *grpcserver) sendTableBroadcasts(srv api.Karlchencloud_SubscribeMatchEventsServer, user cloud.UserId) {
+	stream := s.openTableStream(user)
+	defer s.closeTableStream(user)
+	for {
+		select {
+		case <-srv.Context().Done():
+			return
+		case event := <-stream:
+			if s, ok := status.FromError(srv.Send(event)); ok {
+				switch s.Code() {
+				case codes.OK:
+					// pass
+				case codes.Unavailable, codes.Canceled, codes.DeadlineExceeded:
+					log.Printf("client %s terminated connection", user)
+					return
+
+				default:
+					log.Printf("filed to send to client %s: %v", user, s.Err())
+				}
+			}
+		}
+	}
+}
+func (s *grpcserver) openTableStream(user cloud.UserId) (stream chan *api.MatchEventStream) {
+	stream = make(chan *api.MatchEventStream, 10)
+	s.cltMutex.Lock()
+	s.ClientTableStreams[user] = stream
+	s.cltMutex.Unlock()
+
+	log.Printf("created table stream for %s", user)
+
+	return
+}
+
+func (s *grpcserver) closeTableStream(user cloud.UserId) {
+	s.cltMutex.Lock()
+
+	if stream, ok := s.ClientTableStreams[user]; ok {
+		delete(s.ClientTableStreams, user)
+		close(stream)
+	}
+	log.Printf("closed table stream for %s", user)
+	s.cltMutex.Unlock()
 }

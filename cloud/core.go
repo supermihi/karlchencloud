@@ -21,7 +21,7 @@ type TableMatch struct {
 	Players [game.NumPlayers]UserId
 }
 
-func playerIds(playersInOrder []UserId, pa round.PlayerAssignment) [game.NumPlayers]UserId {
+func getActivePlayerIds(playersInOrder []UserId, pa round.PlayerAssignment) [game.NumPlayers]UserId {
 	var ans [game.NumPlayers]UserId
 	for inGamePlayerNumber, playerIndex := range pa.Playing() {
 		ans[inGamePlayerNumber] = playersInOrder[playerIndex]

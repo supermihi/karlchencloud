@@ -35,6 +35,15 @@ func main() {
 		log.Fatalf("error wrtiing table.config: %v", err)
 	}
 	log.Printf("wrote table.config")
+	stream, err := c.Kc.SubscribeMatchEvents(ctx, &api.TableId{Value: table.TableId})
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			log.Print(err)
+			break
+		}
+		log.Printf("new match event %v", msg)
+	}
 	_, err = c.Kc.StartTable(ctx, &api.TableId{Value: table.TableId})
 	if err != nil {
 		log.Fatalf("%s could not start table: %v", conn.DisplayName, err)

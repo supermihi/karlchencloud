@@ -187,21 +187,29 @@ func ToMatchState(tm *cloud.TableMatch) *api.MatchState {
 		Player_3: string(tm.Players[game.Player3]),
 		Player_4: string(tm.Players[game.Player4]),
 	}
+	ans := &api.MatchState{Turn: turn, Players: players}
 	switch m.Phase() {
 	case match.InAuction:
+		ans.Phase = api.MatchPhase_AUCTION
 		auctionState := toAuctionState(m.Auction)
-		return &api.MatchState{Phase: api.MatchPhase_AUCTION,
-			Turn:    turn,
-			Players: players,
-			Details: &api.MatchState_AuctionState{AuctionState: auctionState}}
+		ans.Details = &api.MatchState_AuctionState{AuctionState: auctionState}
 	case match.InGame:
+		ans.Phase = api.MatchPhase_GAME
 		gameState := ToGameState(m)
-		return &api.MatchState{Phase: api.MatchPhase_GAME,
-			Turn:    turn,
-			Players: players,
-			Details: &api.MatchState_GameState{GameState: gameState}}
+		ans.Details = &api.MatchState_GameState{GameState: gameState}
 	case match.MatchFinished:
-		return &api.MatchState{Phase: api.MatchPhase_FINISHED, Players: players}
+		ans.Phase = api.MatchPhase_FINISHED
+	default:
+		panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", m.Phase()))
 	}
-	panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", m.Phase()))
+	return ans
+
+}
+
+func ToApiUsers(ids []cloud.UserId, users cloud.Users) []*api.User {
+	ans := make([]*api.User, len(ids))
+	for i, id := range ids {
+		ans[i] = &api.User{Id: string(id), Name: users.GetName(id)}
+	}
+	return ans
 }

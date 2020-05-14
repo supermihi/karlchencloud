@@ -19,10 +19,10 @@ service Karlchencloud {
     rpc StartTable (TableId) returns (Empty) {
     }
 
-    rpc JoinTable (JoinTableRequest) returns (Empty) {
+    rpc JoinTable (JoinTableRequest) returns (MyTableState) {
     }
 
-    rpc SubscribeMatchEvents (TableId) returns (stream MatchEvent) {
+    rpc SubscribeMatchEvents (TableId) returns (stream MatchEventStream) {
     }
 
     rpc GetMatchState (TableId) returns (MyMatchState) {
@@ -54,7 +54,7 @@ message EndOfGame {
     int32 value = 2;
 }
 
-message MatchEvent {
+message MatchEventStream {
     oneof event {
         Declaration declared = 1;
         PlayedCard played_card = 3;
@@ -127,6 +127,19 @@ message MyMatchState {
         PlayerPrivateState player_state = 2;
         Empty spectator = 3;
     }
+}
+
+message MyTableState {
+    oneof state {
+        MyMatchState in_match = 1;
+        Empty no_match = 2;
+    }
+    repeated User Users = 3;
+}
+
+message User {
+    string id = 1;
+    string name = 2;
 }
 
 message PlayerPrivateState {
