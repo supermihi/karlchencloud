@@ -80,4 +80,18 @@ func (gbc *GoBotClient) Run() {
 		return
 	}
 	log.Printf("%s joined", gbc.connectData.DisplayName)
+	serv, err := c.SubscribeMatchEvents(ctx, &api.TableId{Value: gbc.table})
+	if err != nil {
+		log.Printf("%s could not subscribe match events: %v", gbc.connectData.DisplayName, err)
+		return
+	}
+	for {
+		msg, err := serv.Recv()
+		if err != nil {
+			log.Printf("%s could not receive event: %v", gbc.connectData.DisplayName, err)
+			return
+		}
+		log.Printf("%s incoming message: %s", gbc.connectData.DisplayName, client.MatchEventString(msg))
+
+	}
 }

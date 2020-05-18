@@ -53,6 +53,32 @@ func ToApiBid(b match.Bid) api.BidType {
 	}
 }
 
+func ToBid(b api.BidType) match.Bid {
+	switch b {
+	case api.BidType_RE_BID:
+		return match.Re
+	case api.BidType_CONTRA_BID:
+		return match.Contra
+	case api.BidType_RE_NO_NINETY:
+		return match.ReKeine90
+	case api.BidType_CONTRA_NO_NINETY:
+		return match.ContraKeine90
+	case api.BidType_RE_NO_SIXTY:
+		return match.ReKeine60
+	case api.BidType_CONTRA_NO_SIXTY:
+		return match.ContraKeine60
+	case api.BidType_RE_NO_THIRTY:
+		return match.ReKeine30
+	case api.BidType_CONTRA_NO_THIRTY:
+		return match.ContraKeine30
+	case api.BidType_RE_SCHWARZ:
+		return match.ReSchwarz
+	case api.BidType_CONTRA_SCHWARZ:
+		return match.ContraSchwarz
+	}
+	panic(fmt.Sprintf("unexpected api bid %v in ToBid()", b))
+}
+
 func ToAuctionPhase(p match.AuctionPhase) api.AuctionPhase {
 	switch p {
 	case match.VorbehaltAbfrage:
@@ -105,6 +131,20 @@ func ToApiSuit(s game.Suit) api.Suit {
 	panic(fmt.Sprintf("unexpected suit %v", s))
 }
 
+func ToSuit(s api.Suit) game.Suit {
+	switch s {
+	case api.Suit_DIAMONDS:
+		return game.Karo
+	case api.Suit_HEARTS:
+		return game.Herz
+	case api.Suit_SPADES:
+		return game.Pik
+	case api.Suit_CLUBS:
+		return game.Kreuz
+	}
+	panic(fmt.Sprintf("unexpected apisuit %v in ToSuit()", s))
+}
+
 func ToApiRank(r game.Rank) api.Rank {
 	switch r {
 	case game.Neun:
@@ -123,8 +163,30 @@ func ToApiRank(r game.Rank) api.Rank {
 	panic(fmt.Sprintf("unexpected rank %v", r))
 }
 
+func ToRank(r api.Rank) game.Rank {
+	switch r {
+	case api.Rank_NINE:
+		return game.Neun
+	case api.Rank_JACK:
+		return game.Bube
+	case api.Rank_QUEEN:
+		return game.Dame
+	case api.Rank_KING:
+		return game.Koenig
+	case api.Rank_TEN:
+		return game.Zehn
+	case api.Rank_ACE:
+		return game.Ass
+	}
+	panic(fmt.Sprintf("unexpected apirank %v in ToRank()", r))
+}
+
 func ToApiCard(c game.Card) *api.Card {
 	return &api.Card{Suit: ToApiSuit(c.Suit), Rank: ToApiRank(c.Rank)}
+}
+
+func ToCard(c *api.Card) game.Card {
+	return game.Card{Suit: ToSuit(c.Suit), Rank: ToRank(c.Rank)}
 }
 
 func ToApiTrick(t *game.IncompleteTrick, m game.Mode) *api.Trick {
@@ -178,7 +240,7 @@ func ToGameState(m *match.Match) *api.GameState {
 		CompletedTricks: int32(m.Game.NumCompletedTricks()),
 		CurrentTrick:    ToApiTrick(m.Game.CurrentTrick, m.Mode())}
 }
-func ToMatchState(tm *cloud.TableMatch) *api.MatchState {
+func ToMatchState(tm *cloud.TableMatch, user cloud.UserId) *api.MatchState {
 	m := tm.Match
 	turn := ToApiPlayer(m.WhoseTurn(), true)
 	players := &api.Players{
@@ -188,28 +250,63 @@ func ToMatchState(tm *cloud.TableMatch) *api.MatchState {
 		Player_4: string(tm.Players[game.Player4]),
 	}
 	ans := &api.MatchState{Turn: turn, Players: players}
-	switch m.Phase() {
-	case match.InAuction:
-		ans.Phase = api.MatchPhase_AUCTION
-		auctionState := toAuctionState(m.Auction)
-		ans.Details = &api.MatchState_AuctionState{AuctionState: auctionState}
-	case match.InGame:
-		ans.Phase = api.MatchPhase_GAME
-		gameState := ToGameState(m)
-		ans.Details = &api.MatchState_GameState{GameState: gameState}
-	case match.MatchFinished:
-		ans.Phase = api.MatchPhase_FINISHED
-	default:
-		panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", m.Phase()))
-	}
+	addDetails(ans, m)
+	addRole(ans, tm, user)
 	return ans
 
 }
 
-func ToApiUsers(ids []cloud.UserId, users cloud.Users) []*api.User {
-	ans := make([]*api.User, len(ids))
-	for i, id := range ids {
-		ans[i] = &api.User{Id: string(id), Name: users.GetName(id)}
+func addRole(state *api.MatchState, tm *cloud.TableMatch, user cloud.UserId) {
+	isPlayer := false
+	for pInd, playerUser := range tm.Players {
+		if user == playerUser {
+			player := game.Player(pInd)
+			playerData := &api.MatchPlayerData{
+				Cards:  GetHandCards(tm.Match, player),
+				Player: ToApiPlayer(player, false)}
+			state.Role = &api.MatchState_PlayerData{PlayerData: playerData}
+			isPlayer = true
+			break
+		}
+	}
+	if !isPlayer {
+		state.Role = &api.MatchState_Spectator{Spectator: &api.Empty{}}
+	}
+}
+
+func addDetails(state *api.MatchState, m *match.Match) {
+	switch m.Phase() {
+	case match.InAuction:
+		state.Phase = api.MatchPhase_AUCTION
+		auctionState := toAuctionState(m.Auction)
+		state.Details = &api.MatchState_AuctionState{AuctionState: auctionState}
+	case match.InGame:
+		state.Phase = api.MatchPhase_GAME
+		gameState := ToGameState(m)
+		state.Details = &api.MatchState_GameState{GameState: gameState}
+	case match.MatchFinished:
+		state.Phase = api.MatchPhase_FINISHED
+	default:
+		panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", m.Phase()))
+	}
+}
+
+func GetHandCards(m *match.Match, p game.Player) []*api.Card {
+	if m.Phase() != match.InGame {
+		return nil
+	}
+	cards := m.Game.HandCards[p]
+	ans := make([]*api.Card, len(cards))
+	for i, card := range cards {
+		ans[i] = ToApiCard(card)
 	}
 	return ans
+}
+
+func ToTableData(table *cloud.Table, user cloud.UserId) *api.TableData {
+	exposedInviteCode := ""
+	if table.Owner() == user {
+		exposedInviteCode = table.InviteCode
+	}
+	return &api.TableData{TableId: table.Id, Owner: string(table.Owner()), InviteCode: exposedInviteCode}
 }

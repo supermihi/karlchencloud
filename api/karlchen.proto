@@ -19,13 +19,17 @@ service Karlchencloud {
     rpc StartTable (TableId) returns (Empty) {
     }
 
-    rpc JoinTable (JoinTableRequest) returns (MyTableState) {
+    rpc JoinTable (JoinTableRequest) returns (TableState) {
+    }
+
+    rpc Play (PlayRequest) returns (Empty) {
+
     }
 
     rpc SubscribeMatchEvents (TableId) returns (stream MatchEventStream) {
     }
 
-    rpc GetMatchState (TableId) returns (MyMatchState) {
+    rpc GetMatchState (TableId) returns (MatchState) {
     }
 }
 
@@ -37,6 +41,11 @@ message Card {
 message Declaration {
     Player player = 1;
     bool vorbehalt = 2;
+}
+
+message Specification {
+    Player player = 1;
+    string mode_id = 2;
 }
 
 message PlayedCard {
@@ -56,13 +65,35 @@ message EndOfGame {
 
 message MatchEventStream {
     oneof event {
-        Declaration declared = 1;
-        PlayedCard played_card = 3;
-        Bid placed_bid = 4;
-        EndOfGame ended = 5;
+        MatchState start = 1;
+        Declaration declared = 2;
+        Specification specified = 3;
+        PlayedCard played_card = 4;
+        Bid placed_bid = 5;
+        EndOfGame ended = 6;
+        MemberEvent member = 7;
     }
-    MatchState new_state = 10;
-    int32 serial_no = 11;
+}
+
+enum MemberEventType {
+    JOIN_TABLE = 0;
+    LEAVE_TABLE = 1;
+    GO_OFFLINE = 2;
+    GO_ONLINE = 3;
+}
+message MemberEvent {
+    string userId = 1;
+    MemberEventType type = 2;
+}
+
+message PlayRequest {
+    oneof request {
+        bool vorbehalt = 1;
+        string mode_id = 2;
+        BidType bid = 3;
+        Card card = 4;
+    }
+    string table = 5;
 }
 message PlayerParty {
     Player player = 1;
@@ -105,13 +136,22 @@ message GameState {
     Mode mode = 5;
 }
 
+message MatchPlayerData {
+    repeated Card cards = 1;
+    Player player = 2;
+}
+
 message MatchState {
     MatchPhase phase = 1;
     Player turn = 2;
     Players players = 3;
+    oneof role {
+        Empty spectator = 4;
+        MatchPlayerData player_data = 5;
+    }
     oneof details {
-        AuctionState auction_state = 4;
-        GameState game_state = 5;
+        AuctionState auction_state = 6;
+        GameState game_state = 7;
     }
 }
 
@@ -121,30 +161,21 @@ message Players {
     string player_3 = 3;
     string player_4 = 4;
 }
-message MyMatchState {
-    MatchState match_state = 1;
-    oneof role {
-        PlayerPrivateState player_state = 2;
-        Empty spectator = 3;
-    }
-}
 
-message MyTableState {
+message TableState {
     oneof state {
-        MyMatchState in_match = 1;
+        MatchState in_match = 1;
         Empty no_match = 2;
     }
-    repeated User Users = 3;
+    repeated TableMember Users = 3;
 }
 
-message User {
+message TableMember {
     string id = 1;
     string name = 2;
+    bool online = 3;
 }
 
-message PlayerPrivateState {
-    repeated Card hand_cards = 1;
-}
 
 message Empty {
 

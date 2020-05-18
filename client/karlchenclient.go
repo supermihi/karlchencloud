@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"github.com/supermihi/karlchencloud/api"
 	"google.golang.org/grpc"
 	"log"
@@ -44,4 +45,15 @@ func GetConnectedService(c ConnectData, ctx context.Context) (*Client, error) {
 		log.Printf("registered %v with id %v", c.DisplayName, ans.Id)
 	}
 	return &Client{kc, conn}, nil
+}
+
+func MatchEventString(ev *api.MatchEventStream) string {
+	switch e := ev.Event.(type) {
+	case *api.MatchEventStream_Member:
+		return fmt.Sprintf("user %s status: %s", e.Member.UserId, e.Member.Type)
+	case *api.MatchEventStream_Start:
+		return fmt.Sprintf("game started with players %v", e.Start.Players)
+	}
+
+	return ev.String()
 }

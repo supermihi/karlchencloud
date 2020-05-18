@@ -21,6 +21,15 @@ type TableMatch struct {
 	Players [game.NumPlayers]UserId
 }
 
+func (tm *TableMatch) PlayerFor(user UserId) game.Player {
+	for p, pId := range tm.Players {
+		if pId == user {
+			return game.Player(p)
+		}
+	}
+	return game.NoPlayer
+}
+
 func getActivePlayerIds(playersInOrder []UserId, pa round.PlayerAssignment) [game.NumPlayers]UserId {
 	var ans [game.NumPlayers]UserId
 	for inGamePlayerNumber, playerIndex := range pa.Playing() {

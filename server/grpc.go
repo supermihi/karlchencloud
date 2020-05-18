@@ -18,18 +18,16 @@ import (
 
 type grpcserver struct {
 	api.UnimplementedKarlchencloudServer
-	room               cloud.Room
-	auth               Auth
-	TableBroadcasts    map[string]chan *api.MatchEventStream
-	ClientTableStreams map[cloud.UserId]chan *api.MatchEventStream
-	brdMutex, cltMutex sync.RWMutex
+	room                         cloud.Room
+	auth                         Auth
+	ClientTableStreams           map[cloud.UserId]chan *api.MatchEventStream
+	roomMutex, clientStreamMutex sync.RWMutex
 }
 
 func NewServer(room cloud.Room, auth Auth) *grpcserver {
 	return &grpcserver{
 		room: room, auth: auth,
-		TableBroadcasts:    make(map[string]chan *api.MatchEventStream, 10),
-		ClientTableStreams: make(map[cloud.UserId]chan *api.MatchEventStream),
+		ClientTableStreams: make(map[cloud.UserId]chan *api.MatchEventStream, 1000),
 	}
 }
 func StartServer(users cloud.Users, port string) {
@@ -69,57 +67,53 @@ func (s *grpcserver) CheckLogin(ctx context.Context, _ *api.Empty) (*api.OkOrNot
 
 func (s *grpcserver) CreateTable(ctx context.Context, _ *api.Empty) (*api.TableData, error) {
 	user, _ := GetAuthenticatedUser(ctx)
+	s.roomMutex.Lock()
 	table := s.room.CreateTable(user)
+	s.roomMutex.Unlock()
 	log.Printf("user %v created new table %v", s.room.Users.GetName(user), table)
-	return toTableData(table, user), nil
-}
-
-func toTableData(table *cloud.Table, user cloud.UserId) *api.TableData {
-	exposedInviteCode := ""
-	if table.Owner() == user {
-		exposedInviteCode = table.InviteCode
-	}
-	return &api.TableData{TableId: table.Id, Owner: string(table.Owner()), InviteCode: exposedInviteCode}
+	return common.ToTableData(table, user), nil
 }
 
 func (s *grpcserver) ListTables(ctx context.Context, _ *api.Empty) (*api.TableList, error) {
 	user, _ := GetAuthenticatedUser(ctx)
+	s.roomMutex.RLock()
 	tables := s.room.Tables.List()
 	result := make([]*api.TableData, len(tables))
 	for i, table := range tables {
-		result[i] = toTableData(table, user)
+		result[i] = common.ToTableData(table, user)
 	}
+	s.roomMutex.RUnlock()
 	return &api.TableList{Tables: result}, nil
 }
 
 func (s *grpcserver) StartTable(ctx context.Context, id *api.TableId) (*api.Empty, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	table, err := s.tryGetTable(id.Value)
+	s.roomMutex.Lock()
+	defer s.roomMutex.Unlock()
+	table, err := s.getTable(id.Value, user, true, true)
 	if err != nil {
 		return nil, err
-	}
-	if table.Owner() != user {
-		return nil, status.Error(codes.PermissionDenied, "you are not owner of the table")
 	}
 	err = table.Start()
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &api.Empty{}, nil
-
-}
-
-func (s *grpcserver) tryGetTable(id string) (*cloud.Table, error) {
-	table, ok := s.room.Tables.ById[id]
-	if !ok {
-		return nil, status.Error(codes.InvalidArgument, "table does not exist")
+	for _, u := range table.Users() {
+		state, err := s.getMatchState(table.Id, u)
+		if err != nil {
+			return nil, err
+		}
+		ev := &api.MatchEventStream{Event: &api.MatchEventStream_Start{Start: state}}
+		s.sendEventIfOnline(u, ev)
 	}
-	return table, nil
+	return &api.Empty{}, nil
 }
 
-func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (*api.MyTableState, error) {
+func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (*api.TableState, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	table, err := s.tryGetTable(req.TableId)
+	s.roomMutex.Lock()
+	defer s.roomMutex.Unlock()
+	table, err := s.getTable(req.TableId, user, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -131,21 +125,107 @@ func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	log.Printf("user %v joined table %v", user, table.Id)
-	state := &api.MyTableState{Users: common.ToApiUsers(table.Users(), s.room.Users)}
+	s.sendEventToAll(table.Users(), api.NewMemberEvent(user, api.MemberEventType_JOIN_TABLE))
+	return s.getTableState(table, user)
+}
+
+func (s *grpcserver) SubscribeMatchEvents(tableId *api.TableId, srv api.Karlchencloud_SubscribeMatchEventsServer) error {
+	user, _ := GetAuthenticatedUser(srv.Context())
+	s.roomMutex.RLock()
+	table, err := s.getTable(tableId.Value, user, true, false)
+	if err != nil {
+		s.roomMutex.RUnlock()
+		return err
+	}
+	go s.sendTableBroadcasts(srv, user)
+	s.sendEventToAll(table.Users(), api.NewMemberEvent(user, api.MemberEventType_GO_ONLINE))
+	s.roomMutex.RUnlock()
+	log.Printf("user %s subscribed for match events", user)
+	<-srv.Context().Done()
+	log.Printf("user %s disconnected from match events", user)
+	s.roomMutex.RLock()
+	table, err = s.getTable(tableId.Value, user, true, false)
+	if err != nil {
+		s.roomMutex.RUnlock()
+		return err
+	}
+	s.sendEventToAll(table.Users(), api.NewMemberEvent(user, api.MemberEventType_GO_OFFLINE))
+	s.roomMutex.RUnlock()
+
+	return srv.Context().Err()
+}
+
+func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty, error) {
+	user, _ := GetAuthenticatedUser(ctx)
+	s.roomMutex.Lock()
+	table, err := s.getTable(req.Table, user, true, false)
+	log.Printf("incoming play request from %s", user)
+	if err != nil {
+		s.roomMutex.Unlock()
+		return nil, err
+	}
 	if table.CurrentMatch == nil {
-		state.State = &api.MyTableState_NoMatch{NoMatch: &api.Empty{}}
+		s.roomMutex.Unlock()
+		return nil, status.Error(codes.InvalidArgument, "no current match")
+	}
+	player := table.CurrentMatch.PlayerFor(user)
+	if player == game.NoPlayer {
+		s.roomMutex.Unlock()
+		return nil, status.Error(codes.InvalidArgument, "you are not playing in this match")
+	}
+	p := common.ToApiPlayer(player, false)
+	m := table.CurrentMatch.Match
+	result := &api.MatchEventStream{}
+	switch action := req.Request.(type) {
+	case *api.PlayRequest_Vorbehalt:
+		if !m.AnnounceGesundOrVorbehalt(player, action.Vorbehalt) {
+			return nil, status.Error(codes.InvalidArgument, "cannot announce")
+		}
+		decl := &api.Declaration{Player: p, Vorbehalt: action.Vorbehalt}
+		result.Event = &api.MatchEventStream_Declared{Declared: decl}
+
+	case *api.PlayRequest_ModeId:
+		if !m.SpecifyVorbehalt(player, match.ModeId(action.ModeId)) {
+			return nil, status.Error(codes.InvalidArgument, "cannot declare")
+		}
+		spec := &api.Specification{Player: p, ModeId: action.ModeId}
+		result.Event = &api.MatchEventStream_Specified{Specified: spec}
+
+	case *api.PlayRequest_Bid:
+		if !m.PlaceBid(player, common.ToBid(action.Bid)) {
+			return nil, status.Error(codes.InvalidArgument, "cannot place bid")
+		}
+		bid := &api.Bid{Player: p, Bid: action.Bid}
+		result.Event = &api.MatchEventStream_PlacedBid{PlacedBid: bid}
+
+	case *api.PlayRequest_Card:
+		if !m.PlayCard(player, common.ToCard(action.Card)) {
+			return nil, status.Error(codes.InvalidArgument, "cannot play card")
+		}
+		card := &api.PlayedCard{Player: p, Card: action.Card}
+		result.Event = &api.MatchEventStream_PlayedCard{PlayedCard: card}
+	}
+	s.sendEventToAll(table.Users(), result)
+	s.roomMutex.Unlock()
+	return &api.Empty{}, nil
+}
+
+func (s *grpcserver) getTableState(table *cloud.Table, user cloud.UserId) (*api.TableState, error) {
+	state := &api.TableState{Users: s.createTableMembers(table)}
+	if table.CurrentMatch == nil {
+		state.State = &api.TableState_NoMatch{NoMatch: &api.Empty{}}
 	} else {
-		matchState, err := s.getMyMatchState(table.Id, user)
+		matchState, err := s.getMatchState(table.Id, user)
 		if err != nil {
 			return nil, err
 		}
-		state.State = &api.MyTableState_InMatch{InMatch: matchState}
+		state.State = &api.TableState_InMatch{InMatch: matchState}
 	}
 	return state, nil
 }
 
-func (s *grpcserver) getMyMatchState(tableId string, user cloud.UserId) (*api.MyMatchState, error) {
-	table, err := s.tryGetTable(tableId)
+func (s *grpcserver) getMatchState(tableId string, user cloud.UserId) (*api.MatchState, error) {
+	table, err := s.getTable(tableId, user, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -153,47 +233,46 @@ func (s *grpcserver) getMyMatchState(tableId string, user cloud.UserId) (*api.My
 	if m == nil {
 		return nil, status.Error(codes.Internal, "no active match at table")
 	}
-	matchState := common.ToMatchState(m)
-	for p, playerUser := range m.Players {
-		if user == playerUser {
-			private := &api.PlayerPrivateState{HandCards: GetHandCards(m.Match, game.Player(p))}
-			return &api.MyMatchState{
-				MatchState: matchState,
-				Role:       &api.MyMatchState_PlayerState{PlayerState: private}}, nil
-		}
-	}
-	return &api.MyMatchState{MatchState: matchState, Role: &api.MyMatchState_Spectator{Spectator: &api.Empty{}}}, nil
-}
-func (s *grpcserver) GetMatchState(ctx context.Context, tableId *api.TableId) (*api.MyMatchState, error) {
-	user, _ := GetAuthenticatedUser(ctx)
-	return s.getMyMatchState(tableId.Value, user)
+	return common.ToMatchState(m, user), nil
 }
 
-func GetHandCards(m *match.Match, p game.Player) []*api.Card {
-	if m.Phase() != match.InGame {
-		return nil
+func (s *grpcserver) getTable(id string, user cloud.UserId, needUserAtTable bool, needUserOwnsTable bool) (table *cloud.Table, err error) {
+	t, ok := s.room.Tables.ById[id]
+	if !ok {
+		return nil, status.Error(codes.InvalidArgument, "table does not exist")
 	}
-	cards := m.Game.HandCards[p]
-	ans := make([]*api.Card, len(cards))
-	for i, card := range cards {
-		ans[i] = common.ToApiCard(card)
+	if needUserAtTable && !t.ContainsPlayer(user) {
+		return nil, status.Error(codes.PermissionDenied, "user not at table")
 	}
-	return ans
+	if needUserOwnsTable && t.Owner() != user {
+		return nil, status.Error(codes.PermissionDenied, "not your table")
+	}
+	return t, nil
 }
 
-func (s *grpcserver) SubscribeMatchEvents(tableId *api.TableId, srv api.Karlchencloud_SubscribeMatchEventsServer) error {
-	user, _ := GetAuthenticatedUser(srv.Context())
-	go s.sendTableBroadcasts(srv, user)
-	<-srv.Context().Done()
-	return srv.Context().Err()
+func (s *grpcserver) sendEventIfOnline(user cloud.UserId, event *api.MatchEventStream) {
+	s.clientStreamMutex.RLock()
+	defer s.clientStreamMutex.RUnlock()
+	stream, ok := s.ClientTableStreams[user]
+	if ok {
+		stream <- event
+	}
+}
+
+func (s *grpcserver) sendEventToAll(users []cloud.UserId, event *api.MatchEventStream) {
+	for _, user := range users {
+		s.sendEventIfOnline(user, event)
+	}
 }
 
 func (s *grpcserver) sendTableBroadcasts(srv api.Karlchencloud_SubscribeMatchEventsServer, user cloud.UserId) {
 	stream := s.openTableStream(user)
 	defer s.closeTableStream(user)
+	log.Printf("waiting for messages to %s", user)
 	for {
 		select {
 		case <-srv.Context().Done():
+			log.Printf("no longer waiting for messages to %s", user)
 			return
 		case event := <-stream:
 			if s, ok := status.FromError(srv.Send(event)); ok {
@@ -205,7 +284,7 @@ func (s *grpcserver) sendTableBroadcasts(srv api.Karlchencloud_SubscribeMatchEve
 					return
 
 				default:
-					log.Printf("filed to send to client %s: %v", user, s.Err())
+					log.Printf("failed to send to client %s: %v", user, s.Err())
 				}
 			}
 		}
@@ -213,9 +292,9 @@ func (s *grpcserver) sendTableBroadcasts(srv api.Karlchencloud_SubscribeMatchEve
 }
 func (s *grpcserver) openTableStream(user cloud.UserId) (stream chan *api.MatchEventStream) {
 	stream = make(chan *api.MatchEventStream, 10)
-	s.cltMutex.Lock()
+	s.clientStreamMutex.Lock()
 	s.ClientTableStreams[user] = stream
-	s.cltMutex.Unlock()
+	s.clientStreamMutex.Unlock()
 
 	log.Printf("created table stream for %s", user)
 
@@ -223,12 +302,28 @@ func (s *grpcserver) openTableStream(user cloud.UserId) (stream chan *api.MatchE
 }
 
 func (s *grpcserver) closeTableStream(user cloud.UserId) {
-	s.cltMutex.Lock()
+	s.clientStreamMutex.Lock()
 
 	if stream, ok := s.ClientTableStreams[user]; ok {
 		delete(s.ClientTableStreams, user)
 		close(stream)
 	}
 	log.Printf("closed table stream for %s", user)
-	s.cltMutex.Unlock()
+	s.clientStreamMutex.Unlock()
+}
+
+func (s *grpcserver) isOnline(user cloud.UserId) bool {
+	s.clientStreamMutex.RLock()
+	_, ok := s.ClientTableStreams[user]
+	s.clientStreamMutex.RUnlock()
+	return ok
+}
+
+func (s *grpcserver) createTableMembers(table *cloud.Table) []*api.TableMember {
+	ans := make([]*api.TableMember, len(table.Users()))
+	for i, id := range table.Users() {
+		ans[i] = &api.TableMember{Id: string(id), Name: s.room.Users.GetName(id),
+			Online: s.isOnline(id)}
+	}
+	return ans
 }
