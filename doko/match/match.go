@@ -24,6 +24,14 @@ const (
 	MatchFinished
 )
 
+func (m *Match) InitialForehand() game.Player {
+	return m.Auction.forehand
+}
+
+func (m *Match) InitialHandCards(p game.Player) game.Hand {
+	return m.Auction.cards[p]
+}
+
 func (m *Match) Phase() Phase {
 	switch {
 	case !m.Auction.IsFinished():

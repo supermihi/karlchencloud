@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/common"
+	"github.com/supermihi/karlchencloud/doko/game"
 	"google.golang.org/grpc"
 	"log"
 )
@@ -11,6 +13,7 @@ import (
 type Client struct {
 	Kc         api.KarlchencloudClient
 	Connection *grpc.ClientConn
+	Creds      *ClientCredentials
 }
 
 func (c *Client) Close() {
@@ -44,7 +47,7 @@ func GetConnectedService(c ConnectData, ctx context.Context) (*Client, error) {
 		creds.UpdateLogin(ans.Id, ans.Secret)
 		log.Printf("registered %v with id %v", c.DisplayName, ans.Id)
 	}
-	return &Client{kc, conn}, nil
+	return &Client{kc, conn, creds}, nil
 }
 
 func MatchEventString(ev *api.MatchEventStream) string {
@@ -56,4 +59,12 @@ func MatchEventString(ev *api.MatchEventStream) string {
 	}
 
 	return ev.String()
+}
+
+func ToHand(cards []*api.Card) game.Hand {
+	ans := make([]game.Card, len(cards))
+	for i := 0; i < len(ans); i++ {
+		ans[i] = common.ToCard(cards[i])
+	}
+	return ans
 }

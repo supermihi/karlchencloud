@@ -8,22 +8,17 @@ import (
 	"github.com/supermihi/karlchencloud/doko/match"
 )
 
-func ToApiPlayer(p game.Player, mapNoPlayerToPlayer1 bool) api.Player {
-	switch p {
-	case game.Player1:
-		return api.Player_PLAYER_1
-	case game.Player2:
-		return api.Player_PLAYER_2
-	case game.Player3:
-		return api.Player_PLAYER_3
-	case game.Player4:
-		return api.Player_PLAYER_4
-	default:
-		if mapNoPlayerToPlayer1 {
-			return api.Player_PLAYER_1
-		}
-		panic("unexpected NoPlayer in ToApiPlayer")
+func ToApiUserId(p game.Player, users cloud.PlayerUserMap) string {
+	if p == game.NoPlayer {
+		panic("cannot convert NoPlayer to user id")
 	}
+	return string(users[p])
+}
+func ToPlayerValue(p game.Player, users cloud.PlayerUserMap) *api.PlayerValue {
+	if p != game.NoPlayer {
+		return &api.PlayerValue{UserId: string(users[p])}
+	}
+	return nil
 }
 
 func ToApiBid(b match.Bid) api.BidType {
@@ -119,18 +114,12 @@ func ToGameType(t api.GameType) game.AnnouncedGameType {
 	panic(fmt.Sprintf("not an api game type: %s", t))
 }
 
-func ToApiMode(mode game.Mode) *api.Mode {
-	soloist := api.Player_PLAYER_1
-	if !game.IsNormalspiel(mode.Type()) {
-		soloist = ToApiPlayer(game.Soloist(mode), false)
-	}
-	spouse := api.Player_PLAYER_1
+func ToApiMode(mode game.Mode, pum cloud.PlayerUserMap) *api.Mode {
+	soloist := ToPlayerValue(game.Soloist(mode), pum)
+	var spouse *api.PlayerValue
 	switch h := mode.(type) {
 	case game.Hochzeit:
-		if h.PartnerFound() {
-			spouse = ToApiPlayer(h.Partner(), false)
-		}
-
+		spouse = ToPlayerValue(h.Partner(), pum)
 	}
 	return &api.Mode{Type: ToApiGameType(mode.Type()), Soloist: soloist, Spouse: spouse}
 }
@@ -207,113 +196,119 @@ func ToCard(c *api.Card) game.Card {
 	return game.Card{Suit: ToSuit(c.Suit), Rank: ToRank(c.Rank)}
 }
 
-func ToApiTrick(t *game.IncompleteTrick, m game.Mode) *api.Trick {
-	result := &api.Trick{Forehand: ToApiPlayer(t.Forehand, false)}
-	if c, ok := t.CardOf(game.Player1); ok {
-		result.CardPlayer_1 = ToApiCard(c)
-	}
-	if c, ok := t.CardOf(game.Player2); ok {
-		result.CardPlayer_2 = ToApiCard(c)
-	}
-	if c, ok := t.CardOf(game.Player3); ok {
-		result.CardPlayer_3 = ToApiCard(c)
-	}
-	if c, ok := t.CardOf(game.Player4); ok {
-		result.CardPlayer_4 = ToApiCard(c)
+func ToApiTrick(t *game.IncompleteTrick, m game.Mode, users cloud.PlayerUserMap) *api.Trick {
+	result := &api.Trick{UserIdForehand: ToApiUserId(t.Forehand, users)}
+	cards := make([]*api.Card, t.NumCardsPlayed())
+	for i := 0; i < len(cards); i++ {
+		cards[i] = ToApiCard(t.NthCard(i))
 	}
 	if t.IsComplete() {
-		result.Winner = ToApiPlayer(game.WinnerOfTrick(t.CardsByPlayer(), t.Forehand, m), false)
+		result.UserIdWinner = ToPlayerValue(game.WinnerOfTrick(t.CardsByPlayer(), t.Forehand, m), users)
 	}
 	return result
 }
 
-func toAuctionState(a *match.Auction) *api.AuctionState {
+func ToApiTrickC(t game.Trick, users cloud.PlayerUserMap) *api.Trick {
+	result := &api.Trick{UserIdForehand: ToApiUserId(t.Forehand, users)}
+	cards := make([]*api.Card, game.NumPlayers)
+	for i := 0; i < len(cards); i++ {
+		cards[i] = ToApiCard(t.NthCard(i))
+	}
+	result.UserIdWinner = ToPlayerValue(t.Winner, users)
+	return result
+}
+
+func toAuctionState(a *match.Auction, users cloud.PlayerUserMap) *api.AuctionState {
 	declarations := make([]*api.Declaration, 0)
 	for _, p := range game.Players() {
 		decl, hasDeclared := a.DeclarationOf(p)
 		if hasDeclared {
-			apiDecl := &api.Declaration{Player: ToApiPlayer(p, false), Vorbehalt: !decl.Gesund}
+			apiDecl := &api.Declaration{UserId: ToApiUserId(p, users), Vorbehalt: !decl.Gesund}
 			declarations = append(declarations, apiDecl)
 		}
 	}
 	return &api.AuctionState{Declarations: declarations}
 }
 
-func toApiBids(bids *match.Bids) []*api.Bid {
+func toApiBids(bids *match.Bids, users cloud.PlayerUserMap) []*api.Bid {
 	var ans []*api.Bid
 	for _, player := range game.Players() {
 		bidsOf := bids.BidsOf(player)
 		apiBidsOf := make([]*api.Bid, len(bidsOf))
 		for i, b := range bidsOf {
-			apiBidsOf[i] = &api.Bid{Player: ToApiPlayer(player, false), Bid: ToApiBid(b)}
+			apiBidsOf[i] = &api.Bid{UserId: ToApiUserId(player, users), Bid: ToApiBid(b)}
 		}
 		ans = append(ans, apiBidsOf...)
 	}
 	return ans
 }
 
-func ToGameState(m *match.Match) *api.GameState {
-	return &api.GameState{Mode: ToApiMode(m.Mode()),
-		Bids:            toApiBids(m.Bids),
+func ToGameState(m *match.Match, users cloud.PlayerUserMap) *api.GameState {
+	var prevTrick *api.Trick
+	if m.Game.NumCompletedTricks() > 0 {
+		prevTrick = ToApiTrickC(m.Game.CompleteTricks[m.Game.NumCompletedTricks()-1], users)
+	}
+	return &api.GameState{Mode: ToApiMode(m.Mode(), users),
+		Bids:            toApiBids(m.Bids, users),
 		CompletedTricks: int32(m.Game.NumCompletedTricks()),
-		CurrentTrick:    ToApiTrick(m.Game.CurrentTrick, m.Mode())}
+		CurrentTrick:    ToApiTrick(m.Game.CurrentTrick, m.Mode(), users),
+		PreviousTrick:   prevTrick,
+	}
 }
 func ToMatchState(tm *cloud.TableMatch, user cloud.UserId) *api.MatchState {
 	m := tm.Match
-	turn := ToApiPlayer(m.WhoseTurn(), true)
+	turn := ToPlayerValue(m.WhoseTurn(), tm.Players)
+	self := tm.Players.PlayerFor(user)
+	if self == game.NoPlayer { // spectator
+		self = m.InitialForehand()
+	}
 	players := &api.Players{
-		Player_1: string(tm.Players[game.Player1]),
-		Player_2: string(tm.Players[game.Player2]),
-		Player_3: string(tm.Players[game.Player3]),
-		Player_4: string(tm.Players[game.Player4]),
+		UserIdSelf:  ToApiUserId(self, tm.Players),
+		UserIdLeft:  ToApiUserId(self.NextPlayer(), tm.Players),
+		UserIdFace:  ToApiUserId(self.NthNext(2), tm.Players),
+		UserIdRight: ToApiUserId(self.NthNext(3), tm.Players),
 	}
 	ans := &api.MatchState{Turn: turn, Players: players}
-	addDetails(ans, m)
-	addRole(ans, tm, user)
+	addDetails(ans, *tm)
+	addRole(ans, *tm, user)
 	return ans
 
 }
 
-func addRole(state *api.MatchState, tm *cloud.TableMatch, user cloud.UserId) {
-	isPlayer := false
-	for pInd, playerUser := range tm.Players {
-		if user == playerUser {
-			player := game.Player(pInd)
-			playerData := &api.MatchPlayerData{
-				Cards:  GetHandCards(tm.Match, player),
-				Player: ToApiPlayer(player, false)}
-			state.Role = &api.MatchState_PlayerData{PlayerData: playerData}
-			isPlayer = true
-			break
-		}
-	}
-	if !isPlayer {
+func addRole(state *api.MatchState, tm cloud.TableMatch, user cloud.UserId) {
+	self := tm.Players.PlayerFor(user)
+	if self == game.NoPlayer {
 		state.Role = &api.MatchState_Spectator{Spectator: &api.Empty{}}
+	} else {
+		cards := GetHandCards(tm.Match, self)
+		state.Role = &api.MatchState_OwnCards{OwnCards: &api.Cards{Cards: cards}}
 	}
 }
 
-func addDetails(state *api.MatchState, m *match.Match) {
-	switch m.Phase() {
+func addDetails(state *api.MatchState, tm cloud.TableMatch) {
+	switch tm.Match.Phase() {
 	case match.InAuction:
 		state.Phase = api.MatchPhase_AUCTION
-		auctionState := toAuctionState(m.Auction)
+		auctionState := toAuctionState(tm.Match.Auction, tm.Players)
 		state.Details = &api.MatchState_AuctionState{AuctionState: auctionState}
 	case match.InGame:
 		state.Phase = api.MatchPhase_GAME
-		gameState := ToGameState(m)
+		gameState := ToGameState(tm.Match, tm.Players)
 		state.Details = &api.MatchState_GameState{GameState: gameState}
 	case match.MatchFinished:
 		state.Phase = api.MatchPhase_FINISHED
 	default:
-		panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", m.Phase()))
+		panic(fmt.Sprintf("ToMatchState called with invalid match phase %v", tm.Match.Phase()))
 	}
 }
 
 func GetHandCards(m *match.Match, p game.Player) []*api.Card {
+	var cards game.Hand
 	if m.Phase() != match.InGame {
-		return nil
+		cards = m.InitialHandCards(p)
+	} else {
+		cards = m.Game.HandCards[p]
 	}
-	cards := m.Game.HandCards[p]
 	ans := make([]*api.Card, len(cards))
 	for i, card := range cards {
 		ans[i] = ToApiCard(card)

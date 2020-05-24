@@ -38,18 +38,22 @@ message Card {
     Rank rank = 2;
 }
 
+message PlayerValue {
+    string user_id = 1;
+}
+
 message Declaration {
-    Player player = 1;
+    string user_id = 1;
     bool vorbehalt = 2;
 }
 
 message PlayedCard {
-    Player player = 1;
+    string user_id = 1;
     Card card = 2;
 }
 
 message Bid {
-    Player player = 1;
+    string user_id = 1;
     BidType bid = 3;
 }
 
@@ -77,7 +81,7 @@ enum MemberEventType {
     GO_ONLINE = 3;
 }
 message MemberEvent {
-    string userId = 1;
+    string user_id = 1;
     MemberEventType type = 2;
 }
 
@@ -89,51 +93,43 @@ message PlayRequest {
     }
     string table = 5;
 }
-message PlayerParty {
-    Player player = 1;
-    Party party = 2;
-}
 
 message AuctionState {
     repeated Declaration declarations = 1;
-    Player turn = 2;
+    string user_id_turn = 2;
 }
 
 message Mode {
     GameType type = 1;
-    Player soloist = 2;
-    Player spouse = 3;
+    PlayerValue soloist = 2;
+    PlayerValue spouse = 3;
 }
 
 message Trick {
-    Card card_player_1 = 1;
-    Card card_player_2 = 2;
-    Card card_player_3 = 3;
-    Card card_player_4 = 4;
-    Player forehand = 5;
-    Player winner = 6;
+    repeated Card cards = 1;
+    string user_id_forehand = 5;
+    PlayerValue user_id_winner = 6;
 }
 
 message GameState {
     repeated Bid bids = 1;
-    int32 CompletedTricks = 2;
+    int32 completed_tricks = 2;
     Trick current_trick = 3;
     Trick previous_trick = 4;
     Mode mode = 5;
 }
 
-message MatchPlayerData {
+message Cards {
     repeated Card cards = 1;
-    Player player = 2;
 }
 
 message MatchState {
     MatchPhase phase = 1;
-    Player turn = 2;
+    PlayerValue turn = 2;
     Players players = 3;
     oneof role {
         Empty spectator = 4;
-        MatchPlayerData player_data = 5;
+        Cards own_cards = 5;
     }
     oneof details {
         AuctionState auction_state = 6;
@@ -142,10 +138,10 @@ message MatchState {
 }
 
 message Players {
-    string player_1 = 1;
-    string player_2 = 2;
-    string player_3 = 3;
-    string player_4 = 4;
+    string user_id_self = 1;
+    string user_id_left = 2;
+    string user_id_face = 3;
+    string user_id_right = 4;
 }
 
 message TableState {
@@ -153,11 +149,11 @@ message TableState {
         MatchState in_match = 1;
         Empty no_match = 2;
     }
-    repeated TableMember Users = 3;
+    repeated TableMember members = 3;
 }
 
 message TableMember {
-    string id = 1;
+    string user_id = 1;
     string name = 2;
     bool online = 3;
 }
@@ -221,13 +217,6 @@ enum Rank {
     ACE = 5;
 }
 
-
-enum Player {
-    PLAYER_1 = 0;
-    PLAYER_2 = 1;
-    PLAYER_3 = 2;
-    PLAYER_4 = 3;
-}
 
 enum Party {
     RE = 0;

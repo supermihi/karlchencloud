@@ -1,6 +1,9 @@
 package game
 
-import "math/rand"
+import (
+	"math/rand"
+	"strings"
+)
 
 type Hand []Card
 type Cards [NumPlayers]Hand
@@ -12,6 +15,14 @@ func (h Hand) CardIndex(card Card) int {
 		}
 	}
 	return -1
+}
+
+func (h Hand) String() string {
+	cardStrings := make([]string, len(h))
+	for i, card := range h {
+		cardStrings[i] = card.String()
+	}
+	return strings.Join(cardStrings, "; ")
 }
 
 func (h *Hand) RemoveCard(c Card) {

@@ -14,6 +14,10 @@ func NewClientCredentials(userId string, secret string) *ClientCredentials {
 	return &ClientCredentials{userId, secret}
 }
 
+func (c *ClientCredentials) UserId() string {
+	return c.userId
+}
+
 func EmptyClientCredentials() *ClientCredentials {
 	return &ClientCredentials{"", ""}
 }

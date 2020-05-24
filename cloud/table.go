@@ -45,10 +45,11 @@ func (t *Table) Start() error {
 	if t.Phase != BeforeFirstGame {
 		return Error("table already started")
 	}
-	if len(t.players) <= game.NumPlayers || len(t.players) >= 7 {
+	if len(t.players) < game.NumPlayers || len(t.players) >= 7 {
 		return Error(fmt.Sprintf("Cannot start table with %v players", len(t.players)))
 	}
 	t.playersInOrder = make([]UserId, len(t.players))
+	copy(t.playersInOrder, t.players)
 	rand.Shuffle(len(t.players), func(i int, j int) {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
 	})

@@ -16,13 +16,14 @@ type Users interface {
 	Authenticate(id UserId, secret string) bool
 }
 
+type PlayerUserMap [game.NumPlayers]UserId
 type TableMatch struct {
 	Match   *match.Match
-	Players [game.NumPlayers]UserId
+	Players PlayerUserMap
 }
 
-func (tm *TableMatch) PlayerFor(user UserId) game.Player {
-	for p, pId := range tm.Players {
+func (pm PlayerUserMap) PlayerFor(user UserId) game.Player {
+	for p, pId := range pm {
 		if pId == user {
 			return game.Player(p)
 		}

@@ -167,12 +167,12 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 		s.roomMutex.Unlock()
 		return nil, status.Error(codes.InvalidArgument, "no current match")
 	}
-	player := table.CurrentMatch.PlayerFor(user)
+	player := table.CurrentMatch.Players.PlayerFor(user)
 	if player == game.NoPlayer {
 		s.roomMutex.Unlock()
 		return nil, status.Error(codes.InvalidArgument, "you are not playing in this match")
 	}
-	p := common.ToApiPlayer(player, false)
+	playerId := common.ToApiUserId(player, table.CurrentMatch.Players)
 	m := table.CurrentMatch.Match
 	result := &api.MatchEventStream{}
 	switch action := req.Request.(type) {
@@ -181,21 +181,21 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 		if !m.AnnounceGameType(player, gameType) {
 			return nil, status.Error(codes.InvalidArgument, "cannot declare")
 		}
-		declaration := &api.Declaration{Player: p, Vorbehalt: !game.IsNormalspiel(gameType)}
+		declaration := &api.Declaration{UserId: playerId, Vorbehalt: !game.IsNormalspiel(gameType)}
 		result.Event = &api.MatchEventStream_Declared{Declared: declaration}
 
 	case *api.PlayRequest_Bid:
 		if !m.PlaceBid(player, common.ToBid(action.Bid)) {
 			return nil, status.Error(codes.InvalidArgument, "cannot place bid")
 		}
-		bid := &api.Bid{Player: p, Bid: action.Bid}
+		bid := &api.Bid{UserId: playerId, Bid: action.Bid}
 		result.Event = &api.MatchEventStream_PlacedBid{PlacedBid: bid}
 
 	case *api.PlayRequest_Card:
 		if !m.PlayCard(player, common.ToCard(action.Card)) {
 			return nil, status.Error(codes.InvalidArgument, "cannot play card")
 		}
-		card := &api.PlayedCard{Player: p, Card: action.Card}
+		card := &api.PlayedCard{UserId: playerId, Card: action.Card}
 		result.Event = &api.MatchEventStream_PlayedCard{PlayedCard: card}
 	}
 	s.sendEventToAll(table.Users(), result)
@@ -204,7 +204,7 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 }
 
 func (s *grpcserver) getTableState(table *cloud.Table, user cloud.UserId) (*api.TableState, error) {
-	state := &api.TableState{Users: s.createTableMembers(table)}
+	state := &api.TableState{Members: s.createTableMembers(table)}
 	if table.CurrentMatch == nil {
 		state.State = &api.TableState_NoMatch{NoMatch: &api.Empty{}}
 	} else {
@@ -315,7 +315,7 @@ func (s *grpcserver) isOnline(user cloud.UserId) bool {
 func (s *grpcserver) createTableMembers(table *cloud.Table) []*api.TableMember {
 	ans := make([]*api.TableMember, len(table.Users()))
 	for i, id := range table.Users() {
-		ans[i] = &api.TableMember{Id: string(id), Name: s.room.Users.GetName(id),
+		ans[i] = &api.TableMember{UserId: string(id), Name: s.room.Users.GetName(id),
 			Online: s.isOnline(id)}
 	}
 	return ans
