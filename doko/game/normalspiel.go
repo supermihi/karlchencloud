@@ -33,7 +33,11 @@ func NewNormalspiel(dealtCards Cards) NormalspielMode {
 	return NormalspielMode{parties, stilleHochzeit}
 }
 
-func (n NormalspielMode) OnCompletedTrick(Trick, int) {
+func (n NormalspielMode) IsStilleHochzeit() bool {
+	return n.stilleHochzeit
+}
+
+func (NormalspielMode) OnCompletedTrick(Trick, int) {
 }
 
 func (NormalspielMode) Klaerungsstich() int {

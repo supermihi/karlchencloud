@@ -35,7 +35,11 @@ func (Farbsolo) OnCompletedTrick(game.Trick, int) {
 }
 
 func (f Farbsolo) Type() game.AnnouncedGameType {
-	switch f.Trumpf {
+	return gameTypeForTrump(f.Trumpf)
+}
+
+func gameTypeForTrump(trump game.Suit) game.AnnouncedGameType {
+	switch trump {
 	case game.Karo:
 		return game.KaroSoloType
 	case game.Herz:
@@ -55,25 +59,12 @@ type VorbehaltFarbsolo struct {
 func (v VorbehaltFarbsolo) CanAnnounceWith(handCards game.Hand) bool {
 	return true
 }
-
-func (v VorbehaltFarbsolo) Identifier() ModeId {
-	switch v.suit {
-	case game.Karo:
-		return "KARO_SOLO"
-	case game.Herz:
-		return "HERZ_SOLO"
-	case game.Pik:
-		return "PIK_SOLO"
-	case game.Kreuz:
-		return "KREUZ_SOLO"
-	default:
-		panic("unexpected suit")
-	}
-
+func (v VorbehaltFarbsolo) Type() game.AnnouncedGameType {
+	return gameTypeForTrump(v.suit)
 }
 
 func (v VorbehaltFarbsolo) Priority() int {
-	return VORBEHALT_PRIORITY_HOCHZEIT + 1
+	return VorbehaltPriorityHochzeit + 1
 }
 
 func (v VorbehaltFarbsolo) CreateMode(announcer game.Player) game.Mode {
@@ -82,13 +73,4 @@ func (v VorbehaltFarbsolo) CreateMode(announcer game.Player) game.Mode {
 
 func (v VorbehaltFarbsolo) AnnouncerTakesForehand() bool {
 	return false
-}
-
-func AllFarbsolos() []SonderspielMode {
-	ans := make([]SonderspielMode, 4)
-	ans[0] = VorbehaltFarbsolo{game.Karo}
-	ans[1] = VorbehaltFarbsolo{game.Herz}
-	ans[2] = VorbehaltFarbsolo{game.Pik}
-	ans[3] = VorbehaltFarbsolo{game.Kreuz}
-	return ans
 }

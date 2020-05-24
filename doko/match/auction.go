@@ -1,151 +1,96 @@
 package match
 
 import (
-	"fmt"
 	"github.com/supermihi/karlchencloud/doko/game"
 )
 
-type Auction struct {
-	sonderspiele   Sonderspiele
-	forehand       game.Player
-	cards          game.Cards
-	vorbehalte     map[game.Player]bool
-	specifications map[game.Player]SonderspielMode
+type Declaration struct {
+	Gesund    bool
+	Vorbehalt Vorbehalt
 }
 
-func NewAuction(forehand game.Player, cards game.Cards, sonderspiele Sonderspiele) *Auction {
+func DeclarationGesund() Declaration {
+	return Declaration{true, nil}
+}
+
+func DeclarationVorbehalt(v Vorbehalt) Declaration {
+	return Declaration{false, v}
+}
+
+type Auction struct {
+	forehand     game.Player
+	cards        game.Cards
+	declarations map[game.Player]Declaration
+}
+
+func NewAuction(forehand game.Player, cards game.Cards) *Auction {
 	return &Auction{
-		sonderspiele,
 		forehand,
 		cards,
-		make(map[game.Player]bool),
-		make(map[game.Player]SonderspielMode),
+		make(map[game.Player]Declaration),
 	}
 }
 
-type AuctionPhase int
-
-const (
-	VorbehaltAbfrage AuctionPhase = iota
-	VorbehaltSpezifikation
-	AuctionFinished
-)
-
-func (a *Auction) Phase() AuctionPhase {
-	if len(a.vorbehalte) < game.NumPlayers {
-		return VorbehaltAbfrage
-	}
-	if len(a.specifications) < a.NumVorbehalt() {
-		return VorbehaltSpezifikation
-	}
-	return AuctionFinished
+func (a *Auction) IsFinished() bool {
+	return len(a.declarations) == game.NumPlayers
 }
 
-type Declaration int
-
-const (
-	NotDeclared Declaration = iota
-	Gesund
-	Vorbehalt
-)
-
-func (a *Auction) DeclarationOf(p game.Player) Declaration {
-	vorbehalt, ok := a.vorbehalte[p]
-	if !ok {
-		return NotDeclared
-	}
-	if vorbehalt {
-		return Vorbehalt
-	}
-	return Gesund
-}
-
-func (a *Auction) NumVorbehalt() int {
-	ans := 0
-	for _, hasVorbehalt := range a.vorbehalte {
-		if hasVorbehalt {
-			ans += 1
-		}
-	}
-	return ans
+func (a *Auction) DeclarationOf(p game.Player) (d Declaration, ok bool) {
+	d, ok = a.declarations[p]
+	return
 }
 
 func (a *Auction) WhoseTurn() game.Player {
-	switch a.Phase() {
-	case VorbehaltAbfrage:
-		return a.forehand.NthNext(len(a.vorbehalte))
-	case VorbehaltSpezifikation:
-		for _, candidate := range game.PlayersFrom(a.forehand) {
-			if a.vorbehalte[candidate] {
-				_, ok := a.specifications[candidate]
-				if !ok {
-					return candidate
-				}
-			}
-		}
-		panic("should not happen")
-	default:
+	if a.IsFinished() {
 		return game.NoPlayer
 	}
+	return a.forehand.NthNext(len(a.declarations))
 }
 
-func (a *Auction) Announce(player game.Player, vorbehalt bool) {
+type DeclarationResult int
+
+func (a *Auction) Declare(player game.Player, t game.AnnouncedGameType) bool {
 	if player != a.WhoseTurn() {
-		panic(fmt.Sprintf("%v cannot anounce because it's not her turn", player))
+		panic("invalid call to Declare")
 	}
-	a.vorbehalte[player] = vorbehalt
-}
-
-type SpecifyVorbehaltResult int
-
-const (
-	Ok SpecifyVorbehaltResult = iota
-	UnknownSonderspielId
-	SonderspielRequirementsUnmet
-)
-
-func (a *Auction) SpecifyVorbehalt(player game.Player, sonderspielId ModeId) SpecifyVorbehaltResult {
-	if a.Phase() != VorbehaltSpezifikation || player != a.WhoseTurn() {
-		panic("invalid call to SpecifyVorbehalt")
+	v := GetVorbehalt(t)
+	if v == nil {
+		// gesund
+		a.declarations[player] = DeclarationGesund()
+	} else {
+		if !v.CanAnnounceWith(a.cards[player]) {
+			return false
+		}
+		a.declarations[player] = DeclarationVorbehalt(v)
 	}
-	ans := a.sonderspiele.FindSonderspiel(sonderspielId)
-	if ans == nil {
-		return UnknownSonderspielId
-	}
-	if !ans.CanAnnounceWith(a.cards[player]) {
-		return SonderspielRequirementsUnmet
-	}
-	a.specifications[player] = ans
-	return Ok
+	return true
 }
 
 type Result struct {
-	Sonderspiel   game.Mode
-	IsSonderspiel bool
-	Forehand      game.Player
+	Mode     game.Mode
+	Forehand game.Player
 }
 
 func (a Auction) GetResult() Result {
-	if a.Phase() != AuctionFinished {
+	if !a.IsFinished() {
 		panic("trying to get result from unfinished auction")
 	}
 	winner := game.NoPlayer
 	maxPrio := -1
 	for _, player := range game.PlayersFrom(a.forehand) {
-		vorbehalt, hasVorbehalt := a.specifications[player]
-		if hasVorbehalt && vorbehalt.Priority() > maxPrio {
+		d := a.declarations[player]
+		if !d.Gesund && d.Vorbehalt.Priority() > maxPrio {
 			winner = player
-			maxPrio = vorbehalt.Priority()
+			maxPrio = d.Vorbehalt.Priority()
 		}
 	}
 	if winner == game.NoPlayer {
-		return Result{nil, false, a.forehand}
+		return Result{game.NewNormalspiel(a.cards), a.forehand}
 	}
-	sonderspiel := a.specifications[winner]
-	mode := sonderspiel.CreateMode(winner)
+	vorbehalt := a.declarations[winner].Vorbehalt
 	forehand := a.forehand
-	if sonderspiel.AnnouncerTakesForehand() {
+	if vorbehalt.AnnouncerTakesForehand() {
 		forehand = winner
 	}
-	return Result{mode, true, forehand}
+	return Result{vorbehalt.CreateMode(winner), forehand}
 }

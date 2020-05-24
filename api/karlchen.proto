@@ -43,11 +43,6 @@ message Declaration {
     bool vorbehalt = 2;
 }
 
-message Specification {
-    Player player = 1;
-    string mode_id = 2;
-}
-
 message PlayedCard {
     Player player = 1;
     Card card = 2;
@@ -67,7 +62,7 @@ message MatchEventStream {
     oneof event {
         MatchState start = 1;
         Declaration declared = 2;
-        Specification specified = 3;
+        Mode mode_defined = 3;
         PlayedCard played_card = 4;
         Bid placed_bid = 5;
         EndOfGame ended = 6;
@@ -88,8 +83,7 @@ message MemberEvent {
 
 message PlayRequest {
     oneof request {
-        bool vorbehalt = 1;
-        string mode_id = 2;
+        GameType declaration = 2;
         BidType bid = 3;
         Card card = 4;
     }
@@ -99,24 +93,16 @@ message PlayerParty {
     Player player = 1;
     Party party = 2;
 }
-enum AuctionPhase {
-    DECLARATION = 0;
-    SPECIFICATION = 1;
-}
 
 message AuctionState {
-    AuctionPhase phase = 1;
-    repeated Declaration declarations = 2;
+    repeated Declaration declarations = 1;
+    Player turn = 2;
 }
 
-
-message SoloInfo {
-    Player soloist = 1;
-    SoloType solo_type = 2;
-}
 message Mode {
     GameType type = 1;
-    SoloInfo solo_info = 2;
+    Player soloist = 2;
+    Player spouse = 3;
 }
 
 message Trick {
@@ -265,13 +251,9 @@ enum BidType {
 enum GameType {
     NORMAL_GAME = 0;
     MARRIAGE = 1;
-    VOLUNTARY_SOLO = 2;
-    COMPULSORY_SOLO = 3;
-}
-enum SoloType {
-    DIAMONDS_SOLO = 0;
-    HEARTS_SOLO = 1;
-    SPADES_SOLO = 2;
-    CLUBS_SOLO = 3;
-    MEATLESS_SOLO = 4;
+    DIAMONDS_SOLO = 2;
+    HEARTS_SOLO = 3;
+    SPADES_SOLO = 4;
+    CLUBS_SOLO = 5;
+    MEATLESS_SOLO = 6;
 }

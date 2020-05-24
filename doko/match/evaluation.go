@@ -31,7 +31,7 @@ func EvaluateGame(g *game.Game, bids *Bids) GameEvaluation {
 		extraPoints,
 		totalValue,
 		parties,
-		game.IsCountedSolo(g.Mode),
+		IsCountedSolo(g.Mode),
 	}
 }
 
@@ -53,7 +53,7 @@ func PointsByPlayer(eval *GameEvaluation, mode game.Mode) [game.NumPlayers]int {
 		if mode.PartyOf(p) != eval.Winner {
 			value = -value
 		}
-		if game.IsCountedSolo(mode) && mode.PartyOf(p) == game.ReParty {
+		if IsCountedSolo(mode) && mode.PartyOf(p) == game.ReParty {
 			// soloist
 			value = value * 3
 		}
@@ -88,4 +88,15 @@ func countReScoreAndTricks(g *game.Game) (int, int) {
 		panic("total tricks != 12")
 	}
 	return reScore, reTricks
+}
+
+func IsCountedSolo(m game.Mode) bool {
+	switch u := m.(type) {
+	case game.NormalspielMode:
+		return u.IsStilleHochzeit()
+	case game.Hochzeit:
+		return false
+	default:
+		return true
+	}
 }

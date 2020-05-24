@@ -7,7 +7,6 @@ import (
 	"github.com/supermihi/karlchencloud/cloud"
 	"github.com/supermihi/karlchencloud/common"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/doko/match"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -177,19 +176,13 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 	m := table.CurrentMatch.Match
 	result := &api.MatchEventStream{}
 	switch action := req.Request.(type) {
-	case *api.PlayRequest_Vorbehalt:
-		if !m.AnnounceGesundOrVorbehalt(player, action.Vorbehalt) {
-			return nil, status.Error(codes.InvalidArgument, "cannot announce")
-		}
-		decl := &api.Declaration{Player: p, Vorbehalt: action.Vorbehalt}
-		result.Event = &api.MatchEventStream_Declared{Declared: decl}
-
-	case *api.PlayRequest_ModeId:
-		if !m.SpecifyVorbehalt(player, match.ModeId(action.ModeId)) {
+	case *api.PlayRequest_Declaration:
+		gameType := common.ToGameType(action.Declaration)
+		if !m.AnnounceGameType(player, gameType) {
 			return nil, status.Error(codes.InvalidArgument, "cannot declare")
 		}
-		spec := &api.Specification{Player: p, ModeId: action.ModeId}
-		result.Event = &api.MatchEventStream_Specified{Specified: spec}
+		declaration := &api.Declaration{Player: p, Vorbehalt: !game.IsNormalspiel(gameType)}
+		result.Event = &api.MatchEventStream_Declared{Declared: declaration}
 
 	case *api.PlayRequest_Bid:
 		if !m.PlaceBid(player, common.ToBid(action.Bid)) {

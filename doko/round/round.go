@@ -34,12 +34,11 @@ func NewMatchStats(evaluation *match.GameEvaluation, assignment *PlayerAssignmen
 type Round struct {
 	numPlayers int
 	scores     []MatchStats
-	rules      match.Sonderspiele
 	cardSeed   int64
 }
 
-func NewRound(numPlayers int, rules match.Sonderspiele, cardSeed int64) *Round {
-	return &Round{numPlayers, make([]MatchStats, 0), rules, cardSeed}
+func NewRound(numPlayers int, cardSeed int64) *Round {
+	return &Round{numPlayers, make([]MatchStats, 0), cardSeed}
 }
 func (r *Round) CurrentPlayerAssignment() PlayerAssignment {
 	return NewPlayerAssignment(r.numPlayers, r.NumFinishedGames())
@@ -48,7 +47,7 @@ func (r *Round) CurrentPlayerAssignment() PlayerAssignment {
 func (r *Round) NextMatch() *match.Match {
 	index := r.NumFinishedGames()
 	assignment := NewPlayerAssignment(r.numPlayers, index)
-	ans := match.NewMatch(assignment.Forehand(r.numPlayers), r.rules, game.DealCards(r.cardSeed+int64(index)))
+	ans := match.NewMatch(assignment.Forehand(r.numPlayers), game.DealCards(r.cardSeed+int64(index)))
 	return &ans
 }
 

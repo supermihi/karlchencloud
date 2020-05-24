@@ -79,42 +79,60 @@ func ToBid(b api.BidType) match.Bid {
 	panic(fmt.Sprintf("unexpected api bid %v in ToBid()", b))
 }
 
-func ToAuctionPhase(p match.AuctionPhase) api.AuctionPhase {
-	switch p {
-	case match.VorbehaltAbfrage:
-		return api.AuctionPhase_DECLARATION
-	case match.VorbehaltSpezifikation:
-		return api.AuctionPhase_SPECIFICATION
-	}
-	panic("unsupported auction phase")
-}
-
-func toSoloType(t game.AnnouncedGameType) api.SoloType {
+func ToApiGameType(t game.AnnouncedGameType) api.GameType {
 	switch t {
+	case game.NormalspielType:
+		return api.GameType_NORMAL_GAME
+	case game.HochzeitType:
+		return api.GameType_MARRIAGE
 	case game.KaroSoloType:
-		return api.SoloType_DIAMONDS_SOLO
+		return api.GameType_DIAMONDS_SOLO
 	case game.HerzSoloType:
-		return api.SoloType_HEARTS_SOLO
+		return api.GameType_HEARTS_SOLO
 	case game.PikSoloType:
-		return api.SoloType_SPADES_SOLO
+		return api.GameType_SPADES_SOLO
 	case game.KreuzSoloType:
-		return api.SoloType_CLUBS_SOLO
+		return api.GameType_CLUBS_SOLO
+	case game.FleischlosType:
+		return api.GameType_MEATLESS_SOLO
 	}
 	panic(fmt.Sprintf("not a solo type: %v", t))
 }
-func ToApiMode(mode game.Mode) *api.Mode {
-	var gameType api.GameType
-	var soloInfo *api.SoloInfo
-	switch mode.(type) {
-	case game.NormalspielMode:
-		gameType = api.GameType_NORMAL_GAME
-	case game.Hochzeit:
-		gameType = api.GameType_MARRIAGE
-	default:
-		gameType = api.GameType_VOLUNTARY_SOLO
-		soloInfo = &api.SoloInfo{Soloist: ToApiPlayer(game.Soloist(mode), false), SoloType: toSoloType(mode.Type())}
+
+func ToGameType(t api.GameType) game.AnnouncedGameType {
+	switch t {
+	case api.GameType_NORMAL_GAME:
+		return game.NormalspielType
+	case api.GameType_MARRIAGE:
+		return game.HochzeitType
+	case api.GameType_DIAMONDS_SOLO:
+		return game.KaroSoloType
+	case api.GameType_HEARTS_SOLO:
+		return game.HerzSoloType
+	case api.GameType_SPADES_SOLO:
+		return game.PikSoloType
+	case api.GameType_CLUBS_SOLO:
+		return game.KreuzSoloType
+	case api.GameType_MEATLESS_SOLO:
+		return game.FleischlosType
 	}
-	return &api.Mode{Type: gameType, SoloInfo: soloInfo}
+	panic(fmt.Sprintf("not an api game type: %s", t))
+}
+
+func ToApiMode(mode game.Mode) *api.Mode {
+	soloist := api.Player_PLAYER_1
+	if !game.IsNormalspiel(mode.Type()) {
+		soloist = ToApiPlayer(game.Soloist(mode), false)
+	}
+	spouse := api.Player_PLAYER_1
+	switch h := mode.(type) {
+	case game.Hochzeit:
+		if h.PartnerFound() {
+			spouse = ToApiPlayer(h.Partner(), false)
+		}
+
+	}
+	return &api.Mode{Type: ToApiGameType(mode.Type()), Soloist: soloist, Spouse: spouse}
 }
 
 func ToApiSuit(s game.Suit) api.Suit {
@@ -212,13 +230,13 @@ func ToApiTrick(t *game.IncompleteTrick, m game.Mode) *api.Trick {
 func toAuctionState(a *match.Auction) *api.AuctionState {
 	declarations := make([]*api.Declaration, 0)
 	for _, p := range game.Players() {
-		decl := a.DeclarationOf(p)
-		if decl != match.NotDeclared {
-			apiDecl := &api.Declaration{Player: ToApiPlayer(p, false), Vorbehalt: decl == match.Vorbehalt}
+		decl, hasDeclared := a.DeclarationOf(p)
+		if hasDeclared {
+			apiDecl := &api.Declaration{Player: ToApiPlayer(p, false), Vorbehalt: !decl.Gesund}
 			declarations = append(declarations, apiDecl)
 		}
 	}
-	return &api.AuctionState{Phase: ToAuctionPhase(a.Phase()), Declarations: declarations}
+	return &api.AuctionState{Declarations: declarations}
 }
 
 func toApiBids(bids *match.Bids) []*api.Bid {

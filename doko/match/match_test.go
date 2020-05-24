@@ -22,7 +22,7 @@ func TestSampleMatch(t *testing.T) {
 			HerzA, Pik9, Pik9, PikA, KreuzK, KreuzA, KreuzA, Karo9, Karo10, HerzB, PikB, KreuzB,
 		},
 	}
-	match := NewMatch(Player3, StandardSonderspiele(), cards)
+	match := NewMatch(Player3, cards)
 	play := func(player Player, card Card) {
 		for _, otherPlayer := range Players() {
 			if otherPlayer != player {
@@ -33,7 +33,7 @@ func TestSampleMatch(t *testing.T) {
 		require.Truef(t, ans, "error playing %v as %v", card, player)
 	}
 	sayGesund := func(player Player) {
-		ans := match.AnnounceGesundOrVorbehalt(player, false)
+		ans := match.AnnounceGameType(player, NormalspielType)
 		assert.Truef(t, ans, "error announcing gesund as %v", player)
 	}
 	expectTrickWinner := func(player Player) {

@@ -1,31 +1,34 @@
 package match
 
-import "github.com/supermihi/karlchencloud/doko/game"
+import (
+	"fmt"
+	"github.com/supermihi/karlchencloud/doko/game"
+)
 
-type ModeId string
-
-type SonderspielMode interface {
+type Vorbehalt interface {
 	CanAnnounceWith(handCards game.Hand) bool
-	Identifier() ModeId
+	Type() game.AnnouncedGameType
 	Priority() int
 	CreateMode(announcer game.Player) game.Mode
 	AnnouncerTakesForehand() bool
 }
 
-type Sonderspiele map[ModeId]SonderspielMode
-
-func (r *Sonderspiele) FindSonderspiel(id ModeId) SonderspielMode {
-	var result, ok = (*r)[id]
-	if !ok {
+func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
+	switch t {
+	case game.NormalspielType:
 		return nil
+	case game.HochzeitType:
+		return VorbehaltHochzeit{}
+	case game.FleischlosType:
+		return VorbehaltFleischlos{}
+	case game.KaroSoloType:
+		return VorbehaltFarbsolo{game.Karo}
+	case game.HerzSoloType:
+		return VorbehaltFarbsolo{game.Herz}
+	case game.PikSoloType:
+		return VorbehaltFarbsolo{game.Pik}
+	case game.KreuzSoloType:
+		return VorbehaltFarbsolo{game.Kreuz}
 	}
-	return result
-}
-
-func MakeSonderspiele(modes []SonderspielMode) Sonderspiele {
-	result := make(Sonderspiele)
-	for _, m := range modes {
-		result[m.Identifier()] = m
-	}
-	return result
+	panic(fmt.Sprintf("unexpected game type %v in GetVorbehalt", t))
 }

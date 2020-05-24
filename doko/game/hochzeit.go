@@ -51,6 +51,10 @@ func (h Hochzeit) PartnerFound() bool {
 	return h.partner != NoPlayer
 }
 
+func (h Hochzeit) Partner() Player {
+	return h.partner
+}
+
 // trick-taking rules equal those of normal mode
 func (h Hochzeit) GameSuit(card Card) GameSuit {
 	return NormalGameSuit(card)

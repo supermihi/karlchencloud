@@ -3,7 +3,6 @@ package cloud
 import (
 	"fmt"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/doko/match"
 	"github.com/supermihi/karlchencloud/doko/round"
 	"math/rand"
 )
@@ -53,7 +52,7 @@ func (t *Table) Start() error {
 	rand.Shuffle(len(t.players), func(i int, j int) {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
 	})
-	t.round = round.NewRound(len(t.players), match.StandardSonderspiele(), rand.Int63())
+	t.round = round.NewRound(len(t.players), rand.Int63())
 	t.Phase = WaitingForNextGame
 	return t.StartMatch()
 }

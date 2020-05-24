@@ -8,11 +8,11 @@ type Mode interface {
 	OnCompletedTrick(t Trick, numTrick int)
 }
 
-func IsNormalspiel(m Mode) bool {
-	switch m.(type) {
-	case NormalspielMode:
+func IsNormalspiel(t AnnouncedGameType) bool {
+	switch t {
+	case NormalspielType:
 		return true
-	case Hochzeit:
+	case HochzeitType:
 		return true
 	default:
 		return false
@@ -30,21 +30,6 @@ func Soloist(m Mode) Player {
 		}
 	}
 	return soloist
-}
-
-func IsAnnouncedSolo(m Mode) bool {
-	return m.Type() != NormalspielType && m.Type() != HochzeitType
-}
-
-func IsCountedSolo(m Mode) bool {
-	switch u := m.(type) {
-	case NormalspielMode:
-		return u.stilleHochzeit
-	case Hochzeit:
-		return false
-	default:
-		return true
-	}
 }
 
 type AnnouncedGameType int

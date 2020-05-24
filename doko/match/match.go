@@ -10,8 +10,8 @@ type Match struct {
 	Bids    *Bids
 }
 
-func NewMatch(forehand game.Player, sonderspiele Sonderspiele, cards game.Cards) Match {
-	auct := NewAuction(forehand, cards, sonderspiele)
+func NewMatch(forehand game.Player, cards game.Cards) Match {
+	auct := NewAuction(forehand, cards)
 	bids := NewBids()
 	return Match{auct, nil, &bids}
 }
@@ -25,13 +25,10 @@ const (
 )
 
 func (m *Match) Phase() Phase {
-	switch m.Auction.Phase() {
-	case VorbehaltAbfrage:
-		fallthrough
-	case VorbehaltSpezifikation:
+	switch {
+	case !m.Auction.IsFinished():
 		return InAuction
-	}
-	if !m.Game.IsFinished() {
+	case !m.Game.IsFinished():
 		return InGame
 	}
 	return MatchFinished
@@ -43,40 +40,18 @@ func (m *Match) DealtCards() game.Cards {
 
 func (m *Match) proceedToGame() {
 	result := m.Auction.GetResult()
-	if result.IsSonderspiel {
-		m.Game = game.NewGame(m.DealtCards(), result.Forehand, result.Sonderspiel)
-	} else {
-		spiel := game.NewNormalspiel(m.DealtCards())
-		m.Game = game.NewGame(m.DealtCards(), m.Auction.forehand, spiel)
-	}
+	m.Game = game.NewGame(m.DealtCards(), result.Forehand, result.Mode)
 }
 
-func (m *Match) AnnounceGesundOrVorbehalt(player game.Player, vorbehalt bool) bool {
-	if m.Phase() != InAuction || m.Auction.Phase() != VorbehaltAbfrage {
+func (m *Match) AnnounceGameType(player game.Player, t game.AnnouncedGameType) bool {
+	if m.Phase() != InAuction || m.Auction.WhoseTurn() != player {
 		return false
 	}
-	if m.Auction.WhoseTurn() != player {
+	result := m.Auction.Declare(player, t)
+	if !result {
 		return false
 	}
-	m.Auction.Announce(player, vorbehalt)
-	if m.Auction.Phase() == AuctionFinished {
-		m.proceedToGame()
-	}
-	return true
-}
-
-func (m *Match) SpecifyVorbehalt(player game.Player, id ModeId) bool {
-	if m.Phase() != InAuction || m.Auction.Phase() != VorbehaltSpezifikation {
-		return false
-	}
-	if m.Auction.WhoseTurn() != player {
-		return false
-	}
-	result := m.Auction.SpecifyVorbehalt(player, id)
-	if result != Ok {
-		return false
-	}
-	if m.Auction.Phase() == AuctionFinished {
+	if m.Auction.IsFinished() {
 		m.proceedToGame()
 	}
 	return true

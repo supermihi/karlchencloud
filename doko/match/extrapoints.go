@@ -10,15 +10,18 @@ type ExtraPoint struct {
 	Trick  int
 }
 
-func findExtraPoints(g *game.Game) []ExtraPoint {
-	var ans []ExtraPoint
-	if !game.IsNormalspiel(g.Mode) {
-		return ans
+func extraPointsApply(t game.AnnouncedGameType) bool {
+	return t == game.NormalspielType || t == game.HochzeitType
+}
+
+func findExtraPoints(g *game.Game) (ans []ExtraPoint) {
+	if !extraPointsApply(g.Mode.Type()) {
+		return
 	}
 	ans = append(ans, doppelkoepfe(g)...)
 	ans = append(ans, fuechse(g)...)
 	ans = append(ans, karlchen(g)...)
-	return ans
+	return
 }
 
 func doppelkoepfe(game *game.Game) []ExtraPoint {

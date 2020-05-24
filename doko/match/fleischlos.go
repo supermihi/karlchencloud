@@ -35,13 +35,11 @@ type VorbehaltFleischlos struct{}
 func (VorbehaltFleischlos) CanAnnounceWith(handCards game.Hand) bool {
 	return true
 }
-
-func (VorbehaltFleischlos) Identifier() ModeId {
-	return "FLEISCHLOS"
+func (VorbehaltFleischlos) Type() game.AnnouncedGameType {
+	return game.FleischlosType
 }
-
 func (VorbehaltFleischlos) Priority() int {
-	return VORBEHALT_PRIORITY_HOCHZEIT + 1
+	return VorbehaltPriorityHochzeit + 1
 }
 
 func (VorbehaltFleischlos) CreateMode(announcer game.Player) game.Mode {
