@@ -4,10 +4,10 @@ package api;
 //option go_package = "github.com/supermihi/karlchencloud/api";
 option go_package = ".;api";
 service Karlchencloud {
-    rpc Register (RegisterRequest) returns (RegisterReply) {
+    rpc Register (UserName) returns (RegisterReply) {
     }
 
-    rpc CheckLogin (Empty) returns (OkOrNot) {
+    rpc CheckLogin (Empty) returns (UserName) {
     }
 
     rpc ListTables (Empty) returns (TableList) {
@@ -29,7 +29,7 @@ service Karlchencloud {
     rpc SubscribeMatchEvents (TableId) returns (stream MatchEventStream) {
     }
 
-    rpc GetMatchState (TableId) returns (MatchState) {
+    rpc GetTableState (TableId) returns (TableState) {
     }
 }
 
@@ -45,11 +45,13 @@ message PlayerValue {
 message Declaration {
     string user_id = 1;
     bool vorbehalt = 2;
+    Mode definedGameMode = 3;
 }
 
 message PlayedCard {
     string user_id = 1;
     Card card = 2;
+    PlayerValue trick_winner = 3;
 }
 
 message Bid {
@@ -66,7 +68,6 @@ message MatchEventStream {
     oneof event {
         MatchState start = 1;
         Declaration declared = 2;
-        Mode mode_defined = 3;
         PlayedCard played_card = 4;
         Bid placed_bid = 5;
         EndOfGame ended = 6;
@@ -82,7 +83,8 @@ enum MemberEventType {
 }
 message MemberEvent {
     string user_id = 1;
-    MemberEventType type = 2;
+    string name = 2;
+    MemberEventType type = 3;
 }
 
 message PlayRequest {
@@ -96,13 +98,13 @@ message PlayRequest {
 
 message AuctionState {
     repeated Declaration declarations = 1;
-    string user_id_turn = 2;
 }
 
 message Mode {
     GameType type = 1;
     PlayerValue soloist = 2;
     PlayerValue spouse = 3;
+    string forehand = 4;
 }
 
 message Trick {
@@ -163,11 +165,7 @@ message Empty {
 
 }
 
-message OkOrNot {
-    bool value = 1;
-}
-
-message RegisterRequest {
+message UserName {
     string name = 1;
 }
 

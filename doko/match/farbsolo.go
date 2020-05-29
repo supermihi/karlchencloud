@@ -13,11 +13,15 @@ func NewFarbsolo(trump game.Suit, soloist game.Player) Farbsolo {
 	return Farbsolo{trump, soloist}
 }
 
-func (f Farbsolo) GameSuit(card game.Card) game.GameSuit {
-	if card.Suit == f.Trumpf || card.Rank == game.Bube || card.Rank == game.Dame || card == game.Dulle() {
+func FarbsoloSuit(trump game.Suit, card game.Card) game.GameSuit {
+	if card.Suit == trump || card.Rank == game.Bube || card.Rank == game.Dame || card == game.Dulle() {
 		return game.Trumpf
 	}
 	return card.Suit.AsFehl()
+}
+
+func (f Farbsolo) GameSuit(card game.Card) game.GameSuit {
+	return FarbsoloSuit(f.Trumpf, card)
 }
 
 func (f Farbsolo) PartyOf(p game.Player) game.Party {

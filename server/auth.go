@@ -20,8 +20,13 @@ func NewAuth(users cloud.Users) Auth {
 }
 
 type userMDKey struct{}
-type userMetadata struct {
-	user cloud.UserId
+type UserData struct {
+	Id   string
+	Name string
+}
+
+func (d UserData) String() string {
+	return d.Name
 }
 
 func parseUserIdSecret(auth string) (string, string, error) {
@@ -51,21 +56,21 @@ func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err er
 	if err != nil {
 		return nil, err
 	}
-	if !a.Users.Authenticate(cloud.UserId(userId), secret) {
+	if !a.Users.Authenticate(userId, secret) {
 		return ctx, status.Error(codes.Unauthenticated, "invalid user/secret combination")
 	}
-	userMd := userMetadata{user: cloud.UserId(userId)}
+	userMd := UserData{Id: userId, Name: a.Users.GetName(userId)}
 	return context.WithValue(ctx, userMDKey{}, userMd), nil
 
 }
 
-func GetAuthenticatedUser(ctx context.Context) (cloud.UserId, bool) {
+func GetAuthenticatedUser(ctx context.Context) (UserData, bool) {
 	userMD := ctx.Value(userMDKey{})
 
 	switch md := userMD.(type) {
-	case userMetadata:
-		return md.user, true
+	case UserData:
+		return md, true
 	default:
-		return cloud.UserId(""), false
+		return UserData{}, false
 	}
 }

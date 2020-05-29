@@ -16,6 +16,13 @@ func (g *Game) NumCompletedTricks() int {
 	return len(g.CompleteTricks)
 }
 
+func (g *Game) PreviousTrick() *Trick {
+	if g.NumCompletedTricks() > 0 {
+		return &g.CompleteTricks[g.NumCompletedTricks()-1]
+	}
+	return nil
+}
+
 func (g *Game) IsFinished() bool {
 	return g.NumCompletedTricks() == NumHandCards
 }

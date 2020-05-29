@@ -51,7 +51,7 @@ type DeclarationResult int
 
 func (a *Auction) Declare(player game.Player, t game.AnnouncedGameType) bool {
 	if player != a.WhoseTurn() {
-		panic("invalid call to Declare")
+		panic("invalid call to declare")
 	}
 	v := GetVorbehalt(t)
 	if v == nil {

@@ -10,14 +10,20 @@ import (
 	"log"
 )
 
-type Client struct {
-	Kc         api.KarlchencloudClient
-	Connection *grpc.ClientConn
+type ClientService struct {
+	Api        api.KarlchencloudClient
+	connection *grpc.ClientConn
 	Creds      *ClientCredentials
+	Name       string
+	Context    context.Context
 }
 
-func (c *Client) Close() {
-	_ = c.Connection.Close()
+func (c *ClientService) CloseConnection() {
+	_ = c.connection.Close()
+}
+
+func (c *ClientService) Logf(format string, v ...interface{}) {
+	log.Printf(c.Name+": "+format, v...)
 }
 
 type ConnectData struct {
@@ -27,7 +33,7 @@ type ConnectData struct {
 	Address        string
 }
 
-func GetConnectedService(c ConnectData, ctx context.Context) (*Client, error) {
+func GetClientService(c ConnectData, ctx context.Context) (ClientService, error) {
 	creds := EmptyClientCredentials()
 	if c.ExistingUserId != nil {
 		creds.UpdateLogin(*c.ExistingUserId, *c.ExistingUserId)
@@ -35,19 +41,29 @@ func GetConnectedService(c ConnectData, ctx context.Context) (*Client, error) {
 	conn, err := grpc.DialContext(ctx, c.Address, grpc.WithInsecure(), grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(creds))
 	if err != nil {
-		return nil, err
+		return ClientService{}, err
 	}
 	kc := api.NewKarlchencloudClient(conn)
-	_, loginErr := kc.CheckLogin(ctx, &api.Empty{})
+	ans, loginErr := kc.CheckLogin(ctx, &api.Empty{})
+	var username string
+	if ans != nil {
+		username = ans.Name
+	}
 	if c.ExistingUserId == nil || loginErr != nil {
-		ans, err := kc.Register(ctx, &api.RegisterRequest{Name: c.DisplayName})
+		ans, err := kc.Register(ctx, &api.UserName{Name: c.DisplayName})
 		if err != nil {
-			return nil, err
+			return ClientService{}, err
 		}
 		creds.UpdateLogin(ans.Id, ans.Secret)
+		username = c.DisplayName
 		log.Printf("registered %v with id %v", c.DisplayName, ans.Id)
 	}
-	return &Client{kc, conn, creds}, nil
+
+	return ClientService{kc, conn, creds, username, ctx}, nil
+}
+
+func (c *ClientService) UserId() string {
+	return c.Creds.UserId()
 }
 
 func MatchEventString(ev *api.MatchEventStream) string {
@@ -67,4 +83,10 @@ func ToHand(cards []*api.Card) game.Hand {
 		ans[i] = common.ToCard(cards[i])
 	}
 	return ans
+}
+
+func (c *ClientService) Play(card game.Card, tableId string) (err error) {
+	_, err = c.Api.Play(c.Context, &api.PlayRequest{Table: tableId,
+		Request: &api.PlayRequest_Card{Card: common.ToApiCard(card)}})
+	return
 }

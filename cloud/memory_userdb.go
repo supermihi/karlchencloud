@@ -3,12 +3,12 @@ package cloud
 import "sync"
 
 type MemoryUserDb struct {
-	users map[UserId]*UserData
+	users map[string]*UserData
 	mtx   sync.RWMutex
 }
 
 type UserData struct {
-	id     UserId
+	id     string
 	name   string
 	secret string
 }
@@ -17,17 +17,17 @@ func RandomSecret() string {
 	return RandomLetters(16)
 }
 
-func NewUserData(id UserId, name string, secret string) *UserData {
+func NewUserData(id string, name string, secret string) *UserData {
 	return &UserData{id, name, secret}
 }
 
 func NewMemoryUserDb() *MemoryUserDb {
-	users := make(map[UserId]*UserData)
+	users := make(map[string]*UserData)
 	ans := MemoryUserDb{users: users}
 	return &ans
 }
 
-func (m *MemoryUserDb) Add(user UserId, name string, secret string) bool {
+func (m *MemoryUserDb) Add(user string, name string, secret string) bool {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	_, exists := m.users[user]
@@ -38,9 +38,9 @@ func (m *MemoryUserDb) Add(user UserId, name string, secret string) bool {
 	return true
 }
 
-func (m *MemoryUserDb) List() []UserId {
+func (m *MemoryUserDb) List() []string {
 	m.mtx.RLock()
-	ans := make([]UserId, 0, len(m.users))
+	ans := make([]string, 0, len(m.users))
 	for id := range m.users {
 		ans = append(ans, id)
 	}
@@ -48,13 +48,13 @@ func (m *MemoryUserDb) List() []UserId {
 	return ans
 }
 
-func (m *MemoryUserDb) GetName(id UserId) string {
+func (m *MemoryUserDb) GetName(id string) string {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	return m.users[id].name
 }
 
-func (m *MemoryUserDb) ChangeName(id UserId, newName string) {
+func (m *MemoryUserDb) ChangeName(id string, newName string) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	_, exists := m.users[id]
@@ -64,7 +64,7 @@ func (m *MemoryUserDb) ChangeName(id UserId, newName string) {
 	m.users[id].name = newName
 }
 
-func (m *MemoryUserDb) Authenticate(id UserId, secret string) bool {
+func (m *MemoryUserDb) Authenticate(id string, secret string) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	user, ok := m.users[id]

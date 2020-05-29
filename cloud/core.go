@@ -6,23 +6,21 @@ import (
 	"github.com/supermihi/karlchencloud/doko/round"
 )
 
-type UserId string
-
 type Users interface {
-	Add(user UserId, name string, secret string) bool
-	List() []UserId
-	GetName(id UserId) string
-	ChangeName(id UserId, name string)
-	Authenticate(id UserId, secret string) bool
+	Add(user string, name string, secret string) bool
+	List() []string
+	GetName(id string) string
+	ChangeName(id string, name string)
+	Authenticate(id string, secret string) bool
 }
 
-type PlayerUserMap [game.NumPlayers]UserId
+type PlayerUserMap [game.NumPlayers]string
 type TableMatch struct {
 	Match   *match.Match
 	Players PlayerUserMap
 }
 
-func (pm PlayerUserMap) PlayerFor(user UserId) game.Player {
+func (pm PlayerUserMap) PlayerFor(user string) game.Player {
 	for p, pId := range pm {
 		if pId == user {
 			return game.Player(p)
@@ -31,8 +29,8 @@ func (pm PlayerUserMap) PlayerFor(user UserId) game.Player {
 	return game.NoPlayer
 }
 
-func getActivePlayerIds(playersInOrder []UserId, pa round.PlayerAssignment) [game.NumPlayers]UserId {
-	var ans [game.NumPlayers]UserId
+func getActivePlayerIds(playersInOrder []string, pa round.PlayerAssignment) [game.NumPlayers]string {
+	var ans [game.NumPlayers]string
 	for inGamePlayerNumber, playerIndex := range pa.Playing() {
 		ans[inGamePlayerNumber] = playersInOrder[playerIndex]
 	}
@@ -48,7 +46,7 @@ func NewTables() *Tables {
 	return &result
 }
 
-func (t *Tables) CreateTable(owner UserId) *Table {
+func (t *Tables) CreateTable(owner string) *Table {
 	table := NewTable(owner)
 	t.ById[table.Id] = table
 	return table

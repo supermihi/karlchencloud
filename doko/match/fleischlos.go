@@ -8,8 +8,11 @@ type FleischlosMode struct {
 	Soloist game.Player
 }
 
-func (f FleischlosMode) GameSuit(card game.Card) game.GameSuit {
+func FleischlosSuite(card game.Card) game.GameSuit {
 	return card.Suit.AsFehl()
+}
+func (f FleischlosMode) GameSuit(card game.Card) game.GameSuit {
+	return FleischlosSuite(card)
 }
 
 func (FleischlosMode) Klaerungsstich() int {
