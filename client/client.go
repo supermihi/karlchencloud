@@ -32,12 +32,12 @@ func (c *TableClient) Start() {
 		c.service.Logf("error subscribing: %v", err)
 		return
 	}
-	go func() {
-		state, err := c.service.Api.GetTableState(c.ctx, &api.TableId{Value: c.tableId})
-		if err != nil {
-			c.handler.OnInitialState(state)
-		}
-	}()
+	state, err := c.service.Api.GetTableState(c.ctx, &api.TableId{Value: c.tableId})
+	if err == nil {
+		c.handler.OnInitialState(state)
+	} else {
+		log.Fatalf("could not get table state: %v", err)
+	}
 	handler := c.handler
 	for {
 		msg, err := stream.Recv()

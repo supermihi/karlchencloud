@@ -56,9 +56,9 @@ func (h *BotHandler) HandleMatchStart(state *api.MatchState) {
 func (h *BotHandler) onMyTurn() {
 	switch h.view.Phase {
 	case match.InAuction:
-		go h.makeTurnAuction()
+		h.makeTurnAuction()
 	case match.InGame:
-		go h.makeTurnGame()
+		h.makeTurnGame()
 	}
 }
 
@@ -125,6 +125,15 @@ func (h *BotHandler) HandlePlayedCard(c *api.PlayedCard) {
 
 func (h *BotHandler) HandleEnd(ev *api.EndOfGame) {
 	h.service.Logf("game ended with winner %s.", ev.Winner)
+}
+
+func (h *BotHandler) OnInitialState(t *api.TableState) {
+	switch ts := t.State.(type) {
+	case *api.TableState_NoMatch:
+		return
+	case *api.TableState_InMatch:
+		h.HandleMatchStart(ts.InMatch)
+	}
 }
 
 func (h *BotHandler) Run() {

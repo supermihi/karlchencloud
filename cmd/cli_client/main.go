@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
+	"github.com/supermihi/karlchencloud/common"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"log"
 	"os"
@@ -65,6 +66,10 @@ func (h *CliHandler) Start() {
 	go client.StartBots(address, 3, table.TableId, table.InviteCode)
 }
 
+func (h *CliHandler) OnInitialState(s *api.TableState) {
+	h.service.Logf("I am quite sure to get a table start event in the first place")
+}
+
 func (h *CliHandler) HandleMemberEvent(ev *api.MemberEvent) {
 	switch ev.Type {
 	case api.MemberEventType_JOIN_TABLE:
@@ -85,9 +90,9 @@ func (h *CliHandler) HandleMemberEvent(ev *api.MemberEvent) {
 			}()
 		}
 	case api.MemberEventType_GO_ONLINE:
-		h.service.Logf("user %s is now online", ev.UserId)
+		h.service.Logf("user %s is now online", h.view.Names[ev.UserId])
 	case api.MemberEventType_GO_OFFLINE:
-		h.service.Logf("user %s is now offline", ev.UserId)
+		h.service.Logf("user %s is now offline", h.view.Names[ev.UserId])
 	default:
 		h.service.Logf("unexpected MemberEvent: %v", ev)
 	}
@@ -102,7 +107,13 @@ func (h *CliHandler) HandleMatchStart(state *api.MatchState) {
 }
 
 func (h *CliHandler) HandlePlayedCard(ev *api.PlayedCard) {
+	if ev.UserId != h.service.UserId() {
+		h.service.Logf("%v played %v", h.view.Names[ev.UserId], common.ToCard(ev.Card))
+	}
 	h.view.UpdateTrick(ev)
+	if len(h.view.Trick.Cards) == 0 {
+		h.service.Logf("trick finished")
+	}
 	h.checkMyTurn()
 }
 
@@ -112,6 +123,9 @@ func (h *CliHandler) HandleEnd(ev *api.EndOfGame) {
 
 func (h *CliHandler) HandleDeclared(d *api.Declaration) {
 	h.view.UpdateOnDeclare(d)
+	if h.view.Phase == match.InGame {
+		h.service.Logf("now in game! Forehand: %s", h.view.Names[h.view.Trick.Forehand])
+	}
 	h.checkMyTurn()
 }
 
@@ -123,9 +137,9 @@ func (h *CliHandler) checkMyTurn() {
 func (h *CliHandler) handleMyTurn() {
 	switch h.view.Phase {
 	case match.InAuction:
-		go h.declare()
+		h.declare()
 	case match.InGame:
-		go h.playCard()
+		h.playCard()
 	default:
 		panic(fmt.Sprintf("should not be here: handleMyTurn in neither auction nor game"))
 	}
@@ -147,7 +161,7 @@ func (h *CliHandler) declare() {
 	if err != nil {
 		log.Fatalf("error declaring game: %v", err)
 	}
-	log.Printf("sucessfully declared %s", declaration)
+	h.service.Logf("successfully declared %s", declaration)
 }
 
 func (h *CliHandler) playCard() {
@@ -164,11 +178,15 @@ func (h *CliHandler) playCard() {
 		i, err = strconv.Atoi(line[:len(line)-1])
 		if err != nil {
 			log.Printf("could not read answer: %v. Please try again", err)
+			continue
 		}
+		err = h.service.Play(h.view.Cards[i], h.view.TableId)
+		if err != nil {
+			log.Printf("could not play card: %v. Try again", err)
+			continue
+		}
+		h.view.DrawCard(i)
 		break
 	}
-	err := h.service.Play(h.view.DrawCard(i), h.view.TableId)
-	if err != nil {
-		log.Fatalf("could not play card: %v", err)
-	}
+
 }

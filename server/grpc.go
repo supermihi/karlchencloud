@@ -174,19 +174,17 @@ func (s *grpcserver) SubscribeMatchEvents(tableId *api.TableId, srv api.Karlchen
 func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty, error) {
 	user, _ := GetAuthenticatedUser(ctx)
 	s.roomMutex.Lock()
+	defer s.roomMutex.Unlock()
 	table, err := s.getTable(req.Table, user.Id, true, false)
 	if err != nil {
-		s.roomMutex.Unlock()
 		return nil, err
 	}
 	players := table.CurrentMatch.Players
 	if table.CurrentMatch == nil {
-		s.roomMutex.Unlock()
 		return nil, status.Error(codes.InvalidArgument, "no current match")
 	}
 	player := players.PlayerFor(user.Id)
 	if player == game.NoPlayer {
-		s.roomMutex.Unlock()
 		return nil, status.Error(codes.InvalidArgument, "you are not playing in this match")
 	}
 	playerId := common.ToApiUserId(player, players)
@@ -217,6 +215,7 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 		if !m.PlayCard(player, common.ToCard(action.Card)) {
 			return nil, status.Error(codes.InvalidArgument, "cannot play card")
 		}
+		log.Printf("%s plays %s", user.Name, common.ToCard(action.Card))
 		card := &api.PlayedCard{UserId: playerId, Card: action.Card}
 
 		if m.Game.CurrentTrick.NumCardsPlayed() == 0 {
@@ -225,7 +224,6 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 		result.Event = &api.MatchEventStream_PlayedCard{PlayedCard: card}
 	}
 	s.sendEventToAll(table.Users(), result)
-	s.roomMutex.Unlock()
 	return &api.Empty{}, nil
 }
 

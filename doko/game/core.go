@@ -18,7 +18,7 @@ const (
 )
 
 func (s Suit) String() string {
-	return [...]string{"♦", "♠", "♠", "♣"}[s]
+	return [...]string{"♦", "♥", "♠", "♣"}[s]
 }
 
 type Rank int
