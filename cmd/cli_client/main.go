@@ -7,6 +7,7 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/common"
+	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"log"
 	"os"
@@ -30,112 +31,86 @@ func main() {
 	}
 	defer service.CloseConnection()
 
-	cliHandler := NewCliHandler(service, ctx)
-	cliHandler.Start()
+	cliHandler := NewCliHandler()
+	cliHandler.Start(service)
 	<-ctx.Done()
 }
 
 type CliHandler struct {
-	numOtherPlayers int
-	view            client.MatchView
-	service         client.ClientService
-	ctx             context.Context
-	tableClient     client.TableClient
+	client.TableClient
 }
 
-func NewCliHandler(s client.ClientService, ctx context.Context) CliHandler {
-	return CliHandler{numOtherPlayers: 0, view: client.NewMatchView(""), service: s,
-		ctx: ctx}
+func NewCliHandler() CliHandler {
+	return CliHandler{}
 }
 
-func (h *CliHandler) Start() {
-	table, err := h.service.Api.CreateTable(h.ctx, &api.Empty{})
+func (h *CliHandler) Start(service client.ClientService) {
+	table, err := service.Api.CreateTable(service.Context, &api.Empty{})
 	if err != nil {
-		log.Fatalf("%s could not create table: %v", h.service.Name, err)
+		log.Fatalf("%s could not create table: %v", service.Name, err)
 	}
-	h.view.TableId = table.TableId
-	h.service.Logf("table %s created with invite code %s", h.view.TableId, table.InviteCode)
-	/*err = ioutil.WriteFile("table.config", []byte(table.TableId+":"+table.InviteCode), 0644)
-	if err != nil {
-		log.Fatalf("error wrtiing table.config: %v", err)
-	}
-	log.Printf("wrote table.config")
-	*/
-	h.tableClient = client.NewTableClient(h.ctx, h.service, table.TableId, h)
-	go h.tableClient.Start()
+	service.Logf("table %s created with invite code %s", table.TableId, table.InviteCode)
+	h.TableClient = client.NewTableClient(service, table.TableId, h)
+	go h.TableClient.Start()
 	go client.StartBots(address, 3, table.TableId, table.InviteCode)
 }
 
-func (h *CliHandler) OnInitialState(s *api.TableState) {
-	h.service.Logf("I am quite sure to get a table start event in the first place")
+func (h *CliHandler) OnTableStateReceived(_ *api.TableState) {
+	h.Logf("Table state received. Let the games begin!")
 }
 
-func (h *CliHandler) HandleMemberEvent(ev *api.MemberEvent) {
+func (h *CliHandler) OnMemberEvent(ev *api.MemberEvent) {
 	switch ev.Type {
 	case api.MemberEventType_JOIN_TABLE:
-		h.view.AddName(ev.UserId, ev.Name)
-		if ev.UserId == h.service.UserId() {
-			h.service.Logf("oh, I joined myself also")
+		if ev.UserId == h.Service.UserId() {
+			h.Logf("oh, I joined myself")
 			return
 		}
-		h.service.Logf("user %s joined table", ev.Name)
-		h.numOtherPlayers += 1
-		if h.numOtherPlayers >= 3 {
-			h.service.Logf("all players there. Starting game ...")
-			go func() {
-				_, err := h.service.Api.StartTable(h.ctx, &api.TableId{Value: h.view.TableId})
-				if err != nil {
-					log.Fatalf("error starting table: %v", err)
-				}
-			}()
+		h.Logf("user %s joined table", ev.Name)
+
+		if len(h.View.MemberNamesById) >= 4 {
+			_, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
+			if err != nil {
+				log.Fatalf("error starting table: %v", err)
+			}
 		}
 	case api.MemberEventType_GO_ONLINE:
-		h.service.Logf("user %s is now online", h.view.Names[ev.UserId])
+		h.Logf("user %s is now online", h.View.MemberNamesById[ev.UserId])
 	case api.MemberEventType_GO_OFFLINE:
-		h.service.Logf("user %s is now offline", h.view.Names[ev.UserId])
+		h.Logf("user %s is now offline", h.View.MemberNamesById[ev.UserId])
 	default:
-		h.service.Logf("unexpected MemberEvent: %v", ev)
+		h.Logf("unexpected MemberEvent: %v", ev)
 	}
 }
 
-func (h *CliHandler) HandleMatchStart(state *api.MatchState) {
-	h.view.InitFromMatchState(state)
-	h.service.Logf("Game starts! Other players: %v", h.view.PlayerNames())
-	h.service.Logf("Forehand: %s", h.view.Names[state.Turn.UserId])
-	h.service.Logf("my cards: %s", h.view.Cards)
-	h.checkMyTurn()
+func (h *CliHandler) OnMatchStart(state *api.MatchState) {
+	h.Logf("Game starts! Other players: %v", h.View.PlayerNames())
+	h.Logf("Forehand: %s", h.View.MemberNamesById[state.Turn.UserId])
+	h.Logf("my cards: %s", h.Match().Cards)
 }
 
-func (h *CliHandler) HandlePlayedCard(ev *api.PlayedCard) {
-	if ev.UserId != h.service.UserId() {
-		h.service.Logf("%v played %v", h.view.Names[ev.UserId], common.ToCard(ev.Card))
+func (h *CliHandler) OnPlayedCard(ev *api.PlayedCard) {
+	if ev.UserId != h.Service.UserId() {
+		h.Logf("%v played %v", h.View.MemberNamesById[ev.UserId], common.ToCard(ev.Card))
 	}
-	h.view.UpdateTrick(ev)
-	if len(h.view.Trick.Cards) == 0 {
-		h.service.Logf("trick finished")
+	if len(h.Match().Trick.Cards) == 0 {
+		h.Logf("trick finished. Winner: %s", h.View.MemberNamesById[h.Match().Trick.Forehand])
 	}
-	h.checkMyTurn()
 }
 
-func (h *CliHandler) HandleEnd(ev *api.EndOfGame) {
-	panic("implement me")
+func (h *CliHandler) OnMatchEnd(_ *api.EndOfGame) {
+	h.Logf("the match has ended.")
+	h.Service.CloseConnection()
 }
 
-func (h *CliHandler) HandleDeclared(d *api.Declaration) {
-	h.view.UpdateOnDeclare(d)
-	if h.view.Phase == match.InGame {
-		h.service.Logf("now in game! Forehand: %s", h.view.Names[h.view.Trick.Forehand])
+func (h *CliHandler) OnDeclaration(_ *api.Declaration) {
+	if h.Match().Phase == match.InGame {
+		h.Logf("now in game! Forehand: %s", h.View.MemberNamesById[h.Match().Trick.Forehand])
 	}
-	h.checkMyTurn()
 }
 
-func (h *CliHandler) checkMyTurn() {
-	if h.view.MyTurn {
-		h.handleMyTurn()
-	}
-}
-func (h *CliHandler) handleMyTurn() {
-	switch h.view.Phase {
+func (h *CliHandler) OnMyTurn() {
+	switch h.Match().Phase {
 	case match.InAuction:
 		h.declare()
 	case match.InGame:
@@ -152,21 +127,19 @@ func (h *CliHandler) declare() {
 	if err != nil {
 		log.Fatalf("error reading rune: %v", err)
 	}
-	declaration := api.GameType_NORMAL_GAME
+	declaration := game.NormalspielType
 	if char == 'h' {
-		declaration = api.GameType_MARRIAGE
+		declaration = game.HochzeitType
 	}
-	_, err = h.service.Api.Play(h.ctx, &api.PlayRequest{Table: h.view.TableId,
-		Request: &api.PlayRequest_Declaration{Declaration: declaration}})
-	if err != nil {
+	if h.Declare(declaration) != nil {
 		log.Fatalf("error declaring game: %v", err)
 	}
-	h.service.Logf("successfully declared %s", declaration)
+	h.Logf("successfully declared %s", declaration)
 }
 
 func (h *CliHandler) playCard() {
 
-	log.Printf("your cards: %v", h.view.Cards)
+	log.Printf("your cards: %v", h.Match().Cards)
 	log.Printf("Choose index to play: ")
 	i := -1
 	for {
@@ -180,12 +153,12 @@ func (h *CliHandler) playCard() {
 			log.Printf("could not read answer: %v. Please try again", err)
 			continue
 		}
-		err = h.service.Play(h.view.Cards[i], h.view.TableId)
+		err = h.PlayCard(h.Match().Cards[i])
 		if err != nil {
 			log.Printf("could not play card: %v. Try again", err)
 			continue
 		}
-		h.view.DrawCard(i)
+		h.Match().DrawCard(i)
 		break
 	}
 

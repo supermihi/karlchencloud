@@ -20,14 +20,14 @@ type grpcserver struct {
 	api.UnimplementedKarlchencloudServer
 	room                         cloud.Room
 	auth                         Auth
-	ClientTableStreams           map[string]chan *api.MatchEventStream
+	ClientTableStreams           map[string]chan *api.MatchEvent
 	roomMutex, clientStreamMutex sync.RWMutex
 }
 
 func NewServer(room cloud.Room, auth Auth) *grpcserver {
 	return &grpcserver{
 		room: room, auth: auth,
-		ClientTableStreams: make(map[string]chan *api.MatchEventStream, 1000),
+		ClientTableStreams: make(map[string]chan *api.MatchEvent, 1000),
 	}
 }
 func StartServer(users cloud.Users, port string) {
@@ -104,7 +104,7 @@ func (s *grpcserver) StartTable(ctx context.Context, id *api.TableId) (*api.Empt
 		if err != nil {
 			return nil, err
 		}
-		ev := &api.MatchEventStream{Event: &api.MatchEventStream_Start{Start: state}}
+		ev := &api.MatchEvent{Event: &api.MatchEvent_Start{Start: state}}
 		s.sendEventIfOnline(u, ev)
 	}
 	return &api.Empty{}, nil
@@ -114,7 +114,7 @@ func (s *grpcserver) getName(userId string) string {
 	return s.auth.Users.GetName(userId)
 }
 
-func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (*api.TableState, error) {
+func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (*api.Empty, error) {
 	user, _ := GetAuthenticatedUser(ctx)
 	s.roomMutex.Lock()
 	defer s.roomMutex.Unlock()
@@ -131,7 +131,7 @@ func (s *grpcserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (
 	}
 	log.Printf("user %v joined table %v", user, table.Id)
 	s.sendEventToAll(table.Users(), api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_JOIN_TABLE))
-	return s.getTableState(table, user.Id)
+	return &api.Empty{}, nil
 }
 
 func (s *grpcserver) GetTableState(ctx context.Context, tableId *api.TableId) (*api.TableState, error) {
@@ -147,28 +147,38 @@ func (s *grpcserver) GetTableState(ctx context.Context, tableId *api.TableId) (*
 
 func (s *grpcserver) SubscribeMatchEvents(tableId *api.TableId, srv api.Karlchencloud_SubscribeMatchEventsServer) error {
 	user, _ := GetAuthenticatedUser(srv.Context())
-	s.roomMutex.RLock()
-	table, err := s.getTable(tableId.Value, user.Id, true, false)
+	err := s.startSubscribeMatchEvents(tableId.Value, user, srv)
 	if err != nil {
-		s.roomMutex.RUnlock()
 		return err
 	}
-	go s.sendTableBroadcasts(srv, user.Id)
-	s.sendEventToAll(table.Users(), api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_GO_ONLINE))
-	s.roomMutex.RUnlock()
-	log.Printf("user %s subscribed for match events", user)
+
 	<-srv.Context().Done()
 	log.Printf("user %s disconnected from match events", user)
 	s.roomMutex.RLock()
-	table, err = s.getTable(tableId.Value, user.Id, true, false)
+	defer s.roomMutex.RUnlock()
+	table, err := s.getTable(tableId.Value, user.Id, true, false)
 	if err != nil {
-		s.roomMutex.RUnlock()
 		return err
 	}
 	s.sendEventToAll(table.Users(), api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_GO_OFFLINE))
-	s.roomMutex.RUnlock()
-
 	return srv.Context().Err()
+}
+
+func (s *grpcserver) startSubscribeMatchEvents(tableId string, user UserData, srv api.Karlchencloud_SubscribeMatchEventsServer) error {
+	s.roomMutex.RLock()
+	defer s.roomMutex.RUnlock()
+	table, err := s.getTable(tableId, user.Id, true, false)
+	if err != nil {
+		return err
+	}
+	state, err := s.getTableState(table, user.Id)
+	if err != nil {
+		return err
+	}
+	s.sendTableBroadcasts(srv, user.Id, state)
+	s.sendEventToAll(table.Users(), api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_GO_ONLINE))
+	log.Printf("user %s subscribed for match events", user)
+	return nil
 }
 
 func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty, error) {
@@ -189,7 +199,7 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 	}
 	playerId := common.ToApiUserId(player, players)
 	m := table.CurrentMatch.Match
-	result := &api.MatchEventStream{}
+	result := &api.MatchEvent{}
 	switch action := req.Request.(type) {
 	case *api.PlayRequest_Declaration:
 		log.Printf("%v declares %v", user.Name, action.Declaration)
@@ -202,14 +212,14 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 			log.Printf("game has started on table %s", table)
 			declaration.DefinedGameMode = common.ToApiMode(m.Mode(), m.Game.WhoseTurn(), players)
 		}
-		result.Event = &api.MatchEventStream_Declared{Declared: declaration}
+		result.Event = &api.MatchEvent_Declared{Declared: declaration}
 
 	case *api.PlayRequest_Bid:
 		if !m.PlaceBid(player, common.ToBid(action.Bid)) {
 			return nil, status.Error(codes.InvalidArgument, "cannot place bid")
 		}
 		bid := &api.Bid{UserId: playerId, Bid: action.Bid}
-		result.Event = &api.MatchEventStream_PlacedBid{PlacedBid: bid}
+		result.Event = &api.MatchEvent_PlacedBid{PlacedBid: bid}
 
 	case *api.PlayRequest_Card:
 		if !m.PlayCard(player, common.ToCard(action.Card)) {
@@ -221,7 +231,7 @@ func (s *grpcserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty
 		if m.Game.CurrentTrick.NumCardsPlayed() == 0 {
 			card.TrickWinner = &api.PlayerValue{UserId: table.CurrentMatch.Players[int(m.Game.PreviousTrick().Winner)]}
 		}
-		result.Event = &api.MatchEventStream_PlayedCard{PlayedCard: card}
+		result.Event = &api.MatchEvent_PlayedCard{PlayedCard: card}
 	}
 	s.sendEventToAll(table.Users(), result)
 	return &api.Empty{}, nil
@@ -267,50 +277,54 @@ func (s *grpcserver) getTable(id string, user string, needUserAtTable bool, need
 	return t, nil
 }
 
-func (s *grpcserver) sendEventIfOnline(user string, event *api.MatchEventStream) {
-	s.clientStreamMutex.RLock()
-	defer s.clientStreamMutex.RUnlock()
+func (s *grpcserver) sendEventIfOnline(user string, event *api.MatchEvent) {
 	stream, ok := s.ClientTableStreams[user]
 	if ok {
 		stream <- event
 	}
 }
 
-func (s *grpcserver) sendEventToAll(users []string, event *api.MatchEventStream) {
+func (s *grpcserver) sendEventToAll(users []string, event *api.MatchEvent) {
+	s.clientStreamMutex.RLock()
 	for _, user := range users {
 		s.sendEventIfOnline(user, event)
 	}
+	defer s.clientStreamMutex.RUnlock()
 }
 
-func (s *grpcserver) sendTableBroadcasts(srv api.Karlchencloud_SubscribeMatchEventsServer, user string) {
+func (s *grpcserver) sendTableBroadcasts(srv api.Karlchencloud_SubscribeMatchEventsServer, user string,
+	state *api.TableState) {
 	stream := s.openTableStream(user)
-	defer s.closeTableStream(user)
-	for {
-		select {
-		case <-srv.Context().Done():
-			log.Printf("no longer waiting for messages to %s", user)
-			return
-		case event := <-stream:
-			if s, ok := status.FromError(srv.Send(event)); ok {
-				switch s.Code() {
-				case codes.OK:
-					// pass
-				case codes.Unavailable, codes.Canceled, codes.DeadlineExceeded:
-					log.Printf("client %s terminated connection", user)
-					return
+	stream <- &api.MatchEvent{Event: &api.MatchEvent_Welcome{Welcome: state}}
+	go func() {
+		defer s.closeTableStream(user)
+		for {
+			select {
+			case <-srv.Context().Done():
+				log.Printf("no longer waiting for messages to %s", user)
+				return
+			case event := <-stream:
+				if s, ok := status.FromError(srv.Send(event)); ok {
+					switch s.Code() {
+					case codes.OK:
+						// pass
+					case codes.Unavailable, codes.Canceled, codes.DeadlineExceeded:
+						log.Printf("client %s terminated connection", user)
+						return
 
-				default:
-					log.Printf("failed to send to client %s: %v", user, s.Err())
+					default:
+						log.Printf("failed to send to client %s: %v", user, s.Err())
+					}
 				}
 			}
 		}
-	}
+	}()
 }
-func (s *grpcserver) openTableStream(user string) (stream chan *api.MatchEventStream) {
-	stream = make(chan *api.MatchEventStream, 10)
+func (s *grpcserver) openTableStream(user string) (stream chan *api.MatchEvent) {
+	stream = make(chan *api.MatchEvent, 10)
 	s.clientStreamMutex.Lock()
+	defer s.clientStreamMutex.Unlock()
 	s.ClientTableStreams[user] = stream
-	s.clientStreamMutex.Unlock()
 	return
 }
 

@@ -1,5 +1,7 @@
 package game
 
+import "fmt"
+
 type Mode interface {
 	GameSuit(Card) GameSuit
 	PartyOf(Player) Party
@@ -43,3 +45,23 @@ const (
 	PikSoloType
 	KreuzSoloType
 )
+
+func (t AnnouncedGameType) String() string {
+	switch t {
+	case NormalspielType:
+		return "Normal Game"
+	case HochzeitType:
+		return "Marriage"
+	case FleischlosType:
+		return "Meatless Solo"
+	case KaroSoloType:
+		return "Diamonds Solo"
+	case HerzSoloType:
+		return "Hearts Solo"
+	case PikSoloType:
+		return "Spades Solo"
+	case KreuzSoloType:
+		return "Clubs Solo"
+	}
+	panic(fmt.Sprintf("unexpected game type: %d", int(t)))
+}

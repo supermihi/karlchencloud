@@ -7,6 +7,7 @@ import (
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"log"
+	"sort"
 )
 
 type TrickView struct {
@@ -35,29 +36,31 @@ type MatchView struct {
 	Cards   game.Hand
 	Players Players
 	Phase   match.Phase
-	TableId string
 	MyTurn  bool
-	Names   map[string]string
 	Trick   *TrickView
 	Mode    *ModeView
 }
-
-func (m *MatchView) PlayerNames() string {
-	p := m.Players
-	return fmt.Sprintf("Left: %s, Face: %s, Right: %s", m.Names[p.Left], m.Names[p.Face], m.Names[p.Right])
+type TableView struct {
+	Match           *MatchView
+	MemberNamesById map[string]string
 }
 
-func NewMatchView(tableId string) MatchView {
-	return MatchView{Phase: match.MatchFinished, TableId: tableId,
-		Names: make(map[string]string)}
+func (m *TableView) PlayerNames() string {
+	if m.Match == nil {
+		return "- no match -"
+	}
+	p := m.Match.Players
+	return fmt.Sprintf("Left: %s, Face: %s, Right: %s", m.MemberNamesById[p.Left], m.MemberNamesById[p.Face], m.MemberNamesById[p.Right])
 }
 
-func (v *MatchView) InitFromMatchState(state *api.MatchState) {
+func NewMatchView(state *api.MatchState) *MatchView {
+	v := &MatchView{}
 	switch r := state.Role.(type) {
 	case *api.MatchState_Spectator:
 		log.Fatalf("unexpected role spectator")
 	case *api.MatchState_OwnCards:
 		v.Cards = ToHand(r.OwnCards.Cards)
+		sort.Sort(game.BySuitAndRank(v.Cards))
 	}
 	v.Players.Left = state.Players.UserIdLeft
 	v.Players.Face = state.Players.UserIdFace
@@ -81,10 +84,19 @@ func (v *MatchView) InitFromMatchState(state *api.MatchState) {
 	}
 	v.Phase = common.ToMatchPhase(state.Phase)
 	v.MyTurn = state.Turn.UserId == v.Players.Me
+	return v
 }
 
-func (v *MatchView) AddName(user string, name string) {
-	v.Names[user] = name
+func NewTableView(ts *api.TableState) *TableView {
+	ans := TableView{MemberNamesById: make(map[string]string)}
+	for _, m := range ts.Members {
+		ans.MemberNamesById[m.UserId] = m.Name
+	}
+	switch state := ts.State.(type) {
+	case *api.TableState_InMatch:
+		ans.Match = NewMatchView(state.InMatch)
+	}
+	return &ans
 }
 
 func (v *MatchView) UpdateTrick(pc *api.PlayedCard) {

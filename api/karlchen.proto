@@ -19,14 +19,14 @@ service Karlchencloud {
     rpc StartTable (TableId) returns (Empty) {
     }
 
-    rpc JoinTable (JoinTableRequest) returns (TableState) {
+    rpc JoinTable (JoinTableRequest) returns (Empty) {
     }
 
     rpc Play (PlayRequest) returns (Empty) {
 
     }
 
-    rpc SubscribeMatchEvents (TableId) returns (stream MatchEventStream) {
+    rpc SubscribeMatchEvents (TableId) returns (stream MatchEvent) {
     }
 
     rpc GetTableState (TableId) returns (TableState) {
@@ -64,10 +64,11 @@ message EndOfGame {
     int32 value = 2;
 }
 
-message MatchEventStream {
+message MatchEvent {
     oneof event {
-        MatchState start = 1;
-        Declaration declared = 2;
+        TableState welcome = 1;
+        MatchState start = 2;
+        Declaration declared = 3;
         PlayedCard played_card = 4;
         Bid placed_bid = 5;
         EndOfGame ended = 6;

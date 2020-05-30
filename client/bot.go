@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"log"
 )
@@ -17,8 +18,8 @@ func StartBots(address string, numBots int, table string, inviteCode string) {
 			ExistingSecret: nil,
 			Address:        address,
 		}
-		clients[i] = NewBotHandler(table, inviteCode, connect)
-		go clients[i].Run()
+		clients[i] = NewBotHandler()
+		go clients[i].Run(connect, table, inviteCode)
 	}
 	for i := 0; i < numBots; i++ {
 		<-clients[i].context.Done()
@@ -28,33 +29,44 @@ func StartBots(address string, numBots int, table string, inviteCode string) {
 }
 
 type BotHandler struct {
-	inviteCode  string
-	connectData ConnectData
-	context     context.Context
-	cancel      context.CancelFunc
-	service     ClientService
-	client      TableClient
-	view        MatchView
+	TableClient
+	context context.Context
+	cancel  context.CancelFunc
 }
 
-func NewBotHandler(table string, inviteCode string, connect ConnectData) *BotHandler {
+func NewBotHandler() *BotHandler {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &BotHandler{
-		view:        NewMatchView(table),
-		inviteCode:  inviteCode,
-		connectData: connect,
-		context:     ctx,
-		cancel:      cancel,
-		service:     ClientService{}}
+		context: ctx,
+		cancel:  cancel}
 }
 
-func (h *BotHandler) HandleMatchStart(state *api.MatchState) {
-	h.view.InitFromMatchState(state)
-	h.checkMyTurn()
+func (h *BotHandler) Run(conn ConnectData, table string, invite string) {
+	ctx := h.context
+	service, err := GetClientService(conn, ctx)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	c := service.Api
+	defer h.cancel()
+	defer service.CloseConnection()
+	_, err = c.JoinTable(ctx, &api.JoinTableRequest{InviteCode: invite, TableId: table})
+	if err != nil {
+		service.Logf("could not join table: %v", err)
+		return
+	}
+	service.Logf("joined")
+	h.TableClient = NewTableClient(service, table, h)
+	h.TableClient.Start()
 }
 
-func (h *BotHandler) onMyTurn() {
-	switch h.view.Phase {
+func (h *BotHandler) OnMatchStart(_ *api.MatchState) {
+	// pass
+}
+
+func (h *BotHandler) OnMyTurn() {
+	switch h.Match().Phase {
 	case match.InAuction:
 		h.makeTurnAuction()
 	case match.InGame:
@@ -64,13 +76,12 @@ func (h *BotHandler) onMyTurn() {
 
 func (h *BotHandler) makeTurnAuction() {
 
-	declaration := api.GameType_NORMAL_GAME
-	if h.view.Cards.NumAlte() == 2 {
-		declaration = api.GameType_MARRIAGE
+	declaration := game.NormalspielType
+	if h.Match().Cards.NumAlte() == 2 {
+		declaration = game.HochzeitType
 	}
-	h.service.Logf("declaring '%s'...", declaration)
-	p := api.PlayRequest{Table: h.view.TableId, Request: &api.PlayRequest_Declaration{Declaration: declaration}}
-	_, err := h.service.Api.Play(h.context, &p)
+	h.Logf("declaring '%s'...", declaration)
+	err := h.Declare(declaration)
 	if err != nil {
 		log.Fatalf("could not make auction turn: %v", err)
 	}
@@ -79,15 +90,16 @@ func (h *BotHandler) makeTurnAuction() {
 
 func (h *BotHandler) makeTurnGame() {
 	cardIndex := -1
-	trick := h.view.Trick
+	m := h.Match()
+	trick := m.Trick
 	if len(trick.Cards) == 0 {
 		// I am forehand
 		cardIndex = 0
 	} else {
 		firstCard := trick.Cards[trick.Forehand]
-		gs := h.view.GameSuit(firstCard)
-		for i, card := range h.view.Cards {
-			if h.view.GameSuit(card) == gs {
+		gs := m.GameSuit(firstCard)
+		for i, card := range m.Cards {
+			if m.GameSuit(card) == gs {
 				cardIndex = i
 				break
 			}
@@ -96,64 +108,29 @@ func (h *BotHandler) makeTurnGame() {
 	if cardIndex == -1 {
 		cardIndex = 0 // no matchnig card -> can play anything
 	}
-	card := h.view.DrawCard(cardIndex)
-	err := h.service.Play(card, h.view.TableId)
-	if err != nil {
+	card := m.DrawCard(cardIndex)
+	if err := h.PlayCard(card); err != nil {
 		log.Fatalf("could not play card: %v", err)
 	}
 
 }
 
-func (h *BotHandler) HandleMemberEvent(m *api.MemberEvent) {
+func (h *BotHandler) OnMemberEvent(_ *api.MemberEvent) {
 	// pass
 }
 
-func (h *BotHandler) HandleDeclared(d *api.Declaration) {
-	h.view.UpdateOnDeclare(d)
-	h.checkMyTurn()
+func (h *BotHandler) OnDeclaration(_ *api.Declaration) {
+	// pass
 }
 
-func (h *BotHandler) checkMyTurn() {
-	if h.view.MyTurn {
-		h.onMyTurn()
-	}
-}
-func (h *BotHandler) HandlePlayedCard(c *api.PlayedCard) {
-	h.view.UpdateTrick(c)
-	h.checkMyTurn()
+func (h *BotHandler) OnPlayedCard(_ *api.PlayedCard) {
+	// pass
 }
 
-func (h *BotHandler) HandleEnd(ev *api.EndOfGame) {
-	h.service.Logf("game ended with winner %s.", ev.Winner)
+func (h *BotHandler) OnMatchEnd(_ *api.EndOfGame) {
+	// pass
 }
 
-func (h *BotHandler) OnInitialState(t *api.TableState) {
-	switch ts := t.State.(type) {
-	case *api.TableState_NoMatch:
-		return
-	case *api.TableState_InMatch:
-		h.HandleMatchStart(ts.InMatch)
-	}
-}
-
-func (h *BotHandler) Run() {
-	conn := h.connectData
-	ctx := h.context
-	service, err := GetClientService(conn, ctx)
-	if err != nil {
-		log.Print(err)
-		return
-	}
-	h.service = service
-	c := service.Api
-	defer h.cancel()
-	defer service.CloseConnection()
-	_, err = c.JoinTable(ctx, &api.JoinTableRequest{InviteCode: h.inviteCode, TableId: h.view.TableId})
-	if err != nil {
-		h.service.Logf("could not join table: %v", err)
-		return
-	}
-	h.service.Logf("joined")
-	h.client = NewTableClient(h.context, h.service, h.view.TableId, h)
-	h.client.Start()
+func (h *BotHandler) OnTableStateReceived(_ *api.TableState) {
+	// pass
 }

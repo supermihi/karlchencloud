@@ -1,10 +1,10 @@
 package api
 
-func NewMemberEvent(user string, name string, eventType MemberEventType) *MatchEventStream {
-	return &MatchEventStream{
-		Event: &MatchEventStream_Member{
+func NewMemberEvent(user string, name string, eventType MemberEventType) *MatchEvent {
+	return &MatchEvent{
+		Event: &MatchEvent_Member{
 			Member: &MemberEvent{
-				UserId: string(user),
+				UserId: user,
 				Name:   name,
 				Type:   eventType},
 		},

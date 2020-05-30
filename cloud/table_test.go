@@ -11,8 +11,8 @@ func TestTable_Start(t *testing.T) {
 	_ = table.Join("user3")
 	_ = table.Join("user4")
 	_ = table.Start()
-	assert.Contains(t, table.CurrentMatch.Players, UserId("user1"))
-	assert.Contains(t, table.CurrentMatch.Players, UserId("user2"))
-	assert.Contains(t, table.CurrentMatch.Players, UserId("user3"))
-	assert.Contains(t, table.CurrentMatch.Players, UserId("user4"))
+	assert.Contains(t, table.CurrentMatch.Players, "user1")
+	assert.Contains(t, table.CurrentMatch.Players, "user2")
+	assert.Contains(t, table.CurrentMatch.Players, "user3")
+	assert.Contains(t, table.CurrentMatch.Players, "user4")
 }

@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/common"
 	"github.com/supermihi/karlchencloud/doko/game"
@@ -66,27 +65,10 @@ func (c *ClientService) UserId() string {
 	return c.Creds.UserId()
 }
 
-func MatchEventString(ev *api.MatchEventStream) string {
-	switch e := ev.Event.(type) {
-	case *api.MatchEventStream_Member:
-		return fmt.Sprintf("user %s status: %s", e.Member.UserId, e.Member.Type)
-	case *api.MatchEventStream_Start:
-		return fmt.Sprintf("game started with players %v", e.Start.Players)
-	}
-
-	return ev.String()
-}
-
 func ToHand(cards []*api.Card) game.Hand {
 	ans := make([]game.Card, len(cards))
 	for i := 0; i < len(ans); i++ {
 		ans[i] = common.ToCard(cards[i])
 	}
 	return ans
-}
-
-func (c *ClientService) Play(card game.Card, tableId string) (err error) {
-	_, err = c.Api.Play(c.Context, &api.PlayRequest{Table: tableId,
-		Request: &api.PlayRequest_Card{Card: common.ToApiCard(card)}})
-	return
 }
