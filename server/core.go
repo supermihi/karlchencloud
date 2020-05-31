@@ -1,9 +1,8 @@
-package cloud
+package server
 
 import (
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/doko/round"
 )
 
 type Users interface {
@@ -16,7 +15,7 @@ type Users interface {
 
 type PlayerUserMap [game.NumPlayers]string
 type TableMatch struct {
-	Match   *match.Match
+	Match   match.Match
 	Players PlayerUserMap
 }
 
@@ -29,7 +28,7 @@ func (pm PlayerUserMap) PlayerFor(user string) game.Player {
 	return game.NoPlayer
 }
 
-func getActivePlayerIds(playersInOrder []string, pa round.PlayerAssignment) [game.NumPlayers]string {
+func getActivePlayerIds(playersInOrder []string, pa match.PlayerAssignment) [game.NumPlayers]string {
 	var ans [game.NumPlayers]string
 	for inGamePlayerNumber, playerIndex := range pa.Playing() {
 		ans[inGamePlayerNumber] = playersInOrder[playerIndex]

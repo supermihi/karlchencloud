@@ -1,13 +1,13 @@
-package cloud
+package server
 
 import "sync"
 
 type MemoryUserDb struct {
-	users map[string]*UserData
+	users map[string]*User
 	mtx   sync.RWMutex
 }
 
-type UserData struct {
+type User struct {
 	id     string
 	name   string
 	secret string
@@ -17,12 +17,12 @@ func RandomSecret() string {
 	return RandomLetters(16)
 }
 
-func NewUserData(id string, name string, secret string) *UserData {
-	return &UserData{id, name, secret}
+func NewUser(id string, name string, secret string) *User {
+	return &User{id, name, secret}
 }
 
 func NewMemoryUserDb() *MemoryUserDb {
-	users := make(map[string]*UserData)
+	users := make(map[string]*User)
 	ans := MemoryUserDb{users: users}
 	return &ans
 }
@@ -34,7 +34,7 @@ func (m *MemoryUserDb) Add(user string, name string, secret string) bool {
 	if exists {
 		return false
 	}
-	m.users[user] = NewUserData(user, name, secret)
+	m.users[user] = NewUser(user, name, secret)
 	return true
 }
 

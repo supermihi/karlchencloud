@@ -1,4 +1,4 @@
-package cloud
+package server
 
 type CloudError struct {
 	msg string

@@ -20,7 +20,7 @@ func DeclarationVorbehalt(v Vorbehalt) Declaration {
 type Auction struct {
 	forehand     game.Player
 	cards        game.Cards
-	declarations map[game.Player]Declaration
+	Declarations map[game.Player]Declaration
 }
 
 func NewAuction(forehand game.Player, cards game.Cards) *Auction {
@@ -32,19 +32,14 @@ func NewAuction(forehand game.Player, cards game.Cards) *Auction {
 }
 
 func (a *Auction) IsFinished() bool {
-	return len(a.declarations) == game.NumPlayers
-}
-
-func (a *Auction) DeclarationOf(p game.Player) (d Declaration, ok bool) {
-	d, ok = a.declarations[p]
-	return
+	return len(a.Declarations) == game.NumPlayers
 }
 
 func (a *Auction) WhoseTurn() game.Player {
 	if a.IsFinished() {
 		return game.NoPlayer
 	}
-	return a.forehand.NthNext(len(a.declarations))
+	return a.forehand.NthNext(len(a.Declarations))
 }
 
 type DeclarationResult int
@@ -56,12 +51,12 @@ func (a *Auction) Declare(player game.Player, t game.AnnouncedGameType) bool {
 	v := GetVorbehalt(t)
 	if v == nil {
 		// gesund
-		a.declarations[player] = DeclarationGesund()
+		a.Declarations[player] = DeclarationGesund()
 	} else {
 		if !v.CanAnnounceWith(a.cards[player]) {
 			return false
 		}
-		a.declarations[player] = DeclarationVorbehalt(v)
+		a.Declarations[player] = DeclarationVorbehalt(v)
 	}
 	return true
 }
@@ -78,7 +73,7 @@ func (a Auction) GetResult() Result {
 	winner := game.NoPlayer
 	maxPrio := -1
 	for _, player := range game.PlayersFrom(a.forehand) {
-		d := a.declarations[player]
+		d := a.Declarations[player]
 		if !d.Gesund && d.Vorbehalt.Priority() > maxPrio {
 			winner = player
 			maxPrio = d.Vorbehalt.Priority()
@@ -87,7 +82,7 @@ func (a Auction) GetResult() Result {
 	if winner == game.NoPlayer {
 		return Result{game.NewNormalspiel(a.cards), a.forehand}
 	}
-	vorbehalt := a.declarations[winner].Vorbehalt
+	vorbehalt := a.Declarations[winner].Vorbehalt
 	forehand := a.forehand
 	if vorbehalt.AnnouncerTakesForehand() {
 		forehand = winner

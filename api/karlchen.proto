@@ -3,7 +3,7 @@ syntax = "proto3";
 package api;
 //option go_package = "github.com/supermihi/karlchencloud/api";
 option go_package = ".;api";
-service Karlchencloud {
+service Doko {
     rpc Register (UserName) returns (RegisterReply) {
     }
 

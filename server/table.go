@@ -1,9 +1,9 @@
-package cloud
+package server
 
 import (
 	"fmt"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/doko/round"
+	"github.com/supermihi/karlchencloud/doko/match"
 	"math/rand"
 )
 
@@ -22,7 +22,7 @@ type Table struct {
 	Phase          TablePhase
 	players        []string
 	playersInOrder []string
-	round          *round.Round
+	round          *match.Round
 	CurrentMatch   *TableMatch
 }
 
@@ -53,7 +53,7 @@ func (t *Table) Start() error {
 	rand.Shuffle(len(t.players), func(i int, j int) {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
 	})
-	t.round = round.NewRound(len(t.players), rand.Int63())
+	t.round = match.NewRound(len(t.players), rand.Int63())
 	t.Phase = WaitingForNextGame
 	return t.StartMatch()
 }
@@ -85,8 +85,8 @@ func (t *Table) Join(user string) error {
 	if t.Phase != BeforeFirstGame {
 		return Error("cannot join a started table")
 	}
-	if len(t.players) > round.MaxPlayersPerRound {
-		return Error(fmt.Sprintf("only %v players supported per table", round.MaxPlayersPerRound))
+	if len(t.players) > match.MaxPlayersPerRound {
+		return Error(fmt.Sprintf("only %v players supported per table", match.MaxPlayersPerRound))
 	}
 	if t.ContainsPlayer(user) {
 		return Error("user already at table")

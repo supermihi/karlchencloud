@@ -1,4 +1,4 @@
-package cloud
+package server
 
 import "math/rand"
 

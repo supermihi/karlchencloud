@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
-	"github.com/supermihi/karlchencloud/common"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"github.com/supermihi/karlchencloud/server"
 	"log"
 	"os"
 	"strconv"
@@ -91,7 +91,7 @@ func (h *CliHandler) OnMatchStart(state *api.MatchState) {
 
 func (h *CliHandler) OnPlayedCard(ev *api.PlayedCard) {
 	if ev.UserId != h.Service.UserId() {
-		h.Logf("%v played %v", h.View.MemberNamesById[ev.UserId], common.ToCard(ev.Card))
+		h.Logf("%v played %v", h.View.MemberNamesById[ev.UserId], server.ToCard(ev.Card))
 	}
 	if len(h.Match().Trick.Cards) == 0 {
 		h.Logf("trick finished. Winner: %s", h.View.MemberNamesById[h.Match().Trick.Forehand])

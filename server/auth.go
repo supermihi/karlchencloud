@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	grpcAuth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/supermihi/karlchencloud/cloud"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -12,10 +11,10 @@ import (
 )
 
 type Auth struct {
-	Users cloud.Users
+	Users Users
 }
 
-func NewAuth(users cloud.Users) Auth {
+func NewAuth(users Users) Auth {
 	return Auth{users}
 }
 

@@ -1,20 +1,19 @@
-package common
+package server
 
 import (
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
-	"github.com/supermihi/karlchencloud/cloud"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 )
 
-func ToApiUserId(p game.Player, users cloud.PlayerUserMap) string {
+func ToApiUserId(p game.Player, users PlayerUserMap) string {
 	if p == game.NoPlayer {
 		panic("cannot convert NoPlayer to user id")
 	}
-	return string(users[p])
+	return users[p]
 }
-func ToPlayerValue(p game.Player, users cloud.PlayerUserMap) *api.PlayerValue {
+func ToPlayerValue(p game.Player, users PlayerUserMap) *api.PlayerValue {
 	if p != game.NoPlayer {
 		return &api.PlayerValue{UserId: string(users[p])}
 	}
@@ -114,7 +113,7 @@ func ToGameType(t api.GameType) game.AnnouncedGameType {
 	panic(fmt.Sprintf("not an api game type: %s", t))
 }
 
-func ToApiMode(mode game.Mode, forehand game.Player, users cloud.PlayerUserMap) *api.Mode {
+func ToApiMode(mode game.Mode, forehand game.Player, users PlayerUserMap) *api.Mode {
 	soloist := ToPlayerValue(game.Soloist(mode), users)
 	var spouse *api.PlayerValue
 	switch h := mode.(type) {
@@ -197,7 +196,7 @@ func ToCard(c *api.Card) game.Card {
 	return game.Card{Suit: ToSuit(c.Suit), Rank: ToRank(c.Rank)}
 }
 
-func ToApiTrick(t *game.IncompleteTrick, m game.Mode, users cloud.PlayerUserMap) *api.Trick {
+func ToApiTrick(t *game.IncompleteTrick, m game.Mode, users PlayerUserMap) *api.Trick {
 	result := &api.Trick{UserIdForehand: ToApiUserId(t.Forehand, users)}
 	cards := make([]*api.Card, t.NumCardsPlayed())
 	for i := 0; i < len(cards); i++ {
@@ -209,7 +208,7 @@ func ToApiTrick(t *game.IncompleteTrick, m game.Mode, users cloud.PlayerUserMap)
 	return result
 }
 
-func ToApiTrickC(t game.Trick, users cloud.PlayerUserMap) *api.Trick {
+func ToApiTrickC(t game.Trick, users PlayerUserMap) *api.Trick {
 	result := &api.Trick{UserIdForehand: ToApiUserId(t.Forehand, users)}
 	cards := make([]*api.Card, game.NumPlayers)
 	for i := 0; i < len(cards); i++ {
@@ -219,10 +218,10 @@ func ToApiTrickC(t game.Trick, users cloud.PlayerUserMap) *api.Trick {
 	return result
 }
 
-func toAuctionState(a *match.Auction, users cloud.PlayerUserMap) *api.AuctionState {
+func toAuctionState(a *match.Auction, users PlayerUserMap) *api.AuctionState {
 	declarations := make([]*api.Declaration, 0)
 	for _, p := range game.Players() {
-		decl, hasDeclared := a.DeclarationOf(p)
+		decl, hasDeclared := a.Declarations[p]
 		if hasDeclared {
 			apiDecl := &api.Declaration{UserId: ToApiUserId(p, users), Vorbehalt: !decl.Gesund}
 			declarations = append(declarations, apiDecl)
@@ -231,7 +230,7 @@ func toAuctionState(a *match.Auction, users cloud.PlayerUserMap) *api.AuctionSta
 	return &api.AuctionState{Declarations: declarations}
 }
 
-func toApiBids(bids *match.Bids, users cloud.PlayerUserMap) []*api.Bid {
+func toApiBids(bids *match.Bids, users PlayerUserMap) []*api.Bid {
 	var ans []*api.Bid
 	for _, player := range game.Players() {
 		bidsOf := bids.BidsOf(player)
@@ -244,7 +243,7 @@ func toApiBids(bids *match.Bids, users cloud.PlayerUserMap) []*api.Bid {
 	return ans
 }
 
-func ToGameState(m *match.Match, users cloud.PlayerUserMap) *api.GameState {
+func ToGameState(m match.Match, users PlayerUserMap) *api.GameState {
 	var prevTrick *api.Trick
 	prevTrickGame := m.Game.PreviousTrick()
 	if prevTrickGame != nil {
@@ -257,7 +256,7 @@ func ToGameState(m *match.Match, users cloud.PlayerUserMap) *api.GameState {
 		PreviousTrick:   prevTrick,
 	}
 }
-func ToMatchState(tm *cloud.TableMatch, user string) *api.MatchState {
+func ToMatchState(tm *TableMatch, user string) *api.MatchState {
 	m := tm.Match
 	turn := ToPlayerValue(m.WhoseTurn(), tm.Players)
 	self := tm.Players.PlayerFor(user)
@@ -277,7 +276,7 @@ func ToMatchState(tm *cloud.TableMatch, user string) *api.MatchState {
 
 }
 
-func addRole(state *api.MatchState, tm cloud.TableMatch, user string) {
+func addRole(state *api.MatchState, tm TableMatch, user string) {
 	self := tm.Players.PlayerFor(user)
 	if self == game.NoPlayer {
 		state.Role = &api.MatchState_Spectator{Spectator: &api.Empty{}}
@@ -287,7 +286,7 @@ func addRole(state *api.MatchState, tm cloud.TableMatch, user string) {
 	}
 }
 
-func addDetails(state *api.MatchState, tm cloud.TableMatch) {
+func addDetails(state *api.MatchState, tm TableMatch) {
 	switch tm.Match.Phase() {
 	case match.InAuction:
 		state.Phase = api.MatchPhase_AUCTION
@@ -304,7 +303,7 @@ func addDetails(state *api.MatchState, tm cloud.TableMatch) {
 	}
 }
 
-func GetHandCards(m *match.Match, p game.Player) []*api.Card {
+func GetHandCards(m match.Match, p game.Player) []*api.Card {
 	var cards game.Hand
 	if m.Phase() != match.InGame {
 		cards = m.InitialHandCards(p)
@@ -318,7 +317,7 @@ func GetHandCards(m *match.Match, p game.Player) []*api.Card {
 	return ans
 }
 
-func ToTableData(table *cloud.Table, user string) *api.TableData {
+func ToTableData(table *Table, user string) *api.TableData {
 	exposedInviteCode := ""
 	if table.Owner() == user {
 		exposedInviteCode = table.InviteCode

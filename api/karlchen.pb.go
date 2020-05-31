@@ -2315,35 +2315,35 @@ var file_api_karlchen_proto_rawDesc = []byte{
 	0x0b, 0x53, 0x50, 0x41, 0x44, 0x45, 0x53, 0x5f, 0x53, 0x4f, 0x4c, 0x4f, 0x10, 0x04, 0x12, 0x0e,
 	0x0a, 0x0a, 0x43, 0x4c, 0x55, 0x42, 0x53, 0x5f, 0x53, 0x4f, 0x4c, 0x4f, 0x10, 0x05, 0x12, 0x11,
 	0x0a, 0x0d, 0x4d, 0x45, 0x41, 0x54, 0x4c, 0x45, 0x53, 0x53, 0x5f, 0x53, 0x4f, 0x4c, 0x4f, 0x10,
-	0x06, 0x32, 0xb5, 0x03, 0x0a, 0x0d, 0x4b, 0x61, 0x72, 0x6c, 0x63, 0x68, 0x65, 0x6e, 0x63, 0x6c,
-	0x6f, 0x75, 0x64, 0x12, 0x2f, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12,
-	0x0d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x1a, 0x12,
-	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x70,
-	0x6c, 0x79, 0x22, 0x00, 0x12, 0x29, 0x0a, 0x0a, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x4c, 0x6f, 0x67,
-	0x69, 0x6e, 0x12, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x0d,
-	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x00, 0x12,
-	0x2a, 0x0a, 0x0a, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x12, 0x0a, 0x2e,
-	0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x0e, 0x2e, 0x61, 0x70, 0x69, 0x2e,
-	0x54, 0x61, 0x62, 0x6c, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x00, 0x12, 0x2b, 0x0a, 0x0b, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x12, 0x0a, 0x2e, 0x61, 0x70, 0x69,
-	0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x0e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62,
-	0x6c, 0x65, 0x44, 0x61, 0x74, 0x61, 0x22, 0x00, 0x12, 0x28, 0x0a, 0x0a, 0x53, 0x74, 0x61, 0x72,
-	0x74, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x12, 0x0c, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62,
-	0x6c, 0x65, 0x49, 0x64, 0x1a, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
-	0x22, 0x00, 0x12, 0x30, 0x0a, 0x09, 0x4a, 0x6f, 0x69, 0x6e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x12,
-	0x15, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x4a, 0x6f, 0x69, 0x6e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70,
-	0x74, 0x79, 0x22, 0x00, 0x12, 0x26, 0x0a, 0x04, 0x50, 0x6c, 0x61, 0x79, 0x12, 0x10, 0x2e, 0x61,
-	0x70, 0x69, 0x2e, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0a,
-	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x14,
-	0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x45, 0x76,
-	0x65, 0x6e, 0x74, 0x73, 0x12, 0x0c, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65,
-	0x49, 0x64, 0x1a, 0x0f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x45, 0x76,
-	0x65, 0x6e, 0x74, 0x22, 0x00, 0x30, 0x01, 0x12, 0x30, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x54, 0x61,
-	0x62, 0x6c, 0x65, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0c, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54,
-	0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x1a, 0x0f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62,
-	0x6c, 0x65, 0x53, 0x74, 0x61, 0x74, 0x65, 0x22, 0x00, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x3b, 0x61,
-	0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x06, 0x32, 0xac, 0x03, 0x0a, 0x04, 0x44, 0x6f, 0x6b, 0x6f, 0x12, 0x2f, 0x0a, 0x08, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x0d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x55, 0x73, 0x65,
+	0x72, 0x4e, 0x61, 0x6d, 0x65, 0x1a, 0x12, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x52, 0x65, 0x67, 0x69,
+	0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12, 0x29, 0x0a, 0x0a, 0x43,
+	0x68, 0x65, 0x63, 0x6b, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x0d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x55, 0x73, 0x65, 0x72,
+	0x4e, 0x61, 0x6d, 0x65, 0x22, 0x00, 0x12, 0x2a, 0x0a, 0x0a, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x61,
+	0x62, 0x6c, 0x65, 0x73, 0x12, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
+	0x1a, 0x0e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x4c, 0x69, 0x73, 0x74,
+	0x22, 0x00, 0x12, 0x2b, 0x0a, 0x0b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x61, 0x62, 0x6c,
+	0x65, 0x12, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x0e, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x44, 0x61, 0x74, 0x61, 0x22, 0x00, 0x12,
+	0x28, 0x0a, 0x0a, 0x53, 0x74, 0x61, 0x72, 0x74, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x12, 0x0c, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x1a, 0x0a, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x30, 0x0a, 0x09, 0x4a, 0x6f, 0x69,
+	0x6e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x12, 0x15, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x4a, 0x6f, 0x69,
+	0x6e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0a, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x26, 0x0a, 0x04, 0x50,
+	0x6c, 0x61, 0x79, 0x12, 0x10, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74,
+	0x79, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x14, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
+	0x4d, 0x61, 0x74, 0x63, 0x68, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x0c, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x1a, 0x0f, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x4d, 0x61, 0x74, 0x63, 0x68, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x22, 0x00, 0x30, 0x01, 0x12, 0x30,
+	0x0a, 0x0d, 0x47, 0x65, 0x74, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12,
+	0x0c, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x1a, 0x0f, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x53, 0x74, 0x61, 0x74, 0x65, 0x22, 0x00,
+	0x42, 0x07, 0x5a, 0x05, 0x2e, 0x3b, 0x61, 0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -2435,24 +2435,24 @@ var file_api_karlchen_proto_depIdxs = []int32{
 	25, // 37: api.TableState.no_match:type_name -> api.Empty
 	24, // 38: api.TableState.members:type_name -> api.TableMember
 	29, // 39: api.TableList.tables:type_name -> api.TableData
-	26, // 40: api.Karlchencloud.Register:input_type -> api.UserName
-	25, // 41: api.Karlchencloud.CheckLogin:input_type -> api.Empty
-	25, // 42: api.Karlchencloud.ListTables:input_type -> api.Empty
-	25, // 43: api.Karlchencloud.CreateTable:input_type -> api.Empty
-	28, // 44: api.Karlchencloud.StartTable:input_type -> api.TableId
-	31, // 45: api.Karlchencloud.JoinTable:input_type -> api.JoinTableRequest
-	15, // 46: api.Karlchencloud.Play:input_type -> api.PlayRequest
-	28, // 47: api.Karlchencloud.SubscribeMatchEvents:input_type -> api.TableId
-	28, // 48: api.Karlchencloud.GetTableState:input_type -> api.TableId
-	27, // 49: api.Karlchencloud.Register:output_type -> api.RegisterReply
-	26, // 50: api.Karlchencloud.CheckLogin:output_type -> api.UserName
-	30, // 51: api.Karlchencloud.ListTables:output_type -> api.TableList
-	29, // 52: api.Karlchencloud.CreateTable:output_type -> api.TableData
-	25, // 53: api.Karlchencloud.StartTable:output_type -> api.Empty
-	25, // 54: api.Karlchencloud.JoinTable:output_type -> api.Empty
-	25, // 55: api.Karlchencloud.Play:output_type -> api.Empty
-	13, // 56: api.Karlchencloud.SubscribeMatchEvents:output_type -> api.MatchEvent
-	23, // 57: api.Karlchencloud.GetTableState:output_type -> api.TableState
+	26, // 40: api.Doko.Register:input_type -> api.UserName
+	25, // 41: api.Doko.CheckLogin:input_type -> api.Empty
+	25, // 42: api.Doko.ListTables:input_type -> api.Empty
+	25, // 43: api.Doko.CreateTable:input_type -> api.Empty
+	28, // 44: api.Doko.StartTable:input_type -> api.TableId
+	31, // 45: api.Doko.JoinTable:input_type -> api.JoinTableRequest
+	15, // 46: api.Doko.Play:input_type -> api.PlayRequest
+	28, // 47: api.Doko.SubscribeMatchEvents:input_type -> api.TableId
+	28, // 48: api.Doko.GetTableState:input_type -> api.TableId
+	27, // 49: api.Doko.Register:output_type -> api.RegisterReply
+	26, // 50: api.Doko.CheckLogin:output_type -> api.UserName
+	30, // 51: api.Doko.ListTables:output_type -> api.TableList
+	29, // 52: api.Doko.CreateTable:output_type -> api.TableData
+	25, // 53: api.Doko.StartTable:output_type -> api.Empty
+	25, // 54: api.Doko.JoinTable:output_type -> api.Empty
+	25, // 55: api.Doko.Play:output_type -> api.Empty
+	13, // 56: api.Doko.SubscribeMatchEvents:output_type -> api.MatchEvent
+	23, // 57: api.Doko.GetTableState:output_type -> api.TableState
 	49, // [49:58] is the sub-list for method output_type
 	40, // [40:49] is the sub-list for method input_type
 	40, // [40:40] is the sub-list for extension type_name
@@ -2820,10 +2820,10 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// KarlchencloudClient is the client API for Karlchencloud service.
+// DokoClient is the client API for Doko service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type KarlchencloudClient interface {
+type DokoClient interface {
 	Register(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*RegisterReply, error)
 	CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UserName, error)
 	ListTables(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableList, error)
@@ -2831,87 +2831,87 @@ type KarlchencloudClient interface {
 	StartTable(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*Empty, error)
 	JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*Empty, error)
 	Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (*Empty, error)
-	SubscribeMatchEvents(ctx context.Context, in *TableId, opts ...grpc.CallOption) (Karlchencloud_SubscribeMatchEventsClient, error)
+	SubscribeMatchEvents(ctx context.Context, in *TableId, opts ...grpc.CallOption) (Doko_SubscribeMatchEventsClient, error)
 	GetTableState(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*TableState, error)
 }
 
-type karlchencloudClient struct {
+type dokoClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewKarlchencloudClient(cc grpc.ClientConnInterface) KarlchencloudClient {
-	return &karlchencloudClient{cc}
+func NewDokoClient(cc grpc.ClientConnInterface) DokoClient {
+	return &dokoClient{cc}
 }
 
-func (c *karlchencloudClient) Register(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*RegisterReply, error) {
+func (c *dokoClient) Register(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*RegisterReply, error) {
 	out := new(RegisterReply)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/Register", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *karlchencloudClient) CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UserName, error) {
+func (c *dokoClient) CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UserName, error) {
 	out := new(UserName)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/CheckLogin", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/CheckLogin", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *karlchencloudClient) ListTables(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableList, error) {
+func (c *dokoClient) ListTables(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableList, error) {
 	out := new(TableList)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/ListTables", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/ListTables", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *karlchencloudClient) CreateTable(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableData, error) {
+func (c *dokoClient) CreateTable(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableData, error) {
 	out := new(TableData)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/CreateTable", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/CreateTable", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *karlchencloudClient) StartTable(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*Empty, error) {
+func (c *dokoClient) StartTable(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/StartTable", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/StartTable", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *karlchencloudClient) JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *dokoClient) JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/JoinTable", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/JoinTable", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *karlchencloudClient) Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *dokoClient) Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/Play", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/Play", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *karlchencloudClient) SubscribeMatchEvents(ctx context.Context, in *TableId, opts ...grpc.CallOption) (Karlchencloud_SubscribeMatchEventsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Karlchencloud_serviceDesc.Streams[0], "/api.Karlchencloud/SubscribeMatchEvents", opts...)
+func (c *dokoClient) SubscribeMatchEvents(ctx context.Context, in *TableId, opts ...grpc.CallOption) (Doko_SubscribeMatchEventsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Doko_serviceDesc.Streams[0], "/api.Doko/SubscribeMatchEvents", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &karlchencloudSubscribeMatchEventsClient{stream}
+	x := &dokoSubscribeMatchEventsClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -2921,16 +2921,16 @@ func (c *karlchencloudClient) SubscribeMatchEvents(ctx context.Context, in *Tabl
 	return x, nil
 }
 
-type Karlchencloud_SubscribeMatchEventsClient interface {
+type Doko_SubscribeMatchEventsClient interface {
 	Recv() (*MatchEvent, error)
 	grpc.ClientStream
 }
 
-type karlchencloudSubscribeMatchEventsClient struct {
+type dokoSubscribeMatchEventsClient struct {
 	grpc.ClientStream
 }
 
-func (x *karlchencloudSubscribeMatchEventsClient) Recv() (*MatchEvent, error) {
+func (x *dokoSubscribeMatchEventsClient) Recv() (*MatchEvent, error) {
 	m := new(MatchEvent)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -2938,17 +2938,17 @@ func (x *karlchencloudSubscribeMatchEventsClient) Recv() (*MatchEvent, error) {
 	return m, nil
 }
 
-func (c *karlchencloudClient) GetTableState(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*TableState, error) {
+func (c *dokoClient) GetTableState(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*TableState, error) {
 	out := new(TableState)
-	err := c.cc.Invoke(ctx, "/api.Karlchencloud/GetTableState", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/GetTableState", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// KarlchencloudServer is the server API for Karlchencloud service.
-type KarlchencloudServer interface {
+// DokoServer is the server API for Doko service.
+type DokoServer interface {
 	Register(context.Context, *UserName) (*RegisterReply, error)
 	CheckLogin(context.Context, *Empty) (*UserName, error)
 	ListTables(context.Context, *Empty) (*TableList, error)
@@ -2956,252 +2956,252 @@ type KarlchencloudServer interface {
 	StartTable(context.Context, *TableId) (*Empty, error)
 	JoinTable(context.Context, *JoinTableRequest) (*Empty, error)
 	Play(context.Context, *PlayRequest) (*Empty, error)
-	SubscribeMatchEvents(*TableId, Karlchencloud_SubscribeMatchEventsServer) error
+	SubscribeMatchEvents(*TableId, Doko_SubscribeMatchEventsServer) error
 	GetTableState(context.Context, *TableId) (*TableState, error)
 }
 
-// UnimplementedKarlchencloudServer can be embedded to have forward compatible implementations.
-type UnimplementedKarlchencloudServer struct {
+// UnimplementedDokoServer can be embedded to have forward compatible implementations.
+type UnimplementedDokoServer struct {
 }
 
-func (*UnimplementedKarlchencloudServer) Register(context.Context, *UserName) (*RegisterReply, error) {
+func (*UnimplementedDokoServer) Register(context.Context, *UserName) (*RegisterReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (*UnimplementedKarlchencloudServer) CheckLogin(context.Context, *Empty) (*UserName, error) {
+func (*UnimplementedDokoServer) CheckLogin(context.Context, *Empty) (*UserName, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckLogin not implemented")
 }
-func (*UnimplementedKarlchencloudServer) ListTables(context.Context, *Empty) (*TableList, error) {
+func (*UnimplementedDokoServer) ListTables(context.Context, *Empty) (*TableList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTables not implemented")
 }
-func (*UnimplementedKarlchencloudServer) CreateTable(context.Context, *Empty) (*TableData, error) {
+func (*UnimplementedDokoServer) CreateTable(context.Context, *Empty) (*TableData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTable not implemented")
 }
-func (*UnimplementedKarlchencloudServer) StartTable(context.Context, *TableId) (*Empty, error) {
+func (*UnimplementedDokoServer) StartTable(context.Context, *TableId) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartTable not implemented")
 }
-func (*UnimplementedKarlchencloudServer) JoinTable(context.Context, *JoinTableRequest) (*Empty, error) {
+func (*UnimplementedDokoServer) JoinTable(context.Context, *JoinTableRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JoinTable not implemented")
 }
-func (*UnimplementedKarlchencloudServer) Play(context.Context, *PlayRequest) (*Empty, error) {
+func (*UnimplementedDokoServer) Play(context.Context, *PlayRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Play not implemented")
 }
-func (*UnimplementedKarlchencloudServer) SubscribeMatchEvents(*TableId, Karlchencloud_SubscribeMatchEventsServer) error {
+func (*UnimplementedDokoServer) SubscribeMatchEvents(*TableId, Doko_SubscribeMatchEventsServer) error {
 	return status.Errorf(codes.Unimplemented, "method SubscribeMatchEvents not implemented")
 }
-func (*UnimplementedKarlchencloudServer) GetTableState(context.Context, *TableId) (*TableState, error) {
+func (*UnimplementedDokoServer) GetTableState(context.Context, *TableId) (*TableState, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTableState not implemented")
 }
 
-func RegisterKarlchencloudServer(s *grpc.Server, srv KarlchencloudServer) {
-	s.RegisterService(&_Karlchencloud_serviceDesc, srv)
+func RegisterDokoServer(s *grpc.Server, srv DokoServer) {
+	s.RegisterService(&_Doko_serviceDesc, srv)
 }
 
-func _Karlchencloud_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserName)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).Register(ctx, in)
+		return srv.(DokoServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/Register",
+		FullMethod: "/api.Doko/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).Register(ctx, req.(*UserName))
+		return srv.(DokoServer).Register(ctx, req.(*UserName))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Karlchencloud_CheckLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_CheckLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).CheckLogin(ctx, in)
+		return srv.(DokoServer).CheckLogin(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/CheckLogin",
+		FullMethod: "/api.Doko/CheckLogin",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).CheckLogin(ctx, req.(*Empty))
+		return srv.(DokoServer).CheckLogin(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Karlchencloud_ListTables_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_ListTables_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).ListTables(ctx, in)
+		return srv.(DokoServer).ListTables(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/ListTables",
+		FullMethod: "/api.Doko/ListTables",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).ListTables(ctx, req.(*Empty))
+		return srv.(DokoServer).ListTables(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Karlchencloud_CreateTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_CreateTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).CreateTable(ctx, in)
+		return srv.(DokoServer).CreateTable(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/CreateTable",
+		FullMethod: "/api.Doko/CreateTable",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).CreateTable(ctx, req.(*Empty))
+		return srv.(DokoServer).CreateTable(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Karlchencloud_StartTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_StartTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TableId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).StartTable(ctx, in)
+		return srv.(DokoServer).StartTable(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/StartTable",
+		FullMethod: "/api.Doko/StartTable",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).StartTable(ctx, req.(*TableId))
+		return srv.(DokoServer).StartTable(ctx, req.(*TableId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Karlchencloud_JoinTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_JoinTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(JoinTableRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).JoinTable(ctx, in)
+		return srv.(DokoServer).JoinTable(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/JoinTable",
+		FullMethod: "/api.Doko/JoinTable",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).JoinTable(ctx, req.(*JoinTableRequest))
+		return srv.(DokoServer).JoinTable(ctx, req.(*JoinTableRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Karlchencloud_Play_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_Play_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PlayRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).Play(ctx, in)
+		return srv.(DokoServer).Play(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/Play",
+		FullMethod: "/api.Doko/Play",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).Play(ctx, req.(*PlayRequest))
+		return srv.(DokoServer).Play(ctx, req.(*PlayRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Karlchencloud_SubscribeMatchEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _Doko_SubscribeMatchEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(TableId)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(KarlchencloudServer).SubscribeMatchEvents(m, &karlchencloudSubscribeMatchEventsServer{stream})
+	return srv.(DokoServer).SubscribeMatchEvents(m, &dokoSubscribeMatchEventsServer{stream})
 }
 
-type Karlchencloud_SubscribeMatchEventsServer interface {
+type Doko_SubscribeMatchEventsServer interface {
 	Send(*MatchEvent) error
 	grpc.ServerStream
 }
 
-type karlchencloudSubscribeMatchEventsServer struct {
+type dokoSubscribeMatchEventsServer struct {
 	grpc.ServerStream
 }
 
-func (x *karlchencloudSubscribeMatchEventsServer) Send(m *MatchEvent) error {
+func (x *dokoSubscribeMatchEventsServer) Send(m *MatchEvent) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _Karlchencloud_GetTableState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Doko_GetTableState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TableId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KarlchencloudServer).GetTableState(ctx, in)
+		return srv.(DokoServer).GetTableState(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Karlchencloud/GetTableState",
+		FullMethod: "/api.Doko/GetTableState",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KarlchencloudServer).GetTableState(ctx, req.(*TableId))
+		return srv.(DokoServer).GetTableState(ctx, req.(*TableId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Karlchencloud_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "api.Karlchencloud",
-	HandlerType: (*KarlchencloudServer)(nil),
+var _Doko_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "api.Doko",
+	HandlerType: (*DokoServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Register",
-			Handler:    _Karlchencloud_Register_Handler,
+			Handler:    _Doko_Register_Handler,
 		},
 		{
 			MethodName: "CheckLogin",
-			Handler:    _Karlchencloud_CheckLogin_Handler,
+			Handler:    _Doko_CheckLogin_Handler,
 		},
 		{
 			MethodName: "ListTables",
-			Handler:    _Karlchencloud_ListTables_Handler,
+			Handler:    _Doko_ListTables_Handler,
 		},
 		{
 			MethodName: "CreateTable",
-			Handler:    _Karlchencloud_CreateTable_Handler,
+			Handler:    _Doko_CreateTable_Handler,
 		},
 		{
 			MethodName: "StartTable",
-			Handler:    _Karlchencloud_StartTable_Handler,
+			Handler:    _Doko_StartTable_Handler,
 		},
 		{
 			MethodName: "JoinTable",
-			Handler:    _Karlchencloud_JoinTable_Handler,
+			Handler:    _Doko_JoinTable_Handler,
 		},
 		{
 			MethodName: "Play",
-			Handler:    _Karlchencloud_Play_Handler,
+			Handler:    _Doko_Play_Handler,
 		},
 		{
 			MethodName: "GetTableState",
-			Handler:    _Karlchencloud_GetTableState_Handler,
+			Handler:    _Doko_GetTableState_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "SubscribeMatchEvents",
-			Handler:       _Karlchencloud_SubscribeMatchEvents_Handler,
+			Handler:       _Doko_SubscribeMatchEvents_Handler,
 			ServerStreams: true,
 		},
 	},

@@ -1,4 +1,4 @@
-package cloud
+package server
 
 type Room struct {
 	Users  Users

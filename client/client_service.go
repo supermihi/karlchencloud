@@ -3,14 +3,14 @@ package client
 import (
 	"context"
 	"github.com/supermihi/karlchencloud/api"
-	"github.com/supermihi/karlchencloud/common"
 	"github.com/supermihi/karlchencloud/doko/game"
+	"github.com/supermihi/karlchencloud/server"
 	"google.golang.org/grpc"
 	"log"
 )
 
 type ClientService struct {
-	Api        api.KarlchencloudClient
+	Api        api.DokoClient
 	connection *grpc.ClientConn
 	Creds      *ClientCredentials
 	Name       string
@@ -42,7 +42,7 @@ func GetClientService(c ConnectData, ctx context.Context) (ClientService, error)
 	if err != nil {
 		return ClientService{}, err
 	}
-	kc := api.NewKarlchencloudClient(conn)
+	kc := api.NewDokoClient(conn)
 	ans, loginErr := kc.CheckLogin(ctx, &api.Empty{})
 	var username string
 	if ans != nil {
@@ -68,7 +68,7 @@ func (c *ClientService) UserId() string {
 func ToHand(cards []*api.Card) game.Hand {
 	ans := make([]game.Card, len(cards))
 	for i := 0; i < len(ans); i++ {
-		ans[i] = common.ToCard(cards[i])
+		ans[i] = server.ToCard(cards[i])
 	}
 	return ans
 }

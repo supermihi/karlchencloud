@@ -1,8 +1,7 @@
-package round
+package match
 
 import (
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/doko/match"
 )
 
 const MaxPlayersPerRound = 6
@@ -23,12 +22,8 @@ func (p *PlayerAssignment) Playing() [game.NumPlayers]int {
 }
 
 type MatchStats struct {
-	evaluation *match.GameEvaluation
+	evaluation *GameEvaluation
 	players    *PlayerAssignment
-}
-
-func NewMatchStats(evaluation *match.GameEvaluation, assignment *PlayerAssignment) MatchStats {
-	return MatchStats{evaluation, assignment}
 }
 
 type Round struct {
@@ -44,11 +39,10 @@ func (r *Round) CurrentPlayerAssignment() PlayerAssignment {
 	return NewPlayerAssignment(r.numPlayers, r.NumFinishedGames())
 }
 
-func (r *Round) NextMatch() *match.Match {
+func (r *Round) NextMatch() Match {
 	index := r.NumFinishedGames()
 	assignment := NewPlayerAssignment(r.numPlayers, index)
-	ans := match.NewMatch(assignment.Forehand(r.numPlayers), game.DealCards(r.cardSeed+int64(index)))
-	return &ans
+	return NewMatch(assignment.Forehand(r.numPlayers), game.DealCards(r.cardSeed+int64(index)))
 }
 
 func (r *Round) NumFinishedGames() int {
