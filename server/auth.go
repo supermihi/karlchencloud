@@ -44,7 +44,7 @@ func parseUserIdSecret(auth string) (string, string, error) {
 
 func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err error) {
 	meth, ok := grpc.Method(ctx)
-	if ok && meth == "/api.Karlchencloud/Register" {
+	if ok && meth == "/api.Doko/Register" {
 		return ctx, nil // ok to call register without auth
 	}
 	basic, err := grpcAuth.AuthFromMD(ctx, "basic")

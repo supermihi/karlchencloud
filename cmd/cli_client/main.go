@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-const address = "localhost:50051"
+const address = "localhost:9090"
 
 func main() {
 	conn := client.ConnectData{

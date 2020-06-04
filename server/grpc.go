@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
-	"net"
 	"net/http"
 	"sync"
 )
@@ -54,21 +53,14 @@ func WrapServer(grpcServer *grpc.Server) *http.Server {
 	}
 	return httpServer
 }
-func StartServer(users Users, port string) {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-
+func CreateServer(users Users) *grpc.Server {
 	room := NewRoom(users)
 	auth := NewAuth(users)
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcauth.UnaryServerInterceptor(auth.Authenticate)),
 		grpc.StreamInterceptor(grpcauth.StreamServerInterceptor(auth.Authenticate)))
 	serv := NewServer(room, auth)
 	api.RegisterDokoServer(grpcServer, serv)
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	return grpcServer
 }
 
 func (s *dokoserver) Register(_ context.Context, req *api.UserName) (*api.RegisterReply, error) {

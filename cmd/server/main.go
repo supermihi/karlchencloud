@@ -4,13 +4,27 @@ package main
 
 import (
 	"github.com/supermihi/karlchencloud/server"
+	"log"
+	"net"
 )
 
 const (
-	port = ":50051"
+	port = "0.0.0.0:9090"
 )
 
 func main() {
 	users := server.NewMemoryUserDb()
-	server.StartServer(users, port)
+
+	srv := server.CreateServer(users)
+
+	log.Printf("starting raw")
+
+	lis, err := net.Listen("tcp", ":50501")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	if err := srv.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+
 }
