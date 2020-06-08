@@ -1,10 +1,10 @@
 import React from "react";
-
-import "./App.css";
+import { hot } from "react-hot-loader/root";
 import { Toolbar, makeStyles, Typography, AppBar } from "@material-ui/core";
 import LoginPage from "./features/login/LoginPageContainer";
-import { selectLogin } from "app/core/login";
+import { selectLogin } from "core/login";
 import { useSelector } from "react-redux";
+import RoomView from "features/room/RoomContainer";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -35,10 +35,10 @@ function App() {
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
-        {state.loggedIn ? "yes!" : <LoginPage />}
+        {state.loggedIn ? <RoomView /> : <LoginPage />}
       </main>
     </>
   );
 }
 
-export default App;
+export default process.env.NODE_ENV === "development" ? hot(App) : App;

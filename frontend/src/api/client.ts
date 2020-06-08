@@ -1,17 +1,39 @@
 import * as karlchen from "./KarlchenServiceClientPb";
 import * as proto from "./karlchen_pb";
-import { Error } from "grpc-web";
+import { Error, Metadata } from "grpc-web";
+import { Base64 } from "js-base64";
+
 const url = "http://localhost:8080";
-export function getAuthenticatedClient(user: string, secret: string) {
-  let auth = "test";
-  return new karlchen.DokoClient(url, { authorization: auth }, null);
+
+let _client: karlchen.DokoClient | null = null;
+
+export interface AuthenticatedClient {
+  client: karlchen.DokoClient;
+  meta: Metadata;
+}
+export function getClient() {
+  if (!_client) {
+    _client = new karlchen.DokoClient(url, null, null);
+  }
+  return _client;
+}
+
+export function getAuthHeader(user: string, secret: string): Metadata {
+  const encoded = Base64.encode(`${user}:${secret}`);
+  return { authorization: `basic ${encoded}` };
+}
+
+export function getAuthenticatedClient(
+  user: string,
+  secret: string
+): AuthenticatedClient {
+  return { client: getClient(), meta: getAuthHeader(user, secret) };
 }
 
 export async function register(name: string) {
-  const client = new karlchen.DokoClient(url, null, null);
   const userName = new proto.UserName();
   userName.setName(name);
-  const ans = await client.register(userName, null);
+  const ans = await getClient().register(userName, null);
   const [id, secret] = [ans.getId(), ans.getSecret()];
   return { id, secret };
 }

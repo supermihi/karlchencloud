@@ -53,12 +53,14 @@ func WrapServer(grpcServer *grpc.Server) *http.Server {
 	}
 	return httpServer
 }
-func CreateServer(users Users) *grpc.Server {
-	room := NewRoom(users)
+func CreateServer(users Users, room *Room) *grpc.Server {
+	if room == nil {
+		room = NewRoom(users)
+	}
 	auth := NewAuth(users)
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcauth.UnaryServerInterceptor(auth.Authenticate)),
 		grpc.StreamInterceptor(grpcauth.StreamServerInterceptor(auth.Authenticate)))
-	serv := NewServer(room, auth)
+	serv := NewServer(*room, auth)
 	api.RegisterDokoServer(grpcServer, serv)
 	return grpcServer
 }

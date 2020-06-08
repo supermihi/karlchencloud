@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 	"strings"
 )
 
@@ -49,13 +50,16 @@ func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err er
 	}
 	basic, err := grpcAuth.AuthFromMD(ctx, "basic")
 	if err != nil {
+		log.Print(err)
 		return nil, err
 	}
 	userId, secret, err := parseUserIdSecret(basic)
 	if err != nil {
+		log.Print(err)
 		return nil, err
 	}
 	if !a.Users.Authenticate(userId, secret) {
+		log.Print(err)
 		return ctx, status.Error(codes.Unauthenticated, "invalid user/secret combination")
 	}
 	userMd := UserData{Id: userId, Name: a.Users.GetName(userId)}

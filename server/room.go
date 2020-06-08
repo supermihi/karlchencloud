@@ -5,8 +5,8 @@ type Room struct {
 	Tables *Tables
 }
 
-func NewRoom(users Users) Room {
-	return Room{users, NewTables()}
+func NewRoom(users Users) *Room {
+	return &Room{users, NewTables()}
 }
 
 func (c *Room) CreateTable(owner string) *Table {

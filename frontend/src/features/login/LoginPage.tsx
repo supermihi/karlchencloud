@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import {
   Typography,
-  Paper,
   Grid,
   TextField,
   Button,
   makeStyles,
   Backdrop,
   CircularProgress,
-  Snackbar,
 } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import { formatError } from "api/client";
+import MainPaper from "core/MainPaper";
 
 interface Props {
   signup: (name: string) => void;
@@ -20,11 +19,6 @@ interface Props {
 }
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-  },
   buttons: {
     display: "flex",
     justifyContent: "flex-end",
@@ -38,7 +32,7 @@ export default ({ signup, loading, error }: Props) => {
   const valid = name.trim() !== "";
   return (
     <>
-      <Paper className={classes.paper}>
+      <MainPaper>
         <Typography component="h1" variant="h6">
           Willkommen!
         </Typography>
@@ -70,7 +64,7 @@ export default ({ signup, loading, error }: Props) => {
         <Backdrop open={loading}>
           <CircularProgress />
         </Backdrop>
-      </Paper>
+      </MainPaper>
       {error && (
         <Alert severity="error" elevation={6}>
           Error signing up: {formatError(error)}

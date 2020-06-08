@@ -32,9 +32,13 @@ func (c *ClientCredentials) RequireTransportSecurity() bool {
 }
 
 func (c *ClientCredentials) GetRequestMetadata(_ context.Context, _ ...string) (map[string]string, error) {
-	auth := c.userId + ":" + c.secret
+	return getAuthMeta(c.userId, c.secret), nil
+}
+
+func getAuthMeta(userId string, secret string) map[string]string {
+	auth := userId + ":" + secret
 	enc := base64.StdEncoding.EncodeToString([]byte(auth))
 	return map[string]string{
 		"authorization": "basic " + enc,
-	}, nil
+	}
 }

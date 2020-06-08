@@ -3,6 +3,7 @@ package main
 //go:generate protoc -I ../../api ../../api/karlchen.proto --go_out=plugins=grpc:../../api
 
 import (
+	"fmt"
 	"github.com/supermihi/karlchencloud/server"
 	"log"
 	"net"
@@ -14,10 +15,18 @@ const (
 
 func main() {
 	users := server.NewMemoryUserDb()
-
-	srv := server.CreateServer(users)
-
+	for i := 1; i < 5; i++ {
+		users.Add(fmt.Sprintf("%d", i), fmt.Sprintf("dummy %d", i), "123")
+	}
+	room := server.NewRoom(users)
+	table := room.CreateTable("dummy 1")
+	err := table.Join("dummy 2")
+	if err != nil {
+		log.Fatalf("mäh")
+	}
+	srv := server.CreateServer(users, room)
 	log.Printf("starting raw")
+
 
 	lis, err := net.Listen("tcp", ":50501")
 	if err != nil {
