@@ -1,7 +1,7 @@
 import React from "react";
 import { hot } from "react-hot-loader/root";
 import { Toolbar, makeStyles, Typography, AppBar } from "@material-ui/core";
-import LoginPage from "./features/login/LoginPageContainer";
+import Welcome from "./features/login";
 import { selectLogin } from "core/login";
 import { useSelector } from "react-redux";
 import RoomView from "features/room/RoomContainer";
@@ -12,6 +12,7 @@ const useStyles = makeStyles((theme) => ({
   },
   layout: {
     width: "auto",
+    backgroundColor: theme.palette.background.paper,
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
     [theme.breakpoints.up(400 + theme.spacing(2) * 2)]: {
@@ -35,7 +36,7 @@ function App() {
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
-        {state.loggedIn ? <RoomView /> : <LoginPage />}
+        {state.loggedIn ? <RoomView /> : <Welcome />}
       </main>
     </>
   );

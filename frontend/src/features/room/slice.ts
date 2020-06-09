@@ -1,7 +1,7 @@
 import { Table } from "model/table";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { selectClient } from "core/login";
-import { ThunkAPI, RootState } from "app/store";
+import { RootState, AsyncThunkConfig } from "app/store";
 import { Empty } from "api/karlchen_pb";
 
 export interface RoomState {
@@ -13,7 +13,7 @@ export interface RoomState {
 
 const initialState: RoomState = { tables: [], loading: false, loaded: false };
 
-export const fetchTables = createAsyncThunk<Table[], void, ThunkAPI>(
+export const fetchTables = createAsyncThunk<Table[], void, AsyncThunkConfig>(
   "room/fetchTables",
   async (_, thunkAPI) => {
     const { client, meta } = selectClient(thunkAPI.getState());
@@ -26,7 +26,7 @@ export const fetchTables = createAsyncThunk<Table[], void, ThunkAPI>(
       .map((t) => ({ owner: t.getOwner(), id: t.getTableId() }));
   }
 );
-export const createTable = createAsyncThunk<Table, void, ThunkAPI>(
+export const createTable = createAsyncThunk<Table, void, AsyncThunkConfig>(
   "room/createTable",
   async (_, thunkAPI) => {
     throw new Error("not implemented");

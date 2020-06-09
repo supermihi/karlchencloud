@@ -50,16 +50,16 @@ func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err er
 	}
 	basic, err := grpcAuth.AuthFromMD(ctx, "basic")
 	if err != nil {
-		log.Print(err)
+		log.Printf("no basic auth: %v", err)
 		return nil, err
 	}
 	userId, secret, err := parseUserIdSecret(basic)
 	if err != nil {
-		log.Print(err)
+		log.Printf("could not parse user/secret in %s: %v", basic, err)
 		return nil, err
 	}
 	if !a.Users.Authenticate(userId, secret) {
-		log.Print(err)
+		log.Printf("invalid user/secret combination %s/%s", userId, secret)
 		return ctx, status.Error(codes.Unauthenticated, "invalid user/secret combination")
 	}
 	userMd := UserData{Id: userId, Name: a.Users.GetName(userId)}
