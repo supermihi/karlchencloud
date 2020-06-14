@@ -1640,6 +1640,77 @@ func (x *Players) GetUserIdRight() string {
 	return ""
 }
 
+type TableData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TableId    string         `protobuf:"bytes,1,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
+	Owner      string         `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
+	InviteCode string         `protobuf:"bytes,3,opt,name=invite_code,json=inviteCode,proto3" json:"invite_code,omitempty"`
+	Members    []*TableMember `protobuf:"bytes,4,rep,name=members,proto3" json:"members,omitempty"`
+}
+
+func (x *TableData) Reset() {
+	*x = TableData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_karlchen_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TableData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TableData) ProtoMessage() {}
+
+func (x *TableData) ProtoReflect() protoreflect.Message {
+	mi := &file_api_karlchen_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TableData.ProtoReflect.Descriptor instead.
+func (*TableData) Descriptor() ([]byte, []int) {
+	return file_api_karlchen_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *TableData) GetTableId() string {
+	if x != nil {
+		return x.TableId
+	}
+	return ""
+}
+
+func (x *TableData) GetOwner() string {
+	if x != nil {
+		return x.Owner
+	}
+	return ""
+}
+
+func (x *TableData) GetInviteCode() string {
+	if x != nil {
+		return x.InviteCode
+	}
+	return ""
+}
+
+func (x *TableData) GetMembers() []*TableMember {
+	if x != nil {
+		return x.Members
+	}
+	return nil
+}
+
 type TableState struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1655,7 +1726,7 @@ type TableState struct {
 func (x *TableState) Reset() {
 	*x = TableState{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_karlchen_proto_msgTypes[17]
+		mi := &file_api_karlchen_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1668,7 +1739,7 @@ func (x *TableState) String() string {
 func (*TableState) ProtoMessage() {}
 
 func (x *TableState) ProtoReflect() protoreflect.Message {
-	mi := &file_api_karlchen_proto_msgTypes[17]
+	mi := &file_api_karlchen_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1681,7 +1752,7 @@ func (x *TableState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TableState.ProtoReflect.Descriptor instead.
 func (*TableState) Descriptor() ([]byte, []int) {
-	return file_api_karlchen_proto_rawDescGZIP(), []int{17}
+	return file_api_karlchen_proto_rawDescGZIP(), []int{18}
 }
 
 func (m *TableState) GetState() isTableState_State {
@@ -1741,7 +1812,7 @@ type TableMember struct {
 func (x *TableMember) Reset() {
 	*x = TableMember{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_karlchen_proto_msgTypes[18]
+		mi := &file_api_karlchen_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1754,7 +1825,7 @@ func (x *TableMember) String() string {
 func (*TableMember) ProtoMessage() {}
 
 func (x *TableMember) ProtoReflect() protoreflect.Message {
-	mi := &file_api_karlchen_proto_msgTypes[18]
+	mi := &file_api_karlchen_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1767,7 +1838,7 @@ func (x *TableMember) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TableMember.ProtoReflect.Descriptor instead.
 func (*TableMember) Descriptor() ([]byte, []int) {
-	return file_api_karlchen_proto_rawDescGZIP(), []int{18}
+	return file_api_karlchen_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *TableMember) GetUserId() string {
@@ -1800,7 +1871,7 @@ type Empty struct {
 func (x *Empty) Reset() {
 	*x = Empty{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_karlchen_proto_msgTypes[19]
+		mi := &file_api_karlchen_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1813,7 +1884,7 @@ func (x *Empty) String() string {
 func (*Empty) ProtoMessage() {}
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_api_karlchen_proto_msgTypes[19]
+	mi := &file_api_karlchen_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1826,7 +1897,7 @@ func (x *Empty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
 func (*Empty) Descriptor() ([]byte, []int) {
-	return file_api_karlchen_proto_rawDescGZIP(), []int{19}
+	return file_api_karlchen_proto_rawDescGZIP(), []int{20}
 }
 
 type UserName struct {
@@ -1840,7 +1911,7 @@ type UserName struct {
 func (x *UserName) Reset() {
 	*x = UserName{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_karlchen_proto_msgTypes[20]
+		mi := &file_api_karlchen_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1853,7 +1924,7 @@ func (x *UserName) String() string {
 func (*UserName) ProtoMessage() {}
 
 func (x *UserName) ProtoReflect() protoreflect.Message {
-	mi := &file_api_karlchen_proto_msgTypes[20]
+	mi := &file_api_karlchen_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1866,7 +1937,7 @@ func (x *UserName) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserName.ProtoReflect.Descriptor instead.
 func (*UserName) Descriptor() ([]byte, []int) {
-	return file_api_karlchen_proto_rawDescGZIP(), []int{20}
+	return file_api_karlchen_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *UserName) GetName() string {
@@ -1888,7 +1959,7 @@ type RegisterReply struct {
 func (x *RegisterReply) Reset() {
 	*x = RegisterReply{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_karlchen_proto_msgTypes[21]
+		mi := &file_api_karlchen_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1901,7 +1972,7 @@ func (x *RegisterReply) String() string {
 func (*RegisterReply) ProtoMessage() {}
 
 func (x *RegisterReply) ProtoReflect() protoreflect.Message {
-	mi := &file_api_karlchen_proto_msgTypes[21]
+	mi := &file_api_karlchen_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1914,7 +1985,7 @@ func (x *RegisterReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterReply.ProtoReflect.Descriptor instead.
 func (*RegisterReply) Descriptor() ([]byte, []int) {
-	return file_api_karlchen_proto_rawDescGZIP(), []int{21}
+	return file_api_karlchen_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *RegisterReply) GetId() string {
@@ -1942,7 +2013,7 @@ type TableId struct {
 func (x *TableId) Reset() {
 	*x = TableId{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_karlchen_proto_msgTypes[22]
+		mi := &file_api_karlchen_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1955,7 +2026,7 @@ func (x *TableId) String() string {
 func (*TableId) ProtoMessage() {}
 
 func (x *TableId) ProtoReflect() protoreflect.Message {
-	mi := &file_api_karlchen_proto_msgTypes[22]
+	mi := &file_api_karlchen_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1968,7 +2039,7 @@ func (x *TableId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TableId.ProtoReflect.Descriptor instead.
 func (*TableId) Descriptor() ([]byte, []int) {
-	return file_api_karlchen_proto_rawDescGZIP(), []int{22}
+	return file_api_karlchen_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *TableId) GetValue() string {
@@ -1976,77 +2047,6 @@ func (x *TableId) GetValue() string {
 		return x.Value
 	}
 	return ""
-}
-
-type TableData struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	TableId    string         `protobuf:"bytes,1,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
-	Owner      string         `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
-	InviteCode string         `protobuf:"bytes,3,opt,name=invite_code,json=inviteCode,proto3" json:"invite_code,omitempty"`
-	Members    []*TableMember `protobuf:"bytes,4,rep,name=members,proto3" json:"members,omitempty"`
-}
-
-func (x *TableData) Reset() {
-	*x = TableData{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_api_karlchen_proto_msgTypes[23]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *TableData) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TableData) ProtoMessage() {}
-
-func (x *TableData) ProtoReflect() protoreflect.Message {
-	mi := &file_api_karlchen_proto_msgTypes[23]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TableData.ProtoReflect.Descriptor instead.
-func (*TableData) Descriptor() ([]byte, []int) {
-	return file_api_karlchen_proto_rawDescGZIP(), []int{23}
-}
-
-func (x *TableData) GetTableId() string {
-	if x != nil {
-		return x.TableId
-	}
-	return ""
-}
-
-func (x *TableData) GetOwner() string {
-	if x != nil {
-		return x.Owner
-	}
-	return ""
-}
-
-func (x *TableData) GetInviteCode() string {
-	if x != nil {
-		return x.InviteCode
-	}
-	return ""
-}
-
-func (x *TableData) GetMembers() []*TableMember {
-	if x != nil {
-		return x.Members
-	}
-	return nil
 }
 
 type JoinTableRequest struct {
@@ -2251,38 +2251,38 @@ var file_api_karlchen_proto_rawDesc = []byte{
 	0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64,
 	0x46, 0x61, 0x63, 0x65, 0x12, 0x22, 0x0a, 0x0d, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x5f,
 	0x72, 0x69, 0x67, 0x68, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x75, 0x73, 0x65,
-	0x72, 0x49, 0x64, 0x52, 0x69, 0x67, 0x68, 0x74, 0x22, 0x90, 0x01, 0x0a, 0x0a, 0x54, 0x61, 0x62,
-	0x6c, 0x65, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x2c, 0x0a, 0x08, 0x69, 0x6e, 0x5f, 0x6d, 0x61,
-	0x74, 0x63, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x61, 0x70, 0x69, 0x2e,
-	0x4d, 0x61, 0x74, 0x63, 0x68, 0x53, 0x74, 0x61, 0x74, 0x65, 0x48, 0x00, 0x52, 0x07, 0x69, 0x6e,
-	0x4d, 0x61, 0x74, 0x63, 0x68, 0x12, 0x27, 0x0a, 0x08, 0x6e, 0x6f, 0x5f, 0x6d, 0x61, 0x74, 0x63,
-	0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d,
-	0x70, 0x74, 0x79, 0x48, 0x00, 0x52, 0x07, 0x6e, 0x6f, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x12, 0x22,
-	0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x61,
-	0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61,
-	0x74, 0x61, 0x42, 0x07, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x22, 0x52, 0x0a, 0x0b, 0x54,
-	0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73,
-	0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65,
-	0x72, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x6e, 0x6c, 0x69, 0x6e,
-	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x22,
-	0x07, 0x0a, 0x05, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x1e, 0x0a, 0x08, 0x55, 0x73, 0x65, 0x72,
-	0x4e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x37, 0x0a, 0x0d, 0x52, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x65, 0x63,
-	0x72, 0x65, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x65, 0x63, 0x72, 0x65,
-	0x74, 0x22, 0x1f, 0x0a, 0x07, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05,
-	0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c,
-	0x75, 0x65, 0x22, 0x89, 0x01, 0x0a, 0x09, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x44, 0x61, 0x74, 0x61,
-	0x12, 0x19, 0x0a, 0x08, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x07, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6f,
-	0x77, 0x6e, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x77, 0x6e, 0x65,
-	0x72, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x6e, 0x76, 0x69, 0x74, 0x65, 0x5f, 0x63, 0x6f, 0x64, 0x65,
-	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x6e, 0x76, 0x69, 0x74, 0x65, 0x43, 0x6f,
-	0x64, 0x65, 0x12, 0x2a, 0x0a, 0x07, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x18, 0x04, 0x20,
-	0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x4d,
-	0x65, 0x6d, 0x62, 0x65, 0x72, 0x52, 0x07, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x73, 0x22, 0x4e,
+	0x72, 0x49, 0x64, 0x52, 0x69, 0x67, 0x68, 0x74, 0x22, 0x89, 0x01, 0x0a, 0x09, 0x54, 0x61, 0x62,
+	0x6c, 0x65, 0x44, 0x61, 0x74, 0x61, 0x12, 0x19, 0x0a, 0x08, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x49,
+	0x64, 0x12, 0x14, 0x0a, 0x05, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x6e, 0x76, 0x69, 0x74,
+	0x65, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x6e,
+	0x76, 0x69, 0x74, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x2a, 0x0a, 0x07, 0x6d, 0x65, 0x6d, 0x62,
+	0x65, 0x72, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x54, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x52, 0x07, 0x6d, 0x65, 0x6d,
+	0x62, 0x65, 0x72, 0x73, 0x22, 0x90, 0x01, 0x0a, 0x0a, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x53, 0x74,
+	0x61, 0x74, 0x65, 0x12, 0x2c, 0x0a, 0x08, 0x69, 0x6e, 0x5f, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x4d, 0x61, 0x74, 0x63,
+	0x68, 0x53, 0x74, 0x61, 0x74, 0x65, 0x48, 0x00, 0x52, 0x07, 0x69, 0x6e, 0x4d, 0x61, 0x74, 0x63,
+	0x68, 0x12, 0x27, 0x0a, 0x08, 0x6e, 0x6f, 0x5f, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x48,
+	0x00, 0x52, 0x07, 0x6e, 0x6f, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x12, 0x22, 0x0a, 0x04, 0x64, 0x61,
+	0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54,
+	0x61, 0x62, 0x6c, 0x65, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x42, 0x07,
+	0x0a, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x22, 0x52, 0x0a, 0x0b, 0x54, 0x61, 0x62, 0x6c, 0x65,
+	0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12,
+	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
+	0x61, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x06, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x22, 0x07, 0x0a, 0x05, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x22, 0x1e, 0x0a, 0x08, 0x55, 0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x22, 0x37, 0x0a, 0x0d, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
+	0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x65, 0x63, 0x72, 0x65, 0x74, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x65, 0x63, 0x72, 0x65, 0x74, 0x22, 0x1f, 0x0a,
+	0x07, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x4e,
 	0x0a, 0x10, 0x4a, 0x6f, 0x69, 0x6e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x12, 0x1f, 0x0a,
@@ -2326,7 +2326,7 @@ var file_api_karlchen_proto_rawDesc = []byte{
 	0x0f, 0x0a, 0x0b, 0x53, 0x50, 0x41, 0x44, 0x45, 0x53, 0x5f, 0x53, 0x4f, 0x4c, 0x4f, 0x10, 0x04,
 	0x12, 0x0e, 0x0a, 0x0a, 0x43, 0x4c, 0x55, 0x42, 0x53, 0x5f, 0x53, 0x4f, 0x4c, 0x4f, 0x10, 0x05,
 	0x12, 0x11, 0x0a, 0x0d, 0x4d, 0x45, 0x41, 0x54, 0x4c, 0x45, 0x53, 0x53, 0x5f, 0x53, 0x4f, 0x4c,
-	0x4f, 0x10, 0x06, 0x32, 0xae, 0x03, 0x0a, 0x04, 0x44, 0x6f, 0x6b, 0x6f, 0x12, 0x2f, 0x0a, 0x08,
+	0x4f, 0x10, 0x06, 0x32, 0xfc, 0x02, 0x0a, 0x04, 0x44, 0x6f, 0x6b, 0x6f, 0x12, 0x2f, 0x0a, 0x08,
 	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x0d, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x55,
 	0x73, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x1a, 0x12, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x52, 0x65,
 	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12, 0x29, 0x0a,
@@ -2350,11 +2350,8 @@ var file_api_karlchen_proto_rawDesc = []byte{
 	0x72, 0x69, 0x62, 0x65, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12,
 	0x0c, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x1a, 0x0f, 0x2e,
 	0x61, 0x70, 0x69, 0x2e, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x22, 0x00,
-	0x30, 0x01, 0x12, 0x30, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x53, 0x74,
-	0x61, 0x74, 0x65, 0x12, 0x0c, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49,
-	0x64, 0x1a, 0x0f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x53, 0x74, 0x61,
-	0x74, 0x65, 0x22, 0x00, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x3b, 0x61, 0x70, 0x69, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x30, 0x01, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x3b, 0x61, 0x70, 0x69, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2396,13 +2393,13 @@ var file_api_karlchen_proto_goTypes = []interface{}{
 	(*Cards)(nil),            // 21: api.Cards
 	(*MatchState)(nil),       // 22: api.MatchState
 	(*Players)(nil),          // 23: api.Players
-	(*TableState)(nil),       // 24: api.TableState
-	(*TableMember)(nil),      // 25: api.TableMember
-	(*Empty)(nil),            // 26: api.Empty
-	(*UserName)(nil),         // 27: api.UserName
-	(*RegisterReply)(nil),    // 28: api.RegisterReply
-	(*TableId)(nil),          // 29: api.TableId
-	(*TableData)(nil),        // 30: api.TableData
+	(*TableData)(nil),        // 24: api.TableData
+	(*TableState)(nil),       // 25: api.TableState
+	(*TableMember)(nil),      // 26: api.TableMember
+	(*Empty)(nil),            // 27: api.Empty
+	(*UserName)(nil),         // 28: api.UserName
+	(*RegisterReply)(nil),    // 29: api.RegisterReply
+	(*TableId)(nil),          // 30: api.TableId
 	(*JoinTableRequest)(nil), // 31: api.JoinTableRequest
 }
 var file_api_karlchen_proto_depIdxs = []int32{
@@ -2413,14 +2410,14 @@ var file_api_karlchen_proto_depIdxs = []int32{
 	8,  // 4: api.PlayedCard.trick_winner:type_name -> api.PlayerValue
 	5,  // 5: api.Bid.bid:type_name -> api.BidType
 	4,  // 6: api.EndOfGame.winner:type_name -> api.Party
-	24, // 7: api.MatchEvent.welcome:type_name -> api.TableState
+	25, // 7: api.MatchEvent.welcome:type_name -> api.TableState
 	22, // 8: api.MatchEvent.start:type_name -> api.MatchState
 	9,  // 9: api.MatchEvent.declared:type_name -> api.Declaration
 	10, // 10: api.MatchEvent.played_card:type_name -> api.PlayedCard
 	11, // 11: api.MatchEvent.placed_bid:type_name -> api.Bid
 	12, // 12: api.MatchEvent.ended:type_name -> api.EndOfGame
 	15, // 13: api.MatchEvent.member:type_name -> api.MemberEvent
-	24, // 14: api.UserState.currentTable:type_name -> api.TableState
+	25, // 14: api.UserState.currentTable:type_name -> api.TableState
 	0,  // 15: api.MemberEvent.type:type_name -> api.MemberEventType
 	6,  // 16: api.PlayRequest.declaration:type_name -> api.GameType
 	5,  // 17: api.PlayRequest.bid:type_name -> api.BidType
@@ -2439,34 +2436,32 @@ var file_api_karlchen_proto_depIdxs = []int32{
 	1,  // 30: api.MatchState.phase:type_name -> api.MatchPhase
 	8,  // 31: api.MatchState.turn:type_name -> api.PlayerValue
 	23, // 32: api.MatchState.players:type_name -> api.Players
-	26, // 33: api.MatchState.spectator:type_name -> api.Empty
+	27, // 33: api.MatchState.spectator:type_name -> api.Empty
 	21, // 34: api.MatchState.own_cards:type_name -> api.Cards
 	17, // 35: api.MatchState.auction_state:type_name -> api.AuctionState
 	20, // 36: api.MatchState.game_state:type_name -> api.GameState
-	22, // 37: api.TableState.in_match:type_name -> api.MatchState
-	26, // 38: api.TableState.no_match:type_name -> api.Empty
-	30, // 39: api.TableState.data:type_name -> api.TableData
-	25, // 40: api.TableData.members:type_name -> api.TableMember
-	27, // 41: api.Doko.Register:input_type -> api.UserName
-	26, // 42: api.Doko.CheckLogin:input_type -> api.Empty
-	26, // 43: api.Doko.GetUserState:input_type -> api.Empty
-	26, // 44: api.Doko.CreateTable:input_type -> api.Empty
-	29, // 45: api.Doko.StartTable:input_type -> api.TableId
+	26, // 37: api.TableData.members:type_name -> api.TableMember
+	22, // 38: api.TableState.in_match:type_name -> api.MatchState
+	27, // 39: api.TableState.no_match:type_name -> api.Empty
+	24, // 40: api.TableState.data:type_name -> api.TableData
+	28, // 41: api.Doko.Register:input_type -> api.UserName
+	27, // 42: api.Doko.CheckLogin:input_type -> api.Empty
+	27, // 43: api.Doko.GetUserState:input_type -> api.Empty
+	27, // 44: api.Doko.CreateTable:input_type -> api.Empty
+	30, // 45: api.Doko.StartTable:input_type -> api.TableId
 	31, // 46: api.Doko.JoinTable:input_type -> api.JoinTableRequest
 	16, // 47: api.Doko.Play:input_type -> api.PlayRequest
-	29, // 48: api.Doko.SubscribeMatchEvents:input_type -> api.TableId
-	29, // 49: api.Doko.GetTableState:input_type -> api.TableId
-	28, // 50: api.Doko.Register:output_type -> api.RegisterReply
-	27, // 51: api.Doko.CheckLogin:output_type -> api.UserName
-	14, // 52: api.Doko.GetUserState:output_type -> api.UserState
-	30, // 53: api.Doko.CreateTable:output_type -> api.TableData
-	26, // 54: api.Doko.StartTable:output_type -> api.Empty
-	26, // 55: api.Doko.JoinTable:output_type -> api.Empty
-	26, // 56: api.Doko.Play:output_type -> api.Empty
-	13, // 57: api.Doko.SubscribeMatchEvents:output_type -> api.MatchEvent
-	24, // 58: api.Doko.GetTableState:output_type -> api.TableState
-	50, // [50:59] is the sub-list for method output_type
-	41, // [41:50] is the sub-list for method input_type
+	30, // 48: api.Doko.SubscribeMatchEvents:input_type -> api.TableId
+	29, // 49: api.Doko.Register:output_type -> api.RegisterReply
+	28, // 50: api.Doko.CheckLogin:output_type -> api.UserName
+	14, // 51: api.Doko.GetUserState:output_type -> api.UserState
+	24, // 52: api.Doko.CreateTable:output_type -> api.TableData
+	27, // 53: api.Doko.StartTable:output_type -> api.Empty
+	27, // 54: api.Doko.JoinTable:output_type -> api.Empty
+	27, // 55: api.Doko.Play:output_type -> api.Empty
+	13, // 56: api.Doko.SubscribeMatchEvents:output_type -> api.MatchEvent
+	49, // [49:57] is the sub-list for method output_type
+	41, // [41:49] is the sub-list for method input_type
 	41, // [41:41] is the sub-list for extension type_name
 	41, // [41:41] is the sub-list for extension extendee
 	0,  // [0:41] is the sub-list for field type_name
@@ -2683,7 +2678,7 @@ func file_api_karlchen_proto_init() {
 			}
 		}
 		file_api_karlchen_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TableState); i {
+			switch v := v.(*TableData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2695,7 +2690,7 @@ func file_api_karlchen_proto_init() {
 			}
 		}
 		file_api_karlchen_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TableMember); i {
+			switch v := v.(*TableState); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2707,7 +2702,7 @@ func file_api_karlchen_proto_init() {
 			}
 		}
 		file_api_karlchen_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Empty); i {
+			switch v := v.(*TableMember); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2719,7 +2714,7 @@ func file_api_karlchen_proto_init() {
 			}
 		}
 		file_api_karlchen_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserName); i {
+			switch v := v.(*Empty); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2731,7 +2726,7 @@ func file_api_karlchen_proto_init() {
 			}
 		}
 		file_api_karlchen_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegisterReply); i {
+			switch v := v.(*UserName); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2743,7 +2738,7 @@ func file_api_karlchen_proto_init() {
 			}
 		}
 		file_api_karlchen_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TableId); i {
+			switch v := v.(*RegisterReply); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2755,7 +2750,7 @@ func file_api_karlchen_proto_init() {
 			}
 		}
 		file_api_karlchen_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TableData); i {
+			switch v := v.(*TableId); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2799,7 +2794,7 @@ func file_api_karlchen_proto_init() {
 		(*MatchState_AuctionState)(nil),
 		(*MatchState_GameState)(nil),
 	}
-	file_api_karlchen_proto_msgTypes[17].OneofWrappers = []interface{}{
+	file_api_karlchen_proto_msgTypes[18].OneofWrappers = []interface{}{
 		(*TableState_InMatch)(nil),
 		(*TableState_NoMatch)(nil),
 	}
@@ -2844,7 +2839,6 @@ type DokoClient interface {
 	JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*Empty, error)
 	Play(ctx context.Context, in *PlayRequest, opts ...grpc.CallOption) (*Empty, error)
 	SubscribeMatchEvents(ctx context.Context, in *TableId, opts ...grpc.CallOption) (Doko_SubscribeMatchEventsClient, error)
-	GetTableState(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*TableState, error)
 }
 
 type dokoClient struct {
@@ -2950,15 +2944,6 @@ func (x *dokoSubscribeMatchEventsClient) Recv() (*MatchEvent, error) {
 	return m, nil
 }
 
-func (c *dokoClient) GetTableState(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*TableState, error) {
-	out := new(TableState)
-	err := c.cc.Invoke(ctx, "/api.Doko/GetTableState", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // DokoServer is the server API for Doko service.
 type DokoServer interface {
 	Register(context.Context, *UserName) (*RegisterReply, error)
@@ -2969,7 +2954,6 @@ type DokoServer interface {
 	JoinTable(context.Context, *JoinTableRequest) (*Empty, error)
 	Play(context.Context, *PlayRequest) (*Empty, error)
 	SubscribeMatchEvents(*TableId, Doko_SubscribeMatchEventsServer) error
-	GetTableState(context.Context, *TableId) (*TableState, error)
 }
 
 // UnimplementedDokoServer can be embedded to have forward compatible implementations.
@@ -2999,9 +2983,6 @@ func (*UnimplementedDokoServer) Play(context.Context, *PlayRequest) (*Empty, err
 }
 func (*UnimplementedDokoServer) SubscribeMatchEvents(*TableId, Doko_SubscribeMatchEventsServer) error {
 	return status.Errorf(codes.Unimplemented, "method SubscribeMatchEvents not implemented")
-}
-func (*UnimplementedDokoServer) GetTableState(context.Context, *TableId) (*TableState, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTableState not implemented")
 }
 
 func RegisterDokoServer(s *grpc.Server, srv DokoServer) {
@@ -3155,24 +3136,6 @@ func (x *dokoSubscribeMatchEventsServer) Send(m *MatchEvent) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _Doko_GetTableState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TableId)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DokoServer).GetTableState(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/api.Doko/GetTableState",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokoServer).GetTableState(ctx, req.(*TableId))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Doko_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "api.Doko",
 	HandlerType: (*DokoServer)(nil),
@@ -3204,10 +3167,6 @@ var _Doko_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Play",
 			Handler:    _Doko_Play_Handler,
-		},
-		{
-			MethodName: "GetTableState",
-			Handler:    _Doko_GetTableState_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

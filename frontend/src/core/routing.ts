@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../app/store";
 
-export type Location = "login" | "room" | "table";
+export type Location = "login" | "lobby" | "table";
 export interface RoutingState {
   location: Location;
 }

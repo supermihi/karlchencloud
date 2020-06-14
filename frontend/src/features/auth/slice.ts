@@ -103,4 +103,13 @@ export const selectClient = createSelector(selectAuth, ({ validLogin }) =>
     ? api.getAuthenticatedClient(validLogin.id, validLogin.secret)
     : null
 );
+export const selectAuthenticatedClientOrThrow = createSelector(
+  selectClient,
+  (client) => {
+    if (!client) {
+      throw new Error("not authenticated");
+    }
+    return client;
+  }
+);
 export default loginSlice.reducer;

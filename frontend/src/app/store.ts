@@ -1,13 +1,23 @@
-import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
+import {
+  Action,
+  configureStore,
+  ThunkAction,
+  getDefaultMiddleware,
+} from "@reduxjs/toolkit";
 import coreReducer from "core";
-import roomReducer from "features/room/slice";
+import lobbyReducer from "features/lobby/slice";
+import createSagaMiddleware from "redux-saga";
+import sagas from "./sagas";
+const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore({
   reducer: {
     core: coreReducer,
-    room: roomReducer,
+    lobby: lobbyReducer,
   },
+  middleware: [...getDefaultMiddleware(), sagaMiddleware],
 });
+sagaMiddleware.run(sagas);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AsyncThunkConfig = { state: RootState };

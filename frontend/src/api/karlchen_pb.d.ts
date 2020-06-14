@@ -544,6 +544,38 @@ export namespace Players {
   }
 }
 
+export class TableData extends jspb.Message {
+  getTableId(): string;
+  setTableId(value: string): TableData;
+
+  getOwner(): string;
+  setOwner(value: string): TableData;
+
+  getInviteCode(): string;
+  setInviteCode(value: string): TableData;
+
+  getMembersList(): Array<TableMember>;
+  setMembersList(value: Array<TableMember>): TableData;
+  clearMembersList(): TableData;
+  addMembers(value?: TableMember, index?: number): TableMember;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TableData.AsObject;
+  static toObject(includeInstance: boolean, msg: TableData): TableData.AsObject;
+  static serializeBinaryToWriter(message: TableData, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TableData;
+  static deserializeBinaryFromReader(message: TableData, reader: jspb.BinaryReader): TableData;
+}
+
+export namespace TableData {
+  export type AsObject = {
+    tableId: string,
+    owner: string,
+    inviteCode: string,
+    membersList: Array<TableMember.AsObject>,
+  }
+}
+
 export class TableState extends jspb.Message {
   getInMatch(): MatchState | undefined;
   setInMatch(value?: MatchState): TableState;
@@ -679,38 +711,6 @@ export class TableId extends jspb.Message {
 export namespace TableId {
   export type AsObject = {
     value: string,
-  }
-}
-
-export class TableData extends jspb.Message {
-  getTableId(): string;
-  setTableId(value: string): TableData;
-
-  getOwner(): string;
-  setOwner(value: string): TableData;
-
-  getInviteCode(): string;
-  setInviteCode(value: string): TableData;
-
-  getMembersList(): Array<TableMember>;
-  setMembersList(value: Array<TableMember>): TableData;
-  clearMembersList(): TableData;
-  addMembers(value?: TableMember, index?: number): TableMember;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): TableData.AsObject;
-  static toObject(includeInstance: boolean, msg: TableData): TableData.AsObject;
-  static serializeBinaryToWriter(message: TableData, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): TableData;
-  static deserializeBinaryFromReader(message: TableData, reader: jspb.BinaryReader): TableData;
-}
-
-export namespace TableData {
-  export type AsObject = {
-    tableId: string,
-    owner: string,
-    inviteCode: string,
-    membersList: Array<TableMember.AsObject>,
   }
 }
 

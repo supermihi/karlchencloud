@@ -10,7 +10,8 @@
       "type": "pwa-chrome",
       "url": "http://localhost:8080",
       "webRoot": "${workspaceFolder}",
-      "runtimeExecutable": "/usr/bin/chromium"
+      "runtimeExecutable": "/usr/bin/chromium",
+      "userDataDir": "${workspaceFolder}/.vscode/vscode-chrome-debug-userdatadir"
     }
   ]
 }

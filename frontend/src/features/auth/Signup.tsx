@@ -56,7 +56,7 @@ export default ({ register, loading, error }: Props) => {
             disabled={!valid}
             variant="contained"
             color="primary"
-            onClick={(_) => signup(name)}
+            onClick={(_) => register(name)}
           >
             Los
           </Button>

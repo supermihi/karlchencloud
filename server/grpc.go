@@ -168,20 +168,6 @@ func (s *dokoserver) GetUserState(ctx context.Context, _ *api.Empty) (*api.UserS
 	}
 	return ans, nil
 }
-func (s *dokoserver) GetTableState(ctx context.Context, tableId *api.TableId) (*api.TableState, error) {
-	user, _ := GetAuthenticatedUser(ctx)
-	s.roomMtx.RLock()
-	defer s.roomMtx.RUnlock()
-	table, err := s.getTable(tableId.Value, user.Id, true, false)
-	if err != nil {
-		return nil, err
-	}
-	state, err := s.getTableState(table, user.Id)
-	if err != nil {
-		return nil, toGrpcError(err)
-	}
-	return state, nil
-}
 
 func (s *dokoserver) SubscribeMatchEvents(tableId *api.TableId, srv api.Doko_SubscribeMatchEventsServer) error {
 	user, _ := GetAuthenticatedUser(srv.Context())

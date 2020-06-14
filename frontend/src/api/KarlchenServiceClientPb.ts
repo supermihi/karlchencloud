@@ -21,7 +21,6 @@ import {
   RegisterReply,
   TableData,
   TableId,
-  TableState,
   UserName,
   UserState} from './karlchen_pb';
 
@@ -341,46 +340,6 @@ export class DokoClient {
       request,
       metadata || {},
       this.methodInfoSubscribeMatchEvents);
-  }
-
-  methodInfoGetTableState = new grpcWeb.AbstractClientBase.MethodInfo(
-    TableState,
-    (request: TableId) => {
-      return request.serializeBinary();
-    },
-    TableState.deserializeBinary
-  );
-
-  getTableState(
-    request: TableId,
-    metadata: grpcWeb.Metadata | null): Promise<TableState>;
-
-  getTableState(
-    request: TableId,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.Error,
-               response: TableState) => void): grpcWeb.ClientReadableStream<TableState>;
-
-  getTableState(
-    request: TableId,
-    metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.Error,
-               response: TableState) => void) {
-    if (callback !== undefined) {
-      return this.client_.rpcCall(
-        this.hostname_ +
-          '/api.Doko/GetTableState',
-        request,
-        metadata || {},
-        this.methodInfoGetTableState,
-        callback);
-    }
-    return this.client_.unaryCall(
-    this.hostname_ +
-      '/api.Doko/GetTableState',
-    request,
-    metadata || {},
-    this.methodInfoGetTableState);
   }
 
 }

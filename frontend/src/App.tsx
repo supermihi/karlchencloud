@@ -3,7 +3,7 @@ import { hot } from "react-hot-loader/root";
 import { Toolbar, makeStyles, Typography, AppBar } from "@material-ui/core";
 import { Component as AuthView } from "./features/auth";
 import { useSelector } from "react-redux";
-import RoomView from "features/room/RoomContainer";
+import LobbyView from "features/lobby/Main";
 import TableView from "features/table/Main";
 import { selectLocation, Location } from "./core/routing";
 
@@ -46,8 +46,8 @@ function Content({ location }: { location: Location }) {
   switch (location) {
     case "login":
       return <AuthView />;
-    case "room":
-      return <RoomView />;
+    case "lobby":
+      return <LobbyView />;
     case "table":
       return <TableView />;
   }

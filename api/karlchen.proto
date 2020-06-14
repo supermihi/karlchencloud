@@ -27,9 +27,6 @@ service Doko {
 
     rpc SubscribeMatchEvents (TableId) returns (stream MatchEvent) {
     }
-
-    rpc GetTableState (TableId) returns (TableState) {
-    }
 }
 
 message Card {
