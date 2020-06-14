@@ -28,16 +28,18 @@ func NewUser(id string, name string, secret string) *User {
 	return &User{id, name, secret}
 }
 
-func NewMemoryUserDb(filename string) (*MemoryUserDb, error) {
+func NewMemoryUserDb() *MemoryUserDb {
+	return &MemoryUserDb{users: make(map[string]*User)}
+}
+
+func NewExportedMemoryUserDb(filename string) (*MemoryUserDb, error) {
 	users := make(map[string]*User)
-	if filename != "" {
-		userList, err := importUsers(filename)
-		if err != nil {
-			return nil, err
-		}
-		for _, u := range userList {
-			users[u.Id] = &u
-		}
+	userList, err := importUsers(filename)
+	if err != nil {
+		return nil, err
+	}
+	for _, u := range userList {
+		users[u.Id] = &u
 	}
 	ans := MemoryUserDb{users: users, filename: filename}
 	return &ans, nil

@@ -8,8 +8,8 @@ import (
 
 func Test_getGamePoints(t *testing.T) {
 	bids := NewBids()
-	bids.placeBid(game.Player1, game.ReParty, Re)
-	bids.placeBid(game.Player2, game.ReParty, ReKeine90)
+	bids.placeBid(game.Player1, Re)
+	bids.placeBid(game.Player2, ReKeine90)
 	points := getGamePoints(&bids, game.ReParty, 151, 10)
 	expected := []GamePoint{NewGamePoint(Gewonnen), NewGamePoint(ReAngesagt), NewGamePoint(ReKeine90Abgesagt), NewGamePoint(Keine90Gespielt)}
 	assert.ElementsMatch(t, expected, points)

@@ -7,23 +7,20 @@ import (
 
 type Room struct {
 	users  Users
-	Tables *Tables
+	tables map[string]*Table
 }
 
 func NewRoom(users Users) *Room {
-	return &Room{users, NewTables()}
+	return &Room{users, make(map[string]*Table)}
 }
 
 func (r *Room) CreateTable(owner string) (table *TableData, err error) {
-	if r.Tables.ActiveTableOf(owner) != nil {
+	if r.ActiveTableOf(owner) != nil {
 		return nil, NewCloudError(TableAlreadyExists)
 	}
-	t := r.Tables.CreateTable(owner)
+	t := NewTable(owner)
+	r.tables[t.Id] = t
 	return GetData(t), nil
-}
-
-func (r *Room) TablePlayers(id string) []string {
-	return r.Tables.ById[id].players
 }
 
 func (r *Room) AddUser(user string, name string, secret string) bool {
@@ -39,7 +36,7 @@ func (r *Room) GetUserData(userId string) (data UserData, err error) {
 }
 
 func (r *Room) GetTable(tableId string) (table *TableData, err error) {
-	t, ok := r.Tables.ById[tableId]
+	t, ok := r.tables[tableId]
 	if ok {
 		return GetData(t), nil
 	}
@@ -47,14 +44,14 @@ func (r *Room) GetTable(tableId string) (table *TableData, err error) {
 }
 
 func (r *Room) JoinTable(tableId string, userId string, inviteCode string) (*TableData, error) {
-	t, tableExists := r.Tables.ById[tableId]
+	t, tableExists := r.tables[tableId]
 	if !tableExists {
 		return nil, NewCloudError(TableDoesNotExist)
 	}
 	if inviteCode != t.InviteCode {
 		return nil, NewCloudError(InvalidInviteCode)
 	}
-	if r.Tables.ActiveTableOf(userId) != nil {
+	if r.ActiveTableOf(userId) != nil {
 		return nil, NewCloudError(UserAlreadyAtOtherTable)
 	}
 	if err := t.Join(userId); err != nil {
@@ -64,7 +61,7 @@ func (r *Room) JoinTable(tableId string, userId string, inviteCode string) (*Tab
 
 }
 func (r *Room) StartTable(tableId string) error {
-	t, tableExists := r.Tables.ById[tableId]
+	t, tableExists := r.tables[tableId]
 	if !tableExists {
 		return NewCloudError(TableDoesNotExist)
 	}
@@ -120,7 +117,7 @@ func GetMatchData(tm *TableMatch) *MatchData {
 	return ans
 }
 func (r *Room) GetMatchData(tableId string) (m *MatchData, err error) {
-	t, ok := r.Tables.ById[tableId]
+	t, ok := r.tables[tableId]
 	if !ok {
 		return nil, NewCloudError(TableDoesNotExist)
 	}
@@ -166,7 +163,7 @@ func (r *Room) PlaceBid(tableId string, userId string, bid match.Bid) (*MatchDat
 }
 
 func (r *Room) getMatchAndPlayer(tableId string, user string) (match *TableMatch, p game.Player, err error) {
-	table, exists := r.Tables.ById[tableId]
+	table, exists := r.tables[tableId]
 	if !exists {
 		err = NewCloudError(TableDoesNotExist)
 		return
@@ -182,4 +179,13 @@ func (r *Room) getMatchAndPlayer(tableId string, user string) (match *TableMatch
 		return
 	}
 	return table.CurrentMatch, p, nil
+}
+
+func (r *Room) ActiveTableOf(user string) *TableData {
+	for _, table := range r.tables {
+		if table.ContainsPlayer(user) {
+			return GetData(table)
+		}
+	}
+	return nil
 }

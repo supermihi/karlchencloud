@@ -35,7 +35,7 @@ func (FleischlosMode) Type() game.AnnouncedGameType {
 
 type VorbehaltFleischlos struct{}
 
-func (VorbehaltFleischlos) CanAnnounceWith(handCards game.Hand) bool {
+func (VorbehaltFleischlos) CanAnnounceWith(_ game.Hand) bool {
 	return true
 }
 func (VorbehaltFleischlos) Type() game.AnnouncedGameType {

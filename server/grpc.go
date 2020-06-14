@@ -158,7 +158,7 @@ func (s *dokoserver) GetUserState(ctx context.Context, _ *api.Empty) (*api.UserS
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
 	ans := &api.UserState{}
-	activeTable := s.room.Tables.ActiveTableOf(user.Id)
+	activeTable := s.room.ActiveTableOf(user.Id)
 	if activeTable != nil {
 		tableState, err := s.getTableState(activeTable, user.Id)
 		if err != nil {

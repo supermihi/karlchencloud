@@ -60,7 +60,7 @@ type VorbehaltFarbsolo struct {
 	suit game.Suit
 }
 
-func (v VorbehaltFarbsolo) CanAnnounceWith(handCards game.Hand) bool {
+func (v VorbehaltFarbsolo) CanAnnounceWith(_ game.Hand) bool {
 	return true
 }
 func (v VorbehaltFarbsolo) Type() game.AnnouncedGameType {

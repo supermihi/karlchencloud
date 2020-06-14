@@ -52,10 +52,6 @@ func getActivePlayerIds(playersInOrder []string, pa match.PlayerAssignment) [gam
 	return ans
 }
 
-type Tables struct {
-	ById map[string]*Table
-}
-
 type TableData struct {
 	Id         string
 	Owner      string
@@ -80,32 +76,4 @@ func (d *TableData) ContainsPlayer(id string) bool {
 		}
 	}
 	return false
-}
-
-func NewTables() *Tables {
-	result := Tables{make(map[string]*Table)}
-	return &result
-}
-
-func (t *Tables) CreateTable(owner string) *Table {
-	table := NewTable(owner)
-	t.ById[table.Id] = table
-	return table
-}
-
-func (t *Tables) List() []*Table {
-	ids := make([]*Table, 0, len(t.ById))
-	for _, v := range t.ById {
-		ids = append(ids, v)
-	}
-	return ids
-}
-
-func (t *Tables) ActiveTableOf(user string) *TableData {
-	for _, table := range t.ById {
-		if table.ContainsPlayer(user) {
-			return GetData(table)
-		}
-	}
-	return nil
 }

@@ -54,7 +54,7 @@ func NewBids() Bids {
 
 }
 
-func (bids *Bids) placeBid(player game.Player, party game.Party, bid Bid) {
+func (bids *Bids) placeBid(player game.Player, bid Bid) {
 	bids.bids[player] = append(bids.bids[player], bid)
 }
 
@@ -104,7 +104,7 @@ func CanPlaceBid(player game.Player, bid Bid, bids *Bids, g *game.Game) bool {
 
 func TryPlaceBid(player game.Player, bid Bid, bids *Bids, g *game.Game) bool {
 	if CanPlaceBid(player, bid, bids, g) {
-		bids.placeBid(player, g.Mode.PartyOf(player), bid)
+		bids.placeBid(player, bid)
 		return true
 	}
 	return false

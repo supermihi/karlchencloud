@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(randErr)
 	}
 	rand.Seed(v)
-	users, err := server.NewMemoryUserDb("users.json")
+	users, err := server.NewExportedMemoryUserDb("users.json")
 	if err != nil {
 		log.Fatalf("error creating users: %v", err)
 	}
