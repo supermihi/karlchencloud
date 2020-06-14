@@ -1,28 +1,23 @@
 import { User } from "model/core";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../app/store";
 
 export interface UsersState {
-  users: User[];
+  byId: { [id: string]: User };
 }
 
-const initialState: UsersState = { users: [] };
+const initialState: UsersState = { byId: {} };
 const usersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    add: (state, action: PayloadAction<User>) => {
-      state.users.push(action.payload);
-    },
     set: (state, { payload: user }: PayloadAction<User>) => {
-      const exist = state.users.find((u) => u.id === user.id);
-      if (exist) {
-        exist.name = user.name;
-      } else {
-        state.users.push(user);
-      }
+      state.byId[user.id] = user;
     },
   },
 });
-export const { add, set } = usersSlice.actions;
+export const { set } = usersSlice.actions;
+export const selectUser = (id: string) => (state: RootState) =>
+  state.core.users.byId[id];
 
 export default usersSlice.reducer;

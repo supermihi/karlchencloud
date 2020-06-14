@@ -20,14 +20,6 @@ func NewAuth(users Users) Auth {
 }
 
 type userMDKey struct{}
-type UserData struct {
-	Id   string
-	Name string
-}
-
-func (d UserData) String() string {
-	return d.Name
-}
 
 func parseUserIdSecret(auth string) (string, string, error) {
 	contentB, err := base64.StdEncoding.DecodeString(auth)
@@ -62,7 +54,12 @@ func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err er
 		log.Printf("invalid user/secret combination %s/%s", userId, secret)
 		return ctx, status.Error(codes.Unauthenticated, "invalid user/secret combination")
 	}
-	userMd := UserData{Id: userId, Name: a.Users.GetName(userId)}
+	name, ok := a.Users.GetName(userId)
+	if !ok {
+		log.Printf("unknown error: user does not exist in auth")
+		return ctx, status.Error(codes.Internal, "unknown error: did not find authenticated user")
+	}
+	userMd := UserData{Id: userId, Name: name}
 	return context.WithValue(ctx, userMDKey{}, userMd), nil
 
 }

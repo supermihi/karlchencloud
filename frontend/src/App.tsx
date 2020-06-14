@@ -1,10 +1,11 @@
 import React from "react";
 import { hot } from "react-hot-loader/root";
 import { Toolbar, makeStyles, Typography, AppBar } from "@material-ui/core";
-import Welcome from "./features/login";
-import { selectLogin } from "core/login";
+import { Component as AuthView } from "./features/auth";
 import { useSelector } from "react-redux";
 import RoomView from "features/room/RoomContainer";
+import TableView from "features/table/Main";
+import { selectLocation, Location } from "./core/routing";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
-  const state = useSelector(selectLogin);
+  const location = useSelector(selectLocation);
   return (
     <>
       <AppBar position="absolute" className={classes.appBar}>
@@ -36,10 +37,20 @@ function App() {
         </Toolbar>
       </AppBar>
       <main className={classes.layout}>
-        {state.loggedIn ? <RoomView /> : <Welcome />}
+        <Content location={location} />
       </main>
     </>
   );
+}
+function Content({ location }: { location: Location }) {
+  switch (location) {
+    case "login":
+      return <AuthView />;
+    case "room":
+      return <RoomView />;
+    case "table":
+      return <TableView />;
+  }
 }
 
 export default process.env.NODE_ENV === "development" ? hot(App) : App;

@@ -211,6 +211,26 @@ export namespace MatchEvent {
   }
 }
 
+export class UserState extends jspb.Message {
+  getCurrenttable(): TableState | undefined;
+  setCurrenttable(value?: TableState): UserState;
+  hasCurrenttable(): boolean;
+  clearCurrenttable(): UserState;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserState.AsObject;
+  static toObject(includeInstance: boolean, msg: UserState): UserState.AsObject;
+  static serializeBinaryToWriter(message: UserState, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserState;
+  static deserializeBinaryFromReader(message: UserState, reader: jspb.BinaryReader): UserState;
+}
+
+export namespace UserState {
+  export type AsObject = {
+    currenttable?: TableState.AsObject,
+  }
+}
+
 export class MemberEvent extends jspb.Message {
   getUserId(): string;
   setUserId(value: string): MemberEvent;
@@ -535,10 +555,10 @@ export class TableState extends jspb.Message {
   hasNoMatch(): boolean;
   clearNoMatch(): TableState;
 
-  getMembersList(): Array<TableMember>;
-  setMembersList(value: Array<TableMember>): TableState;
-  clearMembersList(): TableState;
-  addMembers(value?: TableMember, index?: number): TableMember;
+  getData(): TableData | undefined;
+  setData(value?: TableData): TableState;
+  hasData(): boolean;
+  clearData(): TableState;
 
   getStateCase(): TableState.StateCase;
 
@@ -554,7 +574,7 @@ export namespace TableState {
   export type AsObject = {
     inMatch?: MatchState.AsObject,
     noMatch?: Empty.AsObject,
-    membersList: Array<TableMember.AsObject>,
+    data?: TableData.AsObject,
   }
 
   export enum StateCase { 
@@ -672,6 +692,11 @@ export class TableData extends jspb.Message {
   getInviteCode(): string;
   setInviteCode(value: string): TableData;
 
+  getMembersList(): Array<TableMember>;
+  setMembersList(value: Array<TableMember>): TableData;
+  clearMembersList(): TableData;
+  addMembers(value?: TableMember, index?: number): TableMember;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TableData.AsObject;
   static toObject(includeInstance: boolean, msg: TableData): TableData.AsObject;
@@ -685,26 +710,7 @@ export namespace TableData {
     tableId: string,
     owner: string,
     inviteCode: string,
-  }
-}
-
-export class TableList extends jspb.Message {
-  getTablesList(): Array<TableData>;
-  setTablesList(value: Array<TableData>): TableList;
-  clearTablesList(): TableList;
-  addTables(value?: TableData, index?: number): TableData;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): TableList.AsObject;
-  static toObject(includeInstance: boolean, msg: TableList): TableList.AsObject;
-  static serializeBinaryToWriter(message: TableList, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): TableList;
-  static deserializeBinaryFromReader(message: TableList, reader: jspb.BinaryReader): TableList;
-}
-
-export namespace TableList {
-  export type AsObject = {
-    tablesList: Array<TableData.AsObject>,
+    membersList: Array<TableMember.AsObject>,
   }
 }
 

@@ -1,16 +1,19 @@
-import { configureStore } from "@reduxjs/toolkit";
-import loginReducer from "core/login";
-import usersReducer from "core/users";
-
+import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
+import coreReducer from "core";
 import roomReducer from "features/room/slice";
 
 export const store = configureStore({
   reducer: {
-    login: loginReducer,
-    users: usersReducer,
+    core: coreReducer,
     room: roomReducer,
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AsyncThunkConfig = { state: RootState };
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;

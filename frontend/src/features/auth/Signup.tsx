@@ -13,7 +13,7 @@ import { formatError } from "api/client";
 import MainPaper from "core/MainPaper";
 
 interface Props {
-  signup: (name: string) => void;
+  register: (name: string) => void;
   loading: boolean;
   error: any;
 }
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default ({ signup, loading, error }: Props) => {
+export default ({ register, loading, error }: Props) => {
   const classes = useStyles();
   const [name, setName] = useState("");
   const valid = name.trim() !== "";

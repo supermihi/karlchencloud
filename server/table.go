@@ -43,10 +43,10 @@ func NewTable(owner string) *Table {
 
 func (t *Table) Start() error {
 	if t.Phase != BeforeFirstGame {
-		return Error("table already started")
+		return NewCloudError(TableAlreadyStarted)
 	}
 	if len(t.players) < game.NumPlayers || len(t.players) >= 7 {
-		return Error(fmt.Sprintf("Cannot start table with %v players", len(t.players)))
+		return NewCloudError(InvalidNumberOfPlayers)
 	}
 	t.playersInOrder = make([]string, len(t.players))
 	copy(t.playersInOrder, t.players)
@@ -59,7 +59,7 @@ func (t *Table) Start() error {
 }
 func (t *Table) StartMatch() error {
 	if t.Phase != WaitingForNextGame {
-		return Error("can only start match in phase WaitingForNextGame")
+		return NewCloudError(CannotStartTableNow)
 	}
 	nextMatch := t.round.NextMatch()
 	pa := t.round.CurrentPlayerAssignment()
@@ -83,13 +83,13 @@ func (t *Table) Users() []string {
 
 func (t *Table) Join(user string) error {
 	if t.Phase != BeforeFirstGame {
-		return Error("cannot join a started table")
+		return NewCloudError(UnableToJoinStartedTable)
 	}
 	if len(t.players) > match.MaxPlayersPerRound {
-		return Error(fmt.Sprintf("only %v players supported per table", match.MaxPlayersPerRound))
+		return NewCloudError(TablePlayerLimitReached)
 	}
 	if t.ContainsPlayer(user) {
-		return Error("user already at table")
+		return NewCloudError(UserAlreadyAtTable)
 	}
 	t.players = append(t.players, user)
 	return nil

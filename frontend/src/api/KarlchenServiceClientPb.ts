@@ -21,9 +21,9 @@ import {
   RegisterReply,
   TableData,
   TableId,
-  TableList,
   TableState,
-  UserName} from './karlchen_pb';
+  UserName,
+  UserState} from './karlchen_pb';
 
 export class DokoClient {
   client_: grpcWeb.AbstractClientBase;
@@ -124,44 +124,44 @@ export class DokoClient {
     this.methodInfoCheckLogin);
   }
 
-  methodInfoListTables = new grpcWeb.AbstractClientBase.MethodInfo(
-    TableList,
+  methodInfoGetUserState = new grpcWeb.AbstractClientBase.MethodInfo(
+    UserState,
     (request: Empty) => {
       return request.serializeBinary();
     },
-    TableList.deserializeBinary
+    UserState.deserializeBinary
   );
 
-  listTables(
+  getUserState(
     request: Empty,
-    metadata: grpcWeb.Metadata | null): Promise<TableList>;
+    metadata: grpcWeb.Metadata | null): Promise<UserState>;
 
-  listTables(
+  getUserState(
     request: Empty,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: TableList) => void): grpcWeb.ClientReadableStream<TableList>;
+               response: UserState) => void): grpcWeb.ClientReadableStream<UserState>;
 
-  listTables(
+  getUserState(
     request: Empty,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: TableList) => void) {
+               response: UserState) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.Doko/ListTables',
+          '/api.Doko/GetUserState',
         request,
         metadata || {},
-        this.methodInfoListTables,
+        this.methodInfoGetUserState,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.Doko/ListTables',
+      '/api.Doko/GetUserState',
     request,
     metadata || {},
-    this.methodInfoListTables);
+    this.methodInfoGetUserState);
   }
 
   methodInfoCreateTable = new grpcWeb.AbstractClientBase.MethodInfo(

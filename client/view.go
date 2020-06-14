@@ -89,7 +89,7 @@ func NewMatchView(state *api.MatchState) *MatchView {
 
 func NewTableView(ts *api.TableState) *TableView {
 	ans := TableView{MemberNamesById: make(map[string]string)}
-	for _, m := range ts.Members {
+	for _, m := range ts.Data.Members {
 		ans.MemberNamesById[m.UserId] = m.Name
 	}
 	switch state := ts.State.(type) {

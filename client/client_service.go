@@ -43,12 +43,17 @@ func GetClientService(c ConnectData, ctx context.Context) (ClientService, error)
 		return ClientService{}, err
 	}
 	kc := api.NewDokoClient(conn)
-	ans, loginErr := kc.CheckLogin(ctx, &api.Empty{})
 	var username string
-	if ans != nil {
-		username = ans.Name
+	loggedIn := false
+	if c.ExistingUserId != nil {
+		ans, _ := kc.CheckLogin(ctx, &api.Empty{})
+		if ans != nil {
+			username = ans.Name
+			loggedIn = true
+		}
 	}
-	if c.ExistingUserId == nil || loginErr != nil {
+
+	if c.ExistingUserId == nil || !loggedIn {
 		ans, err := kc.Register(ctx, &api.UserName{Name: c.DisplayName})
 		if err != nil {
 			return ClientService{}, err

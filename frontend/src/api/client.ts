@@ -18,7 +18,7 @@ export function getClient() {
   return _client;
 }
 
-export function getAuthHeader(user: string, secret: string): Metadata {
+export function getAuthMeta(user: string, secret: string): Metadata {
   const encoded = Base64.encode(`${user}:${secret}`);
   return { authorization: `basic ${encoded}` };
 }
@@ -27,7 +27,7 @@ export function getAuthenticatedClient(
   user: string,
   secret: string
 ): AuthenticatedClient {
-  return { client: getClient(), meta: getAuthHeader(user, secret) };
+  return { client: getClient(), meta: getAuthMeta(user, secret) };
 }
 
 export async function register(name: string) {

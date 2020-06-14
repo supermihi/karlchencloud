@@ -98,21 +98,26 @@ func (m *MemoryUserDb) List() []string {
 	return ans
 }
 
-func (m *MemoryUserDb) GetName(id string) string {
+func (m *MemoryUserDb) GetName(id string) (name string, ok bool) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
-	return m.users[id].Name
+	user, ok := m.users[id]
+	if !ok {
+		return "", false
+	}
+	return user.Name, true
 }
 
-func (m *MemoryUserDb) ChangeName(id string, newName string) {
+func (m *MemoryUserDb) ChangeName(id string, newName string) (ok bool) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
-	_, exists := m.users[id]
-	if !exists {
-		panic("cannot change newName of not existing user")
+	existing, ok := m.users[id]
+	if !ok {
+		return false
 	}
 	m.Export()
-	m.users[id].Name = newName
+	existing.Name = newName
+	return true
 }
 
 func (m *MemoryUserDb) Authenticate(id string, secret string) bool {

@@ -8,15 +8,23 @@ import Grid from "@material-ui/core/Grid";
 import { formatError } from "api/client";
 import MainPaper from "core/MainPaper";
 import ForwardIcon from "@material-ui/icons/Forward";
+import { LoginData } from "./api";
 
 interface Props {
-  login: () => void;
-  name: string;
+  currentLogin: LoginData;
   loading: boolean;
   error: any;
+  login: (login: LoginData) => void;
+  forgetLogin: () => void;
 }
 
-export default ({ name, loading, login, error }: Props) => {
+export default ({
+  login,
+  forgetLogin,
+  loading,
+  currentLogin,
+  error,
+}: Props) => {
   return (
     <>
       <MainPaper>
@@ -30,13 +38,15 @@ export default ({ name, loading, login, error }: Props) => {
               fullWidth
               variant="contained"
               color="primary"
-              onClick={login}
+              onClick={() => login(currentLogin)}
             >
-              Als {name} einloggen
+              Als {currentLogin.name} einloggen
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <Button fullWidth>Nicht {name}?</Button>
+            <Button onClick={forgetLogin} fullWidth>
+              Nicht {currentLogin.name}?
+            </Button>
           </Grid>
         </Grid>
 

@@ -10,7 +10,7 @@ service Doko {
     rpc CheckLogin (Empty) returns (UserName) {
     }
 
-    rpc ListTables (Empty) returns (TableList) {
+    rpc GetUserState (Empty) returns (UserState) {
     }
 
     rpc CreateTable (Empty) returns (TableData) {
@@ -23,7 +23,6 @@ service Doko {
     }
 
     rpc Play (PlayRequest) returns (Empty) {
-
     }
 
     rpc SubscribeMatchEvents (TableId) returns (stream MatchEvent) {
@@ -76,6 +75,9 @@ message MatchEvent {
     }
 }
 
+message UserState {
+    TableState currentTable = 1;
+}
 enum MemberEventType {
     JOIN_TABLE = 0;
     LEAVE_TABLE = 1;
@@ -147,12 +149,19 @@ message Players {
     string user_id_right = 4;
 }
 
+message TableData {
+    string table_id = 1;
+    string owner = 2;
+    string invite_code = 3;
+    repeated TableMember members = 4;
+}
+
 message TableState {
     oneof state {
         MatchState in_match = 1;
         Empty no_match = 2;
     }
-    repeated TableMember members = 3;
+    TableData data = 3;
 }
 
 message TableMember {
@@ -179,15 +188,6 @@ message TableId {
     string value = 1;
 }
 
-message TableData {
-    string table_id = 1;
-    string owner = 2;
-    string invite_code = 3;
-}
-
-message TableList {
-    repeated TableData tables = 1;
-}
 
 message JoinTableRequest {
     string table_id = 1;
