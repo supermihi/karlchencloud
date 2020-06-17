@@ -1,6 +1,18 @@
-version: 2
+version: 2.1
+
 jobs:
-  build:
+  Build-Backend:
+    executor:
+      name: go/default
+      tag: '1.14'
+    steps:
+      - checkout
+      - go/load-cache
+      - run:
+          name: go build
+          command: go build ./...
+
+  Test-Backend:
     docker:
       - image: circleci/golang:1.14
 
@@ -8,27 +20,23 @@ jobs:
       TEST_RESULTS: /tmp/test-results # path to where test results will be saved
 
     steps:
-      - checkout
       - run: mkdir -p $TEST_RESULTS
-      - restore_cache:
-          keys:
-            - v1-pkg-cache
       - run: go get github.com/jstemmer/go-junit-report
-
       - run:
           name: Run unit tests
-
-          command: |
-            go test -v ./... 2>&1 | go-junit-report > ${TEST_RESULTS}/go-test-report.xml
-
-      - save_cache: # Store cache in the /go/pkg directory
-          key: v1-pkg-cache
-          paths:
-            - "/go/pkg"
-
-      - store_artifacts:
-          path: /tmp/test-results
-          destination: raw-test-output
-
+          command: go test -v ./... 2>&1 | go-junit-report > ${TEST_RESULTS}/go-test-report.xml
+      - go/save-cache
       - store_test_results:
           path: /tmp/test-results
+
+workflows:
+  version: 2
+  Backend-Workflow:
+    jobs:
+      - Build-Backend
+      - Test-Backend:
+          requires:
+            - Build-Backend
+
+orbs:
+  go: circleci/go@1.3.0
