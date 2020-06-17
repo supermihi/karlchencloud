@@ -8,26 +8,19 @@ jobs:
     steps:
       - checkout
       - go/load-cache
+      - go/mod-download-cached
       - run:
           name: go build
           command: go build ./...
 
   Test-Backend:
-    docker:
-      - image: circleci/golang:1.14
-
-    environment: # environment variables for the build itself
-      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+    executor:
+      name: go/default
+      tag: '1.14'
 
     steps:
-      - run: mkdir -p $TEST_RESULTS
-      - run: go get github.com/jstemmer/go-junit-report
-      - run:
-          name: Run unit tests
-          command: go test -v ./... 2>&1 | go-junit-report > ${TEST_RESULTS}/go-test-report.xml
-      - go/save-cache
-      - store_test_results:
-          path: /tmp/test-results
+      - go/test:
+          failfast: true
 
 workflows:
   version: 2
