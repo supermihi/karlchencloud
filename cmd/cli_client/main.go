@@ -153,6 +153,10 @@ func (h *CliHandler) playCard() {
 			log.Printf("could not read answer: %v. Please try again", err)
 			continue
 		}
+		if i < 0 || i > len(h.Match().Cards)-1 {
+			log.Printf("invalid card index %d", i)
+			continue
+		}
 		err = h.PlayCard(h.Match().Cards[i])
 		if err != nil {
 			log.Printf("could not play card: %v. Try again", err)

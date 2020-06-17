@@ -31,7 +31,7 @@ func (c *TableClient) Logf(format string, v ...interface{}) {
 	c.Service.Logf(format, v...)
 }
 func (c *TableClient) Start() {
-	stream, err := c.Service.Api.SubscribeMatchEvents(c.Service.Context, &api.TableId{Value: c.TableId})
+	stream, err := c.Service.Api.StartSession(c.Service.Context, &api.Empty{})
 	c.Service.Logf("Listening for match events ...")
 	if err != nil {
 		c.Service.Logf("error subscribing: %v", err)
@@ -43,20 +43,20 @@ func (c *TableClient) Start() {
 			log.Fatalf("error receiving from stream: %v", err)
 		}
 		switch ev := msg.Event.(type) {
-		case *api.MatchEvent_Welcome:
+		case *api.Event_Welcome:
 			c.handleWelcome(ev.Welcome)
-		case *api.MatchEvent_Member:
+		case *api.Event_Member:
 			if ev.Member.Type == api.MemberEventType_JOIN_TABLE {
 				c.View.MemberNamesById[ev.Member.UserId] = ev.Member.Name
 			}
 			c.handler.OnMemberEvent(ev.Member)
-		case *api.MatchEvent_Start:
+		case *api.Event_Start:
 			c.handleStart(ev.Start)
-		case *api.MatchEvent_Declared:
+		case *api.Event_Declared:
 			c.handleDeclare(ev.Declared)
-		case *api.MatchEvent_PlayedCard:
+		case *api.Event_PlayedCard:
 			c.handlePlayedCard(ev.PlayedCard)
-		case *api.MatchEvent_Ended:
+		case *api.Event_Ended:
 			c.handleMatchEnded(ev.Ended)
 		default:
 			log.Fatalf("unimplemented event occured: %v", msg)
@@ -64,7 +64,11 @@ func (c *TableClient) Start() {
 	}
 }
 
-func (c *TableClient) handleWelcome(ts *api.TableState) {
+func (c *TableClient) handleWelcome(us *api.UserState) {
+	ts := us.CurrentTable
+	if ts == nil {
+		panic("table client expects active table")
+	}
 	c.View = NewTableView(ts)
 	c.handler.OnTableStateReceived(ts)
 	c.checkMyTurn()

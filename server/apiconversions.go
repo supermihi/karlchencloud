@@ -326,3 +326,11 @@ func ToMatchPhase(p api.MatchPhase) match.Phase {
 	}
 	panic(fmt.Sprintf("unknown match phase: %v", p))
 }
+
+func ToTableData(table *TableData, user string, members []*api.TableMember) *api.TableData {
+	ans := &api.TableData{TableId: table.Id, Owner: table.Owner, Members: members}
+	if table.Owner == user {
+		ans.InviteCode = table.InviteCode
+	}
+	return ans
+}

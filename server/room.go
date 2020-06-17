@@ -60,12 +60,22 @@ func (r *Room) JoinTable(tableId string, userId string, inviteCode string) (*Tab
 	return GetData(t), nil
 
 }
-func (r *Room) StartTable(tableId string) error {
+func (r *Room) StartTable(tableId string, userId string) (*TableData, error) {
 	t, tableExists := r.tables[tableId]
 	if !tableExists {
-		return NewCloudError(TableDoesNotExist)
+		return nil, NewCloudError(TableDoesNotExist)
 	}
-	return t.Start()
+	if !t.ContainsPlayer(userId) {
+		return nil, NewCloudError(UserNotAtTable)
+	}
+	if t.Owner() != userId {
+		return nil, NewCloudError(NotOwnerOfTable)
+	}
+	err := t.Start()
+	if err != nil {
+		return nil, err
+	}
+	return GetData(t), nil
 }
 
 type Declaration struct {

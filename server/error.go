@@ -1,6 +1,10 @@
 package server
 
-import "fmt"
+import (
+	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
 type CloudError struct {
 	msg  string
@@ -80,4 +84,14 @@ func (c ErrorCode) Message() string {
 		return "Cannot place bid"
 	}
 	return "unknown error code"
+}
+
+func toGrpcError(err error) error {
+	if _, ok := status.FromError(err); ok {
+		return err // already a GRPC error
+	}
+	if cloudErr, ok := err.(CloudError); ok {
+		return status.Error(codes.Internal, cloudErr.Error())
+	}
+	return status.Error(codes.Unknown, err.Error())
 }

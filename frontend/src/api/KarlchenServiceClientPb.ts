@@ -15,14 +15,13 @@ import * as grpcWeb from 'grpc-web';
 
 import {
   Empty,
+  Event,
   JoinTableRequest,
-  MatchEvent,
   PlayRequest,
   RegisterReply,
   TableData,
   TableId,
-  UserName,
-  UserState} from './karlchen_pb';
+  UserName} from './karlchen_pb';
 
 export class DokoClient {
   client_: grpcWeb.AbstractClientBase;
@@ -121,46 +120,6 @@ export class DokoClient {
     request,
     metadata || {},
     this.methodInfoCheckLogin);
-  }
-
-  methodInfoGetUserState = new grpcWeb.AbstractClientBase.MethodInfo(
-    UserState,
-    (request: Empty) => {
-      return request.serializeBinary();
-    },
-    UserState.deserializeBinary
-  );
-
-  getUserState(
-    request: Empty,
-    metadata: grpcWeb.Metadata | null): Promise<UserState>;
-
-  getUserState(
-    request: Empty,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.Error,
-               response: UserState) => void): grpcWeb.ClientReadableStream<UserState>;
-
-  getUserState(
-    request: Empty,
-    metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.Error,
-               response: UserState) => void) {
-    if (callback !== undefined) {
-      return this.client_.rpcCall(
-        this.hostname_ +
-          '/api.Doko/GetUserState',
-        request,
-        metadata || {},
-        this.methodInfoGetUserState,
-        callback);
-    }
-    return this.client_.unaryCall(
-    this.hostname_ +
-      '/api.Doko/GetUserState',
-    request,
-    metadata || {},
-    this.methodInfoGetUserState);
   }
 
   methodInfoCreateTable = new grpcWeb.AbstractClientBase.MethodInfo(
@@ -323,23 +282,23 @@ export class DokoClient {
     this.methodInfoPlay);
   }
 
-  methodInfoSubscribeMatchEvents = new grpcWeb.AbstractClientBase.MethodInfo(
-    MatchEvent,
-    (request: TableId) => {
+  methodInfoStartSession = new grpcWeb.AbstractClientBase.MethodInfo(
+    Event,
+    (request: Empty) => {
       return request.serializeBinary();
     },
-    MatchEvent.deserializeBinary
+    Event.deserializeBinary
   );
 
-  subscribeMatchEvents(
-    request: TableId,
+  startSession(
+    request: Empty,
     metadata?: grpcWeb.Metadata) {
     return this.client_.serverStreaming(
       this.hostname_ +
-        '/api.Doko/SubscribeMatchEvents',
+        '/api.Doko/StartSession',
       request,
       metadata || {},
-      this.methodInfoSubscribeMatchEvents);
+      this.methodInfoStartSession);
   }
 
 }

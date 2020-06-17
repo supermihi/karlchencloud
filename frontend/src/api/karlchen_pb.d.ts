@@ -142,55 +142,55 @@ export namespace EndOfGame {
   }
 }
 
-export class MatchEvent extends jspb.Message {
-  getWelcome(): TableState | undefined;
-  setWelcome(value?: TableState): MatchEvent;
+export class Event extends jspb.Message {
+  getWelcome(): UserState | undefined;
+  setWelcome(value?: UserState): Event;
   hasWelcome(): boolean;
-  clearWelcome(): MatchEvent;
+  clearWelcome(): Event;
 
   getStart(): MatchState | undefined;
-  setStart(value?: MatchState): MatchEvent;
+  setStart(value?: MatchState): Event;
   hasStart(): boolean;
-  clearStart(): MatchEvent;
+  clearStart(): Event;
 
   getDeclared(): Declaration | undefined;
-  setDeclared(value?: Declaration): MatchEvent;
+  setDeclared(value?: Declaration): Event;
   hasDeclared(): boolean;
-  clearDeclared(): MatchEvent;
+  clearDeclared(): Event;
 
   getPlayedCard(): PlayedCard | undefined;
-  setPlayedCard(value?: PlayedCard): MatchEvent;
+  setPlayedCard(value?: PlayedCard): Event;
   hasPlayedCard(): boolean;
-  clearPlayedCard(): MatchEvent;
+  clearPlayedCard(): Event;
 
   getPlacedBid(): Bid | undefined;
-  setPlacedBid(value?: Bid): MatchEvent;
+  setPlacedBid(value?: Bid): Event;
   hasPlacedBid(): boolean;
-  clearPlacedBid(): MatchEvent;
+  clearPlacedBid(): Event;
 
   getEnded(): EndOfGame | undefined;
-  setEnded(value?: EndOfGame): MatchEvent;
+  setEnded(value?: EndOfGame): Event;
   hasEnded(): boolean;
-  clearEnded(): MatchEvent;
+  clearEnded(): Event;
 
   getMember(): MemberEvent | undefined;
-  setMember(value?: MemberEvent): MatchEvent;
+  setMember(value?: MemberEvent): Event;
   hasMember(): boolean;
-  clearMember(): MatchEvent;
+  clearMember(): Event;
 
-  getEventCase(): MatchEvent.EventCase;
+  getEventCase(): Event.EventCase;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): MatchEvent.AsObject;
-  static toObject(includeInstance: boolean, msg: MatchEvent): MatchEvent.AsObject;
-  static serializeBinaryToWriter(message: MatchEvent, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): MatchEvent;
-  static deserializeBinaryFromReader(message: MatchEvent, reader: jspb.BinaryReader): MatchEvent;
+  toObject(includeInstance?: boolean): Event.AsObject;
+  static toObject(includeInstance: boolean, msg: Event): Event.AsObject;
+  static serializeBinaryToWriter(message: Event, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Event;
+  static deserializeBinaryFromReader(message: Event, reader: jspb.BinaryReader): Event;
 }
 
-export namespace MatchEvent {
+export namespace Event {
   export type AsObject = {
-    welcome?: TableState.AsObject,
+    welcome?: UserState.AsObject,
     start?: MatchState.AsObject,
     declared?: Declaration.AsObject,
     playedCard?: PlayedCard.AsObject,
@@ -217,6 +217,9 @@ export class UserState extends jspb.Message {
   hasCurrenttable(): boolean;
   clearCurrenttable(): UserState;
 
+  getName(): string;
+  setName(value: string): UserState;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserState.AsObject;
   static toObject(includeInstance: boolean, msg: UserState): UserState.AsObject;
@@ -228,6 +231,7 @@ export class UserState extends jspb.Message {
 export namespace UserState {
   export type AsObject = {
     currenttable?: TableState.AsObject,
+    name: string,
   }
 }
 

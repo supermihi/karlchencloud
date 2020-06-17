@@ -10,21 +10,21 @@ import (
 
 type clientStreams struct {
 	mtx     sync.RWMutex
-	streams map[string]chan *api.MatchEvent
+	streams map[string]chan *api.Event
 }
 
 func newStreams() clientStreams {
-	return clientStreams{streams: make(map[string]chan *api.MatchEvent, 1000)}
+	return clientStreams{streams: make(map[string]chan *api.Event, 1000)}
 }
 
-func (s *clientStreams) send(user string, event *api.MatchEvent) {
+func (s *clientStreams) send(user string, event *api.Event) {
 	stream, ok := s.streams[user]
 	if ok {
 		stream <- event
 	}
 }
 
-func (s *clientStreams) sendToAll(users []string, event *api.MatchEvent) {
+func (s *clientStreams) sendToAll(users []string, event *api.Event) {
 	s.mtx.RLock()
 	defer s.mtx.RUnlock()
 	for _, user := range users {
@@ -33,10 +33,10 @@ func (s *clientStreams) sendToAll(users []string, event *api.MatchEvent) {
 
 }
 
-func (s *clientStreams) startNew(srv api.Doko_SubscribeMatchEventsServer, user string,
-	state *api.TableState) {
+func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user string,
+	state *api.UserState) {
 	stream := s.createStream(user)
-	stream <- &api.MatchEvent{Event: &api.MatchEvent_Welcome{Welcome: state}}
+	stream <- &api.Event{Event: &api.Event_Welcome{Welcome: state}}
 	go func() {
 		defer s.removeStream(user)
 		for {
@@ -62,8 +62,8 @@ func (s *clientStreams) startNew(srv api.Doko_SubscribeMatchEventsServer, user s
 	}()
 }
 
-func (s *clientStreams) createStream(user string) (stream chan *api.MatchEvent) {
-	stream = make(chan *api.MatchEvent, 10)
+func (s *clientStreams) createStream(user string) (stream chan *api.Event) {
+	stream = make(chan *api.Event, 10)
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	s.streams[user] = stream
