@@ -19,6 +19,12 @@ workflows:
   Backend-Workflow:
     jobs:
       - Build-and-Test-Backend
+  Frontend-Workflow:
+    jobs:
+      - node/test:
+          app-dir: ~/project/frontend
+          pkg-manager: yarn
 
 orbs:
   go: circleci/go@1.3.0
+  node: circleci/node@3.0.0
