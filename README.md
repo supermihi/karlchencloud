@@ -7,3 +7,7 @@ The server is implemented in [Go](https://golang.org/) and exposes its API via [
 
 This repository also contains a web frontend written in [TypeScript](typescriptlang.org) with React/Redux and [Material-UI](https://material-ui.com/).
 
+## Usage
+Sorry - no working version available yet.
+
+## Development
