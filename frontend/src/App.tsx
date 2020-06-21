@@ -1,32 +1,35 @@
-import React from "react";
-import { hot } from "react-hot-loader/root";
-import { Toolbar, makeStyles, Typography, AppBar } from "@material-ui/core";
-import { Component as AuthView } from "./features/session";
-import { useSelector } from "react-redux";
-import LobbyView from "features/lobby/Main";
-import TableView from "features/table/Main";
-import { selectLocation, Location } from "./core/routing";
+import React from 'react';
+import { Toolbar, makeStyles, Typography, AppBar } from '@material-ui/core';
+import Login from 'features/auth/Login';
+import Register from 'features/auth/Register';
+import { connect } from 'react-redux';
+import Lobby from 'features/lobby/Lobby';
+import TableView from 'features/table/Main';
+import { selectLocation, Location } from './app/routing';
+import { createSelector } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
-    position: "relative",
+    position: 'relative',
   },
   layout: {
-    width: "auto",
+    width: 'auto',
     backgroundColor: theme.palette.background.paper,
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
     [theme.breakpoints.up(400 + theme.spacing(2) * 2)]: {
       width: 400,
-      marginLeft: "auto",
-      marginRight: "auto",
+      marginLeft: 'auto',
+      marginRight: 'auto',
     },
   },
 }));
 
-function App() {
+interface Props {
+  location: Location;
+}
+function AppView({ location }: Props) {
   const classes = useStyles();
-  const location = useSelector(selectLocation);
   return (
     <>
       <AppBar position="absolute" className={classes.appBar}>
@@ -44,13 +47,15 @@ function App() {
 }
 function Content({ location }: { location: Location }) {
   switch (location) {
-    case "login":
-      return <AuthView />;
-    case "lobby":
-      return <LobbyView />;
-    case "table":
+    case Location.login:
+      return <Login />;
+    case Location.register:
+      return <Register />;
+    case Location.lobby:
+      return <Lobby />;
+    case Location.table:
       return <TableView />;
   }
 }
-
-export default process.env.NODE_ENV === "development" ? hot(App) : App;
+const mapState = createSelector(selectLocation, (location) => ({ location }));
+export default connect(mapState)(AppView);

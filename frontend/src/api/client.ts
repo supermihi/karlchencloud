@@ -2,7 +2,7 @@ import * as karlchen from "./KarlchenServiceClientPb";
 import * as proto from "./karlchen_pb";
 import { Error, Metadata } from "grpc-web";
 import { Base64 } from "js-base64";
-import { LoginData } from "core/session/localstorage";
+import { LoginData } from "app/auth";
 
 const url = "http://localhost:8080";
 

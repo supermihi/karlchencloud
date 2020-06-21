@@ -5,10 +5,11 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
 import Grid from "@material-ui/core/Grid";
-import { formatError } from "api/client";
-import MainPaper from "core/MainPaper";
 import ForwardIcon from "@material-ui/icons/Forward";
-import { LoginData } from "../../core/session/localstorage";
+import { formatError } from "api/client";
+import MainPaper from "components/MainPaper";
+
+import { LoginData } from "app/auth";
 
 interface Props {
   currentLogin: LoginData;

@@ -1,12 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Table } from "model/table";
-import { AsyncThunkConfig } from "app/store";
-import {
-  selectClient,
-  selectAuthenticatedClientOrThrow,
-} from "core/session/slice";
-import { TableId } from "api/karlchen_pb";
-import { tableId } from "../../api/helpers";
 
 interface State {
   table: Table | null;

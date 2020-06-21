@@ -1,14 +1,13 @@
 import React from "react";
 import { Table } from "model/table";
-import MainPaper from "core/MainPaper";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import Divider from "@material-ui/core/Divider";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import Typography from "@material-ui/core/Typography";
+import CurrentTableView from "./CurrentTableView";
 
 interface Props {
-  activeTable: Table | null;
+  activeTable?: Table;
   createTable: () => void;
 }
 
@@ -17,18 +16,27 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
     alignSelf: "center",
   },
+  main: {
+    display: "flex",
+    flexDirection: "column",
+  },
 }));
 
 export default ({ activeTable, createTable }: Props) => {
   const classes = useStyles();
   return (
-    <MainPaper>
-      {activeTable && <Typography variant="h6">Aktiver Tisch:</Typography>}
+    <div className={classes.main}>
+      {activeTable && <CurrentTableView table={activeTable} />}
 
       <Divider />
-      <Fab color="primary" onClick={createTable} className={classes.addTable}>
+      <Fab
+        variant="extended"
+        onClick={createTable}
+        className={classes.addTable}
+      >
         <AddIcon />
+        Tisch starten
       </Fab>
-    </MainPaper>
+    </div>
   );
 };
