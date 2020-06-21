@@ -12,16 +12,16 @@ import {
   getLoginDataFromLocalStorage,
   writeLoginDataToLocalStorage,
   deleteLoginDataInLocalStorage,
-} from "./api";
+} from "./localstorage";
 
-export interface AuthState {
+export interface SessionState {
   storedLogin: LoginData | null;
   validLogin: LoginData | null;
   loading: boolean;
   error?: any;
 }
 
-const initialState = (): AuthState => {
+const initialState = (): SessionState => {
   const existingLogin = getLoginDataFromLocalStorage();
   return {
     loading: false,
@@ -36,11 +36,19 @@ export const register = createAsyncThunk<LoginData, string>(
     const { id, secret } = await api.register(name);
     const ans = { name, id, secret };
     writeLoginDataToLocalStorage(ans);
-    dispatch(loginStored(ans));
+    dispatch(localStorageUpdated(ans));
     return ans;
   }
 );
 
+const startSession = ({id, secret}: LoginData): AppThunk => (dispatch) =>  {
+  try {
+    const server = api.getClient().startSession(new Empty(), api.getAuthMeta(id, secret));
+  } catch (error) {
+    if (api.isGrpcError)
+  }
+
+}
 export const tryLogin = createAsyncThunk<LoginData, LoginData>(
   "model/model",
   async (login, { dispatch }) => {
@@ -49,20 +57,20 @@ export const tryLogin = createAsyncThunk<LoginData, LoginData>(
     const user = await client.checkLogin(new Empty(), meta);
     const newLogin = { ...login, name: user.getName() }; // name might have changed!
     writeLoginDataToLocalStorage(newLogin);
-    dispatch(loginStored(newLogin));
+    dispatch(localStorageUpdated(newLogin));
     return newLogin;
   }
 );
 
 export const forgetLogin = (): AppThunk => (dispatch) => {
   deleteLoginDataInLocalStorage();
-  dispatch(loginStored(null));
+  dispatch(localStorageUpdated(null));
 };
 export const loginSlice = createSlice({
-  name: "login",
+  name: "session",
   initialState: initialState(),
   reducers: {
-    loginStored: (state, { payload }: PayloadAction<LoginData | null>) => {
+    localStorageUpdated: (state, { payload }: PayloadAction<LoginData | null>) => {
       state.storedLogin = payload;
     },
   },
@@ -95,9 +103,9 @@ export const loginSlice = createSlice({
       });
   },
 });
-const { loginStored } = loginSlice.actions;
+const { localStorageUpdated } = loginSlice.actions;
 
-export const selectAuth = (state: RootState) => state.core.auth;
+export const selectAuth = (state: RootState) => state.core.session;
 export const selectClient = createSelector(selectAuth, ({ validLogin }) =>
   validLogin !== null
     ? api.getAuthenticatedClient(validLogin.id, validLogin.secret)

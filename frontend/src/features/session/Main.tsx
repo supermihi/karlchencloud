@@ -5,12 +5,12 @@ import Login from "./Login";
 import {
   selectAuth,
   register,
-  AuthState,
+  SessionState,
   tryLogin,
   forgetLogin,
-} from "./slice";
-import { LoginData } from "./api";
-interface Props extends AuthState {
+} from "../../core/session/slice";
+import { LoginData } from "../../core/session/localstorage";
+interface Props extends SessionState {
   tryLogin: (login: LoginData) => void;
   register: (name: string) => void;
   forgetLogin: () => void;

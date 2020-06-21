@@ -1,7 +1,7 @@
 import React from "react";
 import { hot } from "react-hot-loader/root";
 import { Toolbar, makeStyles, Typography, AppBar } from "@material-ui/core";
-import { Component as AuthView } from "./features/auth";
+import { Component as AuthView } from "./features/session";
 import { useSelector } from "react-redux";
 import LobbyView from "features/lobby/Main";
 import TableView from "features/table/Main";

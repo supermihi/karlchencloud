@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../app/store";
+import { tryLogin, register } from "core/session/slice";
 
 export type Location = "login" | "lobby" | "table";
 export interface RoutingState {
@@ -14,6 +15,14 @@ export const locationSlice = createSlice({
       state.location = payload;
     },
   },
+  extraReducers: (builder) =>
+    builder
+      .addCase(tryLogin.fulfilled.type, (state) => {
+        state.location = "lobby";
+      })
+      .addCase(register.fulfilled.type, (state) => {
+        state.location = "lobby";
+      }),
 });
 export const selectLocation = (root: RootState) => root.core.routing.location;
 export const { setLocation } = locationSlice.actions;

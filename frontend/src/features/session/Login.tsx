@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import { formatError } from "api/client";
 import MainPaper from "core/MainPaper";
 import ForwardIcon from "@material-ui/icons/Forward";
-import { LoginData } from "./api";
+import { LoginData } from "../../core/session/localstorage";
 
 interface Props {
   currentLogin: LoginData;

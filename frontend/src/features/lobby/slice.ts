@@ -1,6 +1,6 @@
 import { Table, toTable, toUser } from "model/table";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { selectAuthenticatedClientOrThrow } from "features/auth/slice";
+import { selectAuthenticatedClientOrThrow } from "core/session/slice";
 import { RootState, AsyncThunkConfig } from "app/store";
 import { Empty } from "api/karlchen_pb";
 
@@ -37,7 +37,7 @@ export const fetchUserState = createAsyncThunk<
   const { client, meta } = selectAuthenticatedClientOrThrow(
     thunkAPI.getState()
   );
-  const result = await client.getUserState(new Empty(), meta);
+  const result = await client.(new Empty(), meta);
   const table = result.getCurrenttable()?.getData();
   if (!table) {
     return null;

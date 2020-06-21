@@ -4,7 +4,7 @@ import { AsyncThunkConfig } from "app/store";
 import {
   selectClient,
   selectAuthenticatedClientOrThrow,
-} from "features/auth/slice";
+} from "core/session/slice";
 import { TableId } from "api/karlchen_pb";
 import { tableId } from "../../api/helpers";
 

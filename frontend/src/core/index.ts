@@ -1,9 +1,9 @@
-import authReducer from "../features/auth/slice";
+import sessionReducer from "./session/slice";
 import usersReducer from "./users";
 import routingReducer from "./routing";
 import { combineReducers } from "redux";
 export default combineReducers({
-  auth: authReducer,
+  session: sessionReducer,
   users: usersReducer,
   routing: routingReducer,
 });
