@@ -3,6 +3,7 @@ import {
   createSelector,
   createSlice,
   PayloadAction,
+  createAction,
 } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "app/store";
 import * as api from "api/client";
@@ -41,11 +42,11 @@ export const register = createAsyncThunk<LoginData, string>(
   }
 );
 
-const startSession = ({id, secret}: LoginData): AppThunk => (dispatch) =>  {
+const startSession = createAsyncThunk<UserSt): AppThunk => (dispatch) =>  {
   try {
     const server = api.getClient().startSession(new Empty(), api.getAuthMeta(id, secret));
   } catch (error) {
-    if (api.isGrpcError)
+    if (dispatch())
   }
 
 }

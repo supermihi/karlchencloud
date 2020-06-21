@@ -44,10 +44,5 @@ func PlayersFrom(player Player) [NumPlayers]Player {
 	return ans
 }
 func (p Player) NthNext(i int) Player {
-	r := p
-	for i > 0 {
-		r = r.NextPlayer()
-		i -= 1
-	}
-	return r
+	return Player((int(p) + i) % NumPlayers)
 }
