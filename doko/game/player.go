@@ -44,5 +44,8 @@ func PlayersFrom(player Player) [NumPlayers]Player {
 	return ans
 }
 func (p Player) NthNext(i int) Player {
+	if p == NoPlayer {
+		panic("not a valid player")
+	}
 	return Player((int(p) + i) % NumPlayers)
 }
