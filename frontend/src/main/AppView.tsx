@@ -1,17 +1,12 @@
-import React from 'react';
-import { Toolbar, makeStyles, Typography, AppBar } from '@material-ui/core';
+import * as React from 'react';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Login from 'features/auth/Login';
 import Register from 'features/auth/Register';
-import { connect } from 'react-redux';
 import Lobby from 'features/lobby/Lobby';
 import TableView from 'features/table/Main';
-import { selectLocation, Location } from './app/routing';
-import { createSelector } from '@reduxjs/toolkit';
-
+import { Location } from '../app/routing';
+import AppBar from './AppBar';
 const useStyles = makeStyles((theme) => ({
-  appBar: {
-    position: 'relative',
-  },
   layout: {
     width: 'auto',
     backgroundColor: theme.palette.background.paper,
@@ -22,23 +17,18 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: 'auto',
       marginRight: 'auto',
     },
-  },
+  } as const,
 }));
 
 interface Props {
   location: Location;
 }
-function AppView({ location }: Props) {
+
+export default function AppView({ location }: Props) {
   const classes = useStyles();
   return (
     <>
-      <AppBar position="absolute" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
-            Karlchencloud
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <AppBar />
       <main className={classes.layout}>
         <Content location={location} />
       </main>
@@ -57,5 +47,3 @@ function Content({ location }: { location: Location }) {
       return <TableView />;
   }
 }
-const mapState = createSelector(selectLocation, (location) => ({ location }));
-export default connect(mapState)(AppView);

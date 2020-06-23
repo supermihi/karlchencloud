@@ -1,10 +1,10 @@
-import * as karlchen from "./KarlchenServiceClientPb";
-import * as proto from "./karlchen_pb";
-import { Error, Metadata } from "grpc-web";
-import { Base64 } from "js-base64";
-import { LoginData } from "app/auth";
+import * as karlchen from './KarlchenServiceClientPb';
+import * as proto from './karlchen_pb';
+import { Error, Metadata } from 'grpc-web';
+import { Base64 } from 'js-base64';
+import { LoginData } from 'app/auth';
 
-const url = "http://localhost:8080";
+const url = 'http://localhost:8080';
 
 let _client: karlchen.DokoClient | null = null;
 
@@ -45,7 +45,7 @@ export function isGrpcError(error: any): error is Error {
 
 export function formatError(error: any) {
   if (!error) {
-    return "";
+    return '';
   }
   if (isGrpcError(error)) {
     return `error ${error.code}: ${error.message}`;

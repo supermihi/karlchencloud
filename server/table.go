@@ -2,24 +2,18 @@ package server
 
 import (
 	"fmt"
+	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"math/rand"
-)
-
-type TablePhase int
-
-const (
-	BeforeFirstGame TablePhase = iota
-	Playing
-	WaitingForNextGame
-	AllGamesEnded
+	"time"
 )
 
 type Table struct {
 	Id             string
+	Created        time.Time
 	InviteCode     string
-	Phase          TablePhase
+	Phase          api.TablePhase
 	players        []string
 	playersInOrder []string
 	round          *match.Round
@@ -37,12 +31,12 @@ func (t *Table) String() string {
 func NewTable(owner string) *Table {
 	id := RandomLetters(6)
 	inviteCode := RandomLetters(12)
-	table := Table{id, inviteCode, BeforeFirstGame, []string{owner}, nil, nil, nil}
+	table := Table{id, time.Now(), inviteCode, api.TablePhase_NOT_STARTED, []string{owner}, nil, nil, nil}
 	return &table
 }
 
 func (t *Table) Start() error {
-	if t.Phase != BeforeFirstGame {
+	if t.Phase != api.TablePhase_NOT_STARTED {
 		return NewCloudError(TableAlreadyStarted)
 	}
 	if len(t.players) < game.NumPlayers || len(t.players) >= 7 {
@@ -54,11 +48,11 @@ func (t *Table) Start() error {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
 	})
 	t.round = match.NewRound(len(t.players), rand.Int63())
-	t.Phase = WaitingForNextGame
+	t.Phase = api.TablePhase_BETWEEN_GAMES
 	return t.StartMatch()
 }
 func (t *Table) StartMatch() error {
-	if t.Phase != WaitingForNextGame {
+	if t.Phase != api.TablePhase_BETWEEN_GAMES {
 		return NewCloudError(CannotStartTableNow)
 	}
 	nextMatch := t.round.NextMatch()
@@ -82,7 +76,7 @@ func (t *Table) Users() []string {
 }
 
 func (t *Table) Join(user string) error {
-	if t.Phase != BeforeFirstGame {
+	if t.Phase != api.TablePhase_NOT_STARTED {
 		return NewCloudError(UnableToJoinStartedTable)
 	}
 	if len(t.players) > match.MaxPlayersPerRound {

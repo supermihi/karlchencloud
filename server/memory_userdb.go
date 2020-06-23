@@ -39,7 +39,8 @@ func NewExportedMemoryUserDb(filename string) (*MemoryUserDb, error) {
 		return nil, err
 	}
 	for _, u := range userList {
-		users[u.Id] = &u
+		user := u
+		users[user.Id] = &user
 	}
 	ans := MemoryUserDb{users: users, filename: filename}
 	return &ans, nil

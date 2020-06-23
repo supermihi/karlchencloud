@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Table } from "model/table";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Table } from 'model/table';
 
 interface State {
   table: Table | null;
@@ -19,7 +19,7 @@ const initialState: State = {
 };
 export const tableSlice = createSlice({
   initialState,
-  name: "table",
+  name: 'table',
   reducers: {
     setTable: (state, { payload: table }: PayloadAction<Table>) => {
       state.table = table;

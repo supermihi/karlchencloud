@@ -1,5 +1,4 @@
 syntax = "proto3";
-
 package api;
 //option go_package = "github.com/supermihi/karlchencloud/api";
 option go_package = ".;api";
@@ -19,7 +18,13 @@ service Doko {
     rpc JoinTable (JoinTableRequest) returns (Empty) {
     }
 
-    rpc Play (PlayRequest) returns (Empty) {
+    rpc PlayCard (PlayCardRequest) returns (Empty) {
+    }
+
+    rpc PlaceBid (PlaceBidRequest) returns (Empty) {
+    }
+
+    rpc Declare (DeclareRequest) returns (Empty) {
     }
 
     rpc StartSession (Empty) returns (stream Event) {
@@ -85,15 +90,20 @@ message MemberEvent {
     MemberEventType type = 3;
 }
 
-message PlayRequest {
-    oneof request {
-        GameType declaration = 2;
-        BidType bid = 3;
-        Card card = 4;
-    }
-    string table = 5;
+message PlayCardRequest {
+    string table = 1;
+    Card card = 2;
 }
 
+message PlaceBidRequest {
+    string table = 1;
+    BidType bid = 2;
+}
+
+message DeclareRequest {
+    string table = 1;
+    GameType declaration = 2;
+}
 message AuctionState {
     repeated Declaration declarations = 1;
 }
@@ -149,15 +159,18 @@ message TableData {
     string owner = 2;
     string invite_code = 3;
     repeated TableMember members = 4;
+    Timestamp created = 5;
 }
 
+message Timestamp {
+    int64 nanos = 1;
+}
 message TableState {
-    oneof state {
-        MatchState in_match = 1;
-        Empty no_match = 2;
-    }
+    TablePhase phase = 1;
+    MatchState current_match = 2;
     TableData data = 3;
 }
+
 
 message TableMember {
     string user_id = 1;
@@ -190,6 +203,12 @@ message JoinTableRequest {
 }
 
 
+enum TablePhase {
+    NOT_STARTED = 0;
+    PLAYING = 1;
+    BETWEEN_GAMES = 2;
+    TABLE_ENDED = 3;
+}
 enum MatchPhase {
     AUCTION = 0;
     GAME = 1;

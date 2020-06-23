@@ -127,8 +127,11 @@ func (s *dokoserver) StartSession(_ *api.Empty, srv api.Doko_StartSessionServer)
 }
 
 func (s *dokoserver) startEventSubscription(user UserData, srv api.Doko_StartSessionServer) error {
+	s.streams.mtx.Lock()
 	s.roomMtx.RLock()
 	defer s.roomMtx.RUnlock()
+	defer s.streams.mtx.Unlock()
+	s.streams.startNew(srv, user.Id)
 
 	userState := &api.UserState{}
 	table := s.room.ActiveTableOf(user.Id)
@@ -138,10 +141,13 @@ func (s *dokoserver) startEventSubscription(user UserData, srv api.Doko_StartSes
 			return err
 		}
 		userState.CurrentTable = state
-		receivers := getRelatedUsers(user.Id, s.room)
-		s.streams.sendToAll(receivers, api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_GO_ONLINE))
 	}
-	s.streams.startNew(srv, user.Id, userState)
+	s.streams.send(user.Id, &api.Event{Event: &api.Event_Welcome{Welcome: userState}})
+	receivers := getRelatedUsers(user.Id, s.room)
+	go func() {
+		// requires streams.mtx, hence the goroutine
+		s.streams.sendToAll(receivers, api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_GO_ONLINE))
+	}()
 	log.Printf("user %s connected", user)
 	return nil
 }
@@ -175,66 +181,75 @@ func (s *dokoserver) endEventSubscription(srv api.Doko_StartSessionServer, user 
 	return srv.Context().Err()
 }
 
-func (s *dokoserver) Play(ctx context.Context, req *api.PlayRequest) (*api.Empty, error) {
+func (s *dokoserver) Declare(ctx context.Context, d *api.DeclareRequest) (*api.Empty, error) {
 	user, _ := GetAuthenticatedUser(ctx)
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
+	gameType := ToGameType(d.Declaration)
+	m, err := s.room.Declare(d.Table, user.Id, gameType)
+	if err != nil {
+		return nil, toGrpcError(err)
+	}
+	log.Printf("%v declares %v", user.Name, d.Declaration)
+	declaration := &api.Declaration{UserId: user.Id, Vorbehalt: !game.IsNormalspiel(gameType)}
+	if m.Phase == match.InGame {
+		log.Printf("game has started at table %s", d.Table)
+		declaration.DefinedGameMode = ToApiMode(m.Mode, m.Turn, m.Players)
+	}
+	result := &api.Event{Event: &api.Event_Declared{Declared: declaration}}
+	return &api.Empty{}, s.sendToPlayers(d.Table, result)
+}
+func (s *dokoserver) sendToPlayers(tableId string, event *api.Event) error {
+	table, err := s.room.GetTable(tableId)
+	if err != nil {
+		return toGrpcError(err)
+	}
+	s.streams.sendToAll(table.Players, event)
+	return nil
+}
+
+func (s *dokoserver) PlaceBid(ctx context.Context, req *api.PlaceBidRequest) (*api.Empty, error) {
+	user, _ := GetAuthenticatedUser(ctx)
+	_, err := s.room.PlaceBid(req.Table, user.Id, ToBid(req.Bid))
+	if err != nil {
+		return nil, toGrpcError(err)
+	}
+	bid := &api.Bid{UserId: user.Id, Bid: req.Bid}
+	result := &api.Event{Event: &api.Event_PlacedBid{PlacedBid: bid}}
+	return &api.Empty{}, s.sendToPlayers(req.Table, result)
+}
+func (s *dokoserver) PlayCard(ctx context.Context, req *api.PlayCardRequest) (*api.Empty, error) {
+	user, _ := GetAuthenticatedUser(ctx)
+	s.roomMtx.Lock()
+	defer s.roomMtx.Unlock()
+
+	m, err := s.room.PlayCard(req.Table, user.Id, ToCard(req.Card))
+	if err != nil {
+		return nil, toGrpcError(err)
+	}
+	log.Printf("%s plays %s", user.Name, ToCard(req.Card))
 	table, err := s.room.GetTable(req.Table)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	result := &api.Event{}
-	switch action := req.Request.(type) {
-	case *api.PlayRequest_Declaration:
-		gameType := ToGameType(action.Declaration)
-		m, err := s.room.Declare(req.Table, user.Id, gameType)
-		if err != nil {
-			return nil, toGrpcError(err)
-		}
-		log.Printf("%v declares %v", user.Name, action.Declaration)
-		declaration := &api.Declaration{UserId: user.Id, Vorbehalt: !game.IsNormalspiel(gameType)}
-		if m.Phase == match.InGame {
-			log.Printf("game has started on table %s", table.Id)
-			declaration.DefinedGameMode = ToApiMode(m.Mode, m.Turn, m.Players)
-		}
-		result = &api.Event{Event: &api.Event_Declared{Declared: declaration}}
-
-	case *api.PlayRequest_Bid:
-		_, err := s.room.PlaceBid(req.Table, user.Id, ToBid(action.Bid))
-		if err != nil {
-			return nil, toGrpcError(err)
-		}
-		bid := &api.Bid{UserId: user.Id, Bid: action.Bid}
-		result.Event = &api.Event_PlacedBid{PlacedBid: bid}
-	case *api.PlayRequest_Card:
-		m, err := s.room.PlayCard(req.Table, user.Id, ToCard(action.Card))
-		if err != nil {
-			return nil, toGrpcError(err)
-		}
-		log.Printf("%s plays %s", user.Name, ToCard(action.Card))
-		card := &api.PlayedCard{UserId: user.Id, Card: action.Card}
-
-		if m.CurrentTrick != nil && m.CurrentTrick.NumCardsPlayed() == 0 {
-			card.TrickWinner = &api.PlayerValue{UserId: table.Players[int(m.PreviousTrick.Winner)]}
-		}
-		result.Event = &api.Event_PlayedCard{PlayedCard: card}
+	card := &api.PlayedCard{UserId: user.Id, Card: req.Card}
+	if m.CurrentTrick != nil && m.CurrentTrick.NumCardsPlayed() == 0 {
+		card.TrickWinner = &api.PlayerValue{UserId: table.Players[int(m.PreviousTrick.Winner)]}
 	}
+	result := &api.Event{Event: &api.Event_PlayedCard{PlayedCard: card}}
 	s.streams.sendToAll(table.Players, result)
 	return &api.Empty{}, nil
 }
 
 func (s *dokoserver) getTableState(table *TableData, user string) (*api.TableState, error) {
 	data := ToTableData(table, user, s.createTableMembers(table))
-	state := &api.TableState{Data: data}
-	if !table.InMatch {
-		state.State = &api.TableState_NoMatch{NoMatch: &api.Empty{}}
-	} else {
+	state := &api.TableState{Data: data, Phase: table.Phase}
+	if table.Phase == api.TablePhase_PLAYING {
 		matchData, err := s.room.GetMatchData(table.Id)
 		if err != nil {
 			return nil, err
 		}
-		matchState := ToMatchState(matchData, user)
-		state.State = &api.TableState_InMatch{InMatch: matchState}
+		state.CurrentMatch = ToMatchState(matchData, user)
 	}
 	return state, nil
 }

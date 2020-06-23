@@ -1,18 +1,9 @@
-import * as api from "api/karlchen_pb";
-import {
-  Table,
-  Auction,
-  Players,
-  Declaration,
-  Mode,
-  Game,
-  nthNext,
-  Trick,
-  TableState,
-  Match,
-} from "./table";
-import { User, Card } from "./core";
-import { fromPairs, mapValues, groupBy } from "lodash";
+import * as api from 'api/karlchen_pb';
+import { Table, Players, nthNext, TableState } from './table';
+import { User, Card } from './core';
+import { fromPairs, mapValues, groupBy } from 'lodash';
+import { Auction, Declaration, Game, Match, Mode, Trick } from './match';
+import { toDate } from 'api/helpers';
 
 export function toTable(t: api.TableData): Table {
   return {
@@ -20,15 +11,17 @@ export function toTable(t: api.TableData): Table {
     id: t.getTableId(),
     invite: t.getInviteCode(),
     players: t.getMembersList().map(toUser),
+    created: toDate(t.getCreated() as api.Timestamp).toLocaleString(),
   };
 }
 
 export function toTableState(t: api.TableState): TableState {
   return {
     table: toTable(t.getData() as api.TableData),
-    match: t.hasInMatch()
-      ? toMatch(t.getInMatch() as api.MatchState)
+    match: t.hasCurrentMatch()
+      ? toMatch(t.getCurrentMatch() as api.MatchState)
       : undefined,
+    phase: t.getPhase(),
   };
 }
 

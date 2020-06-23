@@ -1,12 +1,12 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppThunk, RootState } from "app/store";
-import * as api from "api/client";
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AppThunk, RootState } from 'app/store';
+import * as api from 'api/client';
 import {
   getLoginDataFromLocalStorage,
   writeLoginDataToLocalStorage,
   deleteLoginDataInLocalStorage,
-} from "./localstorage";
-import { LoginData } from ".";
+} from './localstorage';
+import { LoginData } from '.';
 
 export interface SessionState {
   storedLogin: LoginData | null;
@@ -23,7 +23,7 @@ const initialState = (): SessionState => {
 };
 
 export const register = createAsyncThunk<LoginData, string>(
-  "model/register",
+  'model/register',
   async (name, { dispatch }) => {
     const { id, secret } = await api.register(name);
     const ans = { name, id, secret };
@@ -38,7 +38,7 @@ export const forgetLogin = (): AppThunk => (dispatch) => {
   dispatch(localStorageUpdated(null));
 };
 export const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState: initialState(),
   reducers: {
     localStorageUpdated: (

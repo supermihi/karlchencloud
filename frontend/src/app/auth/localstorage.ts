@@ -1,8 +1,8 @@
-import { LoginData } from ".";
+import { LoginData } from '.';
 
-const key_id = "auth_id";
-const key_secret = "auth_secret";
-const key_name = "auth_name";
+const key_id = 'auth_id';
+const key_secret = 'auth_secret';
+const key_name = 'auth_name';
 
 export function getLoginDataFromLocalStorage(): LoginData | null {
   const [id, secret, name] = [key_id, key_secret, key_name].map((key) =>

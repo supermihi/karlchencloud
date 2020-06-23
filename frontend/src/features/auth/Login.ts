@@ -1,13 +1,13 @@
-import { connect } from "react-redux";
-import LoginView from "./LoginView";
-import { createSelector } from "@reduxjs/toolkit";
-import { selectAuth, forgetLogin } from "app/auth/slice";
-import { selectSession, startSession } from "app/session";
-import { LoginData } from "app/auth";
+import { connect } from 'react-redux';
+import LoginView from './LoginView';
+import { createSelector } from '@reduxjs/toolkit';
+import { selectAuth, forgetLogin } from 'app/auth/slice';
+import * as session from 'app/session';
+import { LoginData } from 'app/auth';
 
 const mapStateToProps = createSelector(
   selectAuth,
-  selectSession,
+  session.selectSession,
   (auth, session) => ({
     loading: session.starting,
     error: session.error,
@@ -16,6 +16,7 @@ const mapStateToProps = createSelector(
 );
 const mapDispatchToProps = {
   forgetLogin,
-  login: startSession,
+  login: session.startSession,
+  resetError: session.actions.resetError,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(LoginView);

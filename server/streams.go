@@ -33,10 +33,8 @@ func (s *clientStreams) sendToAll(users []string, event *api.Event) {
 
 }
 
-func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user string,
-	state *api.UserState) {
+func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user string) {
 	stream := s.createStream(user)
-	stream <- &api.Event{Event: &api.Event_Welcome{Welcome: state}}
 	go func() {
 		defer s.removeStream(user)
 		for {
@@ -64,8 +62,6 @@ func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user string,
 
 func (s *clientStreams) createStream(user string) (stream chan *api.Event) {
 	stream = make(chan *api.Event, 10)
-	s.mtx.Lock()
-	defer s.mtx.Unlock()
 	s.streams[user] = stream
 	return
 }
@@ -81,8 +77,6 @@ func (s *clientStreams) removeStream(user string) {
 }
 
 func (s *clientStreams) isOnline(user string) bool {
-	s.mtx.RLock()
 	_, ok := s.streams[user]
-	s.mtx.RUnlock()
 	return ok
 }

@@ -1,6 +1,6 @@
-import { RootState } from "./store";
-import { selectAuth } from "app/auth/slice";
-import { selectSession } from "./session";
+import { RootState } from './store';
+import { selectAuth } from 'app/auth/slice';
+import { selectSession } from './session';
 
 export enum Location {
   register,

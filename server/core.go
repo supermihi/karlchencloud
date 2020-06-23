@@ -1,8 +1,10 @@
 package server
 
 import (
+	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"time"
 )
 
 type UserData struct {
@@ -57,7 +59,8 @@ type TableData struct {
 	Owner      string
 	InviteCode string
 	Players    []string
-	InMatch    bool
+	Phase      api.TablePhase
+	Created    time.Time
 }
 
 func GetData(t *Table) *TableData {
@@ -66,7 +69,7 @@ func GetData(t *Table) *TableData {
 		players = t.players
 	}
 	return &TableData{Id: t.Id, Owner: t.Owner(), InviteCode: t.InviteCode, Players: players,
-		InMatch: t.CurrentMatch != nil}
+		Phase: t.Phase, Created: t.Created}
 }
 
 func (d *TableData) ContainsPlayer(id string) bool {

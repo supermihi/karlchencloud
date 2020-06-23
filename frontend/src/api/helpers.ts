@@ -1,4 +1,4 @@
-import { TableId, Empty } from "./karlchen_pb";
+import { TableId, Timestamp } from './karlchen_pb';
 
 export function tableId(id: string): TableId {
   const ans = new TableId();
@@ -6,6 +6,6 @@ export function tableId(id: string): TableId {
   return ans;
 }
 
-export function newEmpty(): Empty {
-  return new Empty();
+export function toDate(ts: Timestamp): Date {
+  return new Date(ts.getNanos() / 1e6);
 }

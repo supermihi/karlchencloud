@@ -1,7 +1,7 @@
-import { connect } from "react-redux";
-import RegisterView from "./RegisterView";
-import { createSelector } from "@reduxjs/toolkit";
-import { selectAuth, register } from "app/auth/slice";
+import { connect } from 'react-redux';
+import RegisterView from './RegisterView';
+import { createSelector } from '@reduxjs/toolkit';
+import { selectAuth, register } from 'app/auth/slice';
 
 const mapState = createSelector(
   selectAuth,

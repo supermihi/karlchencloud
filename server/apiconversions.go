@@ -328,7 +328,8 @@ func ToMatchPhase(p api.MatchPhase) match.Phase {
 }
 
 func ToTableData(table *TableData, user string, members []*api.TableMember) *api.TableData {
-	ans := &api.TableData{TableId: table.Id, Owner: table.Owner, Members: members}
+	ans := &api.TableData{TableId: table.Id, Owner: table.Owner, Members: members,
+		Created: api.NewTimestamp(table.Created)}
 	if table.Owner == user {
 		ans.InviteCode = table.InviteCode
 	}

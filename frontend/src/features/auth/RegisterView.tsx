@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Alert from "@material-ui/lab/Alert";
-import { formatError } from "api/client";
-import MainPaper from "components/MainPaper";
+import React, { useState } from 'react';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Alert from '@material-ui/lab/Alert';
+import { formatError } from 'api/client';
+import MainPaper from 'components/MainPaper';
 
 interface Props {
   register: (name: string) => void;
@@ -18,16 +18,16 @@ interface Props {
 
 const useStyles = makeStyles((theme) => ({
   buttons: {
-    display: "flex",
-    justifyContent: "flex-end",
+    display: 'flex',
+    justifyContent: 'flex-end',
     marginTop: theme.spacing(3),
   },
 }));
 
 export default ({ register, loading, error }: Props) => {
   const classes = useStyles();
-  const [name, setName] = useState("");
-  const valid = name.trim() !== "";
+  const [name, setName] = useState('');
+  const valid = name.trim() !== '';
   return (
     <>
       <MainPaper>

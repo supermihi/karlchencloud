@@ -1,5 +1,5 @@
-import React from 'react';
-import { Table } from 'model/table';
+import * as React from 'react';
+
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
@@ -11,18 +11,29 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
+
+import { canStartTable, TableState } from 'model/table';
+import { TablePhase } from 'api/karlchen_pb';
+import GrowDiv from 'components/GrowDiv';
+import InviteDialog from './InviteDialog';
+
 interface Props {
-  table: Table;
+  table: TableState;
 }
 const useStyles = makeStyles((theme) => ({
   continueButton: {
     marginLeft: 'auto',
-  },
+  } as const,
+  online: {
+    color: theme.palette.success.main,
+  } as const,
 }));
 
 export default function CurrentTableView({ table }: Props) {
-  const owner = table.players.find((p) => p.id === table.owner);
+  const { table: data, phase } = table;
+  const owner = data.players.find((p) => p.id === data.owner);
   const classes = useStyles();
+  const [inviteOpen, setInviteOpen] = React.useState(false);
   return (
     <Card>
       <CardContent>
@@ -30,30 +41,54 @@ export default function CurrentTableView({ table }: Props) {
           variant="h4"
           component="h2"
         >{`${owner?.name}'s Tisch`}</Typography>
+        <Typography color="textSecondary">
+          Created {data.created.toLocaleString()}
+        </Typography>
         <List>
-          {table.players.map((player) => (
+          {data.players.map((player) => (
             <ListItem key={player.id}>
               <ListItemAvatar>
                 <Avatar>{player.name[0].toUpperCase()}</Avatar>
               </ListItemAvatar>
               <ListItemText
                 primary={player.name}
-                secondary={player.online ? 'online' : 'offline'}
-              ></ListItemText>
+                secondary={
+                  player.online && <em className={classes.online}>online</em>
+                }
+              />
             </ListItem>
           ))}
         </List>
       </CardContent>
-      <CardActions disableSpacing>
-        <Button>Mitspieler einladen</Button>
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.continueButton}
-          size="small"
-        >
-          Weiter spielen
-        </Button>
+      <CardActions>
+        {phase === TablePhase.NOT_STARTED && (
+          <>
+            <Button onClick={() => setInviteOpen(true)}>
+              Mitspieler einladen
+            </Button>
+            <InviteDialog
+              open={inviteOpen}
+              handleClose={() => setInviteOpen(false)}
+              inviteCode={table.table.invite || ''}
+            />
+          </>
+        )}
+        <GrowDiv />
+        {(phase === TablePhase.PLAYING ||
+          phase === TablePhase.BETWEEN_GAMES) && (
+          <Button variant="contained" color="primary" size="small">
+            Weiter spielen
+          </Button>
+        )}
+        {phase === TablePhase.NOT_STARTED && (
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!canStartTable(table)}
+          >
+            Starten
+          </Button>
+        )}{' '}
       </CardActions>
     </Card>
   );

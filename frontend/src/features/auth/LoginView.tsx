@@ -1,15 +1,15 @@
-import React from "react";
-import Button from "@material-ui/core/Button";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Typography from "@material-ui/core/Typography";
-import Alert from "@material-ui/lab/Alert";
-import Grid from "@material-ui/core/Grid";
-import ForwardIcon from "@material-ui/icons/Forward";
-import { formatError } from "api/client";
-import MainPaper from "components/MainPaper";
+import * as React from 'react';
+import Button from '@material-ui/core/Button';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Typography from '@material-ui/core/Typography';
+import Alert from '@material-ui/lab/Alert';
+import Grid from '@material-ui/core/Grid';
+import ForwardIcon from '@material-ui/icons/Forward';
+import { formatError } from 'api/client';
+import MainPaper from 'components/MainPaper';
 
-import { LoginData } from "app/auth";
+import { LoginData } from 'app/auth';
 
 interface Props {
   currentLogin: LoginData;
@@ -17,6 +17,7 @@ interface Props {
   error: any;
   login: (login: LoginData) => void;
   forgetLogin: () => void;
+  resetError: () => void;
 }
 
 export default ({
@@ -25,6 +26,7 @@ export default ({
   loading,
   currentLogin,
   error,
+  resetError,
 }: Props) => {
   return (
     <>
@@ -56,7 +58,7 @@ export default ({
         </Backdrop>
       </MainPaper>
       {error && (
-        <Alert severity="error" elevation={6}>
+        <Alert onClose={() => resetError()} severity="error" elevation={6}>
           Error logging in: {formatError(error)}
         </Alert>
       )}

@@ -1,15 +1,16 @@
-import { LoginData } from "app/auth";
+import { LoginData } from 'app/auth';
 import {
   createAsyncThunk,
   createSlice,
   createSelector,
-} from "@reduxjs/toolkit";
-import { TableState } from "model/table";
-import { getClient, getAuthMeta, getAuthenticatedClient } from "api/client";
-import * as api from "api/karlchen_pb";
-import { toTableState } from "model/apiconv";
-import { RootState } from "app/store";
-import * as lobby from "./lobby";
+} from '@reduxjs/toolkit';
+import { TableState } from 'model/table';
+import { getClient, getAuthMeta, getAuthenticatedClient } from 'api/client';
+import * as api from 'api/karlchen_pb';
+import { toTableState } from 'model/apiconv';
+import { AppThunk, RootState } from 'app/store';
+import * as lobby from './lobby';
+import { ClientReadableStream } from 'grpc-web';
 
 export interface SessionState {
   session: LoginData | null;
@@ -27,18 +28,20 @@ interface SessionStart {
   login: LoginData;
   currentTable: TableState | null;
 }
+let _stream: ClientReadableStream<api.Event>;
+
 export const startSession = createAsyncThunk<
   SessionStart,
   { id: string; secret: string }
->("session/start", async ({ id, secret }, { dispatch }) => {
+>('session/start', async ({ id, secret }, { dispatch }) => {
   const client = getClient();
   const authMeta = getAuthMeta(id, secret);
   const userStateReceived = new Promise<api.UserState>((resolve, reject) => {
     try {
-      const stream = client.startSession(new api.Empty(), authMeta);
-      stream.on("data", (e) =>
-        e.hasWelcome() ? resolve(e.getWelcome()) : null
-      );
+      _stream = client.startSession(new api.Empty(), authMeta);
+      _stream
+        .on('data', (e) => (e.hasWelcome() ? resolve(e.getWelcome()) : null))
+        .on('error', reject);
     } catch (error) {
       reject(error);
     }
@@ -51,10 +54,21 @@ export const startSession = createAsyncThunk<
   return { login: { name, id, secret }, currentTable };
 });
 
+export const endSession = (): AppThunk => (dispatch) => {
+  if (_stream) {
+    _stream.cancel();
+    dispatch(actions.sessionEnded());
+  }
+};
 const slice = createSlice({
-  name: "session",
+  name: 'session',
   initialState,
-  reducers: {},
+  reducers: {
+    resetError: (state) => {
+      state.error = undefined;
+    },
+    sessionEnded: () => initialState,
+  },
   extraReducers: (builder) => {
     builder
       .addCase(startSession.pending, (state) => {
@@ -84,9 +98,10 @@ export const selectAuthenticatedClientOrThrow = createSelector(
   selectClient,
   (client) => {
     if (!client) {
-      throw new Error("not authenticated");
+      throw new Error('not authenticated');
     }
     return client;
   }
 );
+export const actions = slice.actions;
 export default slice.reducer;

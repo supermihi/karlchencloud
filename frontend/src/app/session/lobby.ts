@@ -1,19 +1,18 @@
-import { createAsyncThunk, ActionReducerMapBuilder } from "@reduxjs/toolkit";
-import { Table } from "model/table";
-import { AsyncThunkConfig } from "app/store";
-import { selectAuthenticatedClientOrThrow, SessionState } from ".";
-import { toTable } from "model/apiconv";
-import { Empty } from "api/karlchen_pb";
+import { ActionReducerMapBuilder, createAsyncThunk } from '@reduxjs/toolkit';
+import { Table } from 'model/table';
+import { AsyncThunkConfig } from 'app/store';
+import { selectAuthenticatedClientOrThrow, SessionState } from '.';
+import { toTable } from 'model/apiconv';
+import { Empty, TablePhase } from 'api/karlchen_pb';
 
 export const createTable = createAsyncThunk<Table, void, AsyncThunkConfig>(
-  "lobby/createTable",
+  'lobby/createTable',
   async (_, thunkAPI) => {
     const { client, meta } = selectAuthenticatedClientOrThrow(
       thunkAPI.getState()
     );
     const result = await client.createTable(new Empty(), meta);
-    const table = toTable(result);
-    return table;
+    return toTable(result);
   }
 );
 
@@ -23,6 +22,7 @@ export const addReducerCases = (
   builder.addCase(createTable.fulfilled, (state, { payload: table }) => {
     state.currentTable = {
       table,
+      phase: TablePhase.NOT_STARTED,
     };
   });
 };
