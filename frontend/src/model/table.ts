@@ -13,6 +13,12 @@ export interface Table {
 export function canStartTable(t: TableState) {
   return t.phase === TablePhase.NOT_STARTED && t.table.players.length >= 4;
 }
+export function canContinueTable(t: TableState) {
+  return t.phase === TablePhase.BETWEEN_GAMES || t.phase === TablePhase.PLAYING;
+}
+export function waitingForPlayers(t: TableState) {
+  return t.phase === TablePhase.NOT_STARTED && t.table.players.length < 4;
+}
 
 export interface TableState {
   table: Table;

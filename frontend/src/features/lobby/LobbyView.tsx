@@ -1,8 +1,10 @@
 import React from 'react';
 import { TableState } from 'model/table';
-import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import Divider from '@material-ui/core/Divider';
+import SearchIcon from '@material-ui/icons/Search';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import CurrentTableView from './CurrentTableView';
 
@@ -21,6 +23,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
     flexDirection: 'column',
   } as const,
+  buttons: {
+    marginTop: theme.spacing(2),
+  },
 }));
 
 export default ({ activeTable, createTable }: Props) => {
@@ -28,16 +33,23 @@ export default ({ activeTable, createTable }: Props) => {
   return (
     <div className={classes.main}>
       {activeTable && <CurrentTableView table={activeTable} />}
-
-      <Divider />
-      <Fab
-        variant="extended"
-        onClick={createTable}
-        className={classes.addTable}
-      >
-        <AddIcon />
-        Tisch starten
-      </Fab>
+      <Grid container spacing={2} className={classes.buttons}>
+        <Grid item xs={4}>
+          <Button fullWidth startIcon={<MailOutlineIcon />}>
+            Einladung
+          </Button>
+        </Grid>
+        <Grid item xs={4}>
+          <Button fullWidth startIcon={<SearchIcon />}>
+            Tisch suchen
+          </Button>
+        </Grid>
+        <Grid item xs={4}>
+          <Button startIcon={<AddIcon />} fullWidth onClick={createTable}>
+            Neuer Tisch
+          </Button>
+        </Grid>
+      </Grid>
     </div>
   );
 };

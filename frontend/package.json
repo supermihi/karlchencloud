@@ -18,12 +18,13 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-redux": "^7.1.7",
     "@types/redux-saga": "^0.10.5",
+    "copy-to-clipboard": "^3.3.1",
     "google-protobuf": "^3.12.2",
     "grpc-web": "^1.2.0",
     "js-base64": "^2.6.1",
     "lodash": "^4.17.15",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react-dom": "npm:@hot-loader/react-dom",
     "react-redux": "^7.2.0",
     "react-scripts": "3.4.1",
     "redux": "^4.0.5",
@@ -50,12 +51,14 @@
     ],
     "development": [
       "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 firefox version"
     ]
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "react-app-rewire-hot-loader": "^2.0.1",
+    "react-app-rewired": "^2.1.6",
+    "react-hot-loader": "^4.12.21"
   }
 }

@@ -12,7 +12,12 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 
-import { canStartTable, TableState } from 'model/table';
+import {
+  canStartTable,
+  TableState,
+  canContinueTable,
+  waitingForPlayers,
+} from 'model/table';
 import { TablePhase } from 'api/karlchen_pb';
 import GrowDiv from 'components/GrowDiv';
 import InviteDialog from './InviteDialog';
@@ -27,15 +32,19 @@ const useStyles = makeStyles((theme) => ({
   online: {
     color: theme.palette.success.main,
   } as const,
+  note: {
+    color: theme.palette.text.hint,
+  },
 }));
 
 export default function CurrentTableView({ table }: Props) {
-  const { table: data, phase } = table;
+  const { table: data } = table;
   const owner = data.players.find((p) => p.id === data.owner);
   const classes = useStyles();
   const [inviteOpen, setInviteOpen] = React.useState(false);
+  const started = table.phase !== TablePhase.NOT_STARTED;
   return (
-    <Card>
+    <Card variant="outlined">
       <CardContent>
         <Typography
           variant="h4"
@@ -59,9 +68,14 @@ export default function CurrentTableView({ table }: Props) {
             </ListItem>
           ))}
         </List>
+        {waitingForPlayers(table) && (
+          <Typography variant="body1" className={classes.note}>
+            Warte auf Mitspieler …
+          </Typography>
+        )}
       </CardContent>
       <CardActions>
-        {phase === TablePhase.NOT_STARTED && (
+        {!started && (
           <>
             <Button onClick={() => setInviteOpen(true)}>
               Mitspieler einladen
@@ -74,13 +88,12 @@ export default function CurrentTableView({ table }: Props) {
           </>
         )}
         <GrowDiv />
-        {(phase === TablePhase.PLAYING ||
-          phase === TablePhase.BETWEEN_GAMES) && (
+        {canContinueTable(table) && (
           <Button variant="contained" color="primary" size="small">
             Weiter spielen
           </Button>
         )}
-        {phase === TablePhase.NOT_STARTED && (
+        {!started && (
           <Button
             variant="contained"
             color="primary"
