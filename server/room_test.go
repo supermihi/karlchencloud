@@ -10,10 +10,10 @@ func TestRoom_JoinTable(t *testing.T) {
 	assert.True(t, r.users.Add("owner", "owner", "secret"))
 	table, err := r.CreateTable("owner")
 	assert.Nil(t, err)
-	_, err = r.JoinTable(table.Id, "player 2", "not the invite code")
+	_, err = r.JoinTable("player 2", "not the invite code")
 	assert.NotNil(t, err)
-	_, err = r.JoinTable(table.Id, "player 2", table.InviteCode)
+	_, err = r.JoinTable("player 2", table.InviteCode)
 	assert.Nil(t, err)
-	_, err = r.JoinTable(table.Id, "player 2", table.InviteCode) // joining again
+	_, err = r.JoinTable("player 2", table.InviteCode) // joining again
 	assert.NotNil(t, err)
 }
