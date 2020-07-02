@@ -12,19 +12,19 @@ service Doko {
     rpc CreateTable (Empty) returns (TableData) {
     }
 
-    rpc StartTable (TableId) returns (Empty) {
+    rpc StartTable (TableId) returns (MatchState) {
     }
 
-    rpc JoinTable (JoinTableRequest) returns (Empty) {
+    rpc JoinTable (JoinTableRequest) returns (TableState) {
     }
 
-    rpc PlayCard (PlayCardRequest) returns (Empty) {
+    rpc PlayCard (PlayCardRequest) returns (PlayedCard) {
     }
 
-    rpc PlaceBid (PlaceBidRequest) returns (Empty) {
+    rpc PlaceBid (PlaceBidRequest) returns (Bid) {
     }
 
-    rpc Declare (DeclareRequest) returns (Empty) {
+    rpc Declare (DeclareRequest) returns (Declaration) {
     }
 
     rpc StartSession (Empty) returns (stream Event) {
@@ -198,8 +198,7 @@ message TableId {
 
 
 message JoinTableRequest {
-    string table_id = 1;
-    string invite_code = 2;
+    string invite_code = 1;
 }
 
 

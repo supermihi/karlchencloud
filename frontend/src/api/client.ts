@@ -2,7 +2,7 @@ import * as karlchen from './KarlchenServiceClientPb';
 import * as proto from './karlchen_pb';
 import { Error, Metadata } from 'grpc-web';
 import { Base64 } from 'js-base64';
-import { LoginData } from 'app/auth';
+import { MyUserData } from 'app/auth';
 
 const url = 'http://localhost:8080';
 
@@ -31,7 +31,7 @@ export function getAuthenticatedClient(
   return { client: getClient(), meta: getAuthMeta(user, secret) };
 }
 
-export async function register(name: string): Promise<LoginData> {
+export async function register(name: string): Promise<MyUserData> {
   const userName = new proto.UserName();
   userName.setName(name);
   const ans = await getClient().register(userName, null);

@@ -1,10 +1,10 @@
-import { LoginData } from '.';
+import { MyUserData } from '.';
 
 const key_id = 'auth_id';
 const key_secret = 'auth_secret';
 const key_name = 'auth_name';
 
-export function getLoginDataFromLocalStorage(): LoginData | null {
+export function getLoginDataFromLocalStorage(): MyUserData | null {
   const [id, secret, name] = [key_id, key_secret, key_name].map((key) =>
     window.localStorage.getItem(key)
   );
@@ -14,7 +14,7 @@ export function getLoginDataFromLocalStorage(): LoginData | null {
   return null;
 }
 
-export function writeLoginDataToLocalStorage({ id, name, secret }: LoginData) {
+export function writeLoginDataToLocalStorage({ id, name, secret }: MyUserData) {
   window.localStorage.setItem(key_id, id);
   window.localStorage.setItem(key_name, name);
   window.localStorage.setItem(key_secret, secret);

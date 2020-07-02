@@ -45,6 +45,7 @@ export default ({ register, loading, error }: Props) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               fullWidth
+              onSubmit={() => valid && register(name)}
               placeholder="Gorm"
             />
           </Grid>

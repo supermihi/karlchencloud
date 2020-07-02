@@ -19,6 +19,7 @@ func StartBots(address string, numBots int, table string, inviteCode string) {
 			Address:        address,
 		}
 		clients[i] = NewBotHandler()
+		log.Printf("starting bot %d", i)
 		go clients[i].Run(connect, table, inviteCode)
 	}
 	for i := 0; i < numBots; i++ {
@@ -51,7 +52,7 @@ func (h *BotHandler) Run(conn ConnectData, table string, invite string) {
 	c := service.Api
 	defer h.cancel()
 	defer service.CloseConnection()
-	_, err = c.JoinTable(ctx, &api.JoinTableRequest{InviteCode: invite, TableId: table})
+	_, err = c.JoinTable(ctx, &api.JoinTableRequest{InviteCode: invite})
 	if err != nil {
 		service.Logf("could not join table: %v", err)
 		return

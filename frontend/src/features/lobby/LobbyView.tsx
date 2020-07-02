@@ -7,10 +7,12 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import CurrentTableView from './CurrentTableView';
+import AcceptInviteDialog from './AcceptInviteDialog';
 
 interface Props {
   activeTable: TableState | null;
   createTable: () => void;
+  suppliedInviteCode: string | null;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -24,15 +26,14 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   } as const,
   buttons: {
-    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
 }));
 
-export default ({ activeTable, createTable }: Props) => {
+export default ({ activeTable, createTable, suppliedInviteCode }: Props) => {
   const classes = useStyles();
   return (
     <div className={classes.main}>
-      {activeTable && <CurrentTableView table={activeTable} />}
       <Grid container spacing={2} className={classes.buttons}>
         <Grid item xs={4}>
           <Button fullWidth startIcon={<MailOutlineIcon />}>
@@ -45,11 +46,18 @@ export default ({ activeTable, createTable }: Props) => {
           </Button>
         </Grid>
         <Grid item xs={4}>
-          <Button startIcon={<AddIcon />} fullWidth onClick={createTable}>
+          <Button
+            startIcon={<AddIcon />}
+            disabled={Boolean(activeTable)}
+            fullWidth
+            onClick={createTable}
+          >
             Neuer Tisch
           </Button>
         </Grid>
       </Grid>
+      {suppliedInviteCode && <AcceptInviteDialog />}
+      {activeTable && <CurrentTableView table={activeTable} />}
     </div>
   );
 };

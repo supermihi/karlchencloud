@@ -6322,8 +6322,7 @@ proto.api.JoinTableRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.api.JoinTableRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    tableId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    inviteCode: jspb.Message.getFieldWithDefault(msg, 2, "")
+    inviteCode: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -6362,10 +6361,6 @@ proto.api.JoinTableRequest.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setTableId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
       msg.setInviteCode(value);
       break;
     default:
@@ -6397,17 +6392,10 @@ proto.api.JoinTableRequest.prototype.serializeBinary = function() {
  */
 proto.api.JoinTableRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getTableId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
   f = message.getInviteCode();
   if (f.length > 0) {
     writer.writeString(
-      2,
+      1,
       f
     );
   }
@@ -6415,10 +6403,10 @@ proto.api.JoinTableRequest.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional string table_id = 1;
+ * optional string invite_code = 1;
  * @return {string}
  */
-proto.api.JoinTableRequest.prototype.getTableId = function() {
+proto.api.JoinTableRequest.prototype.getInviteCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
@@ -6427,26 +6415,8 @@ proto.api.JoinTableRequest.prototype.getTableId = function() {
  * @param {string} value
  * @return {!proto.api.JoinTableRequest} returns this
  */
-proto.api.JoinTableRequest.prototype.setTableId = function(value) {
-  return jspb.Message.setProto3StringField(this, 1, value);
-};
-
-
-/**
- * optional string invite_code = 2;
- * @return {string}
- */
-proto.api.JoinTableRequest.prototype.getInviteCode = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.api.JoinTableRequest} returns this
- */
 proto.api.JoinTableRequest.prototype.setInviteCode = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 

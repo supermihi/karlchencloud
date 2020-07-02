@@ -101,14 +101,16 @@ func (c *TableClient) checkMyTurn() {
 	}
 }
 func (c *TableClient) PlayCard(card game.Card) (err error) {
-	_, err = c.Service.Api.Play(c.Service.Context, &api.PlayRequest{Table: c.TableId,
-		Request: &api.PlayRequest_Card{Card: server.ToApiCard(card)}})
+	_, err = c.Service.Api.PlayCard(
+		c.Service.Context,
+		&api.PlayCardRequest{Table: c.TableId, Card: server.ToApiCard(card)})
 	return
 }
 
 func (c *TableClient) Declare(t game.AnnouncedGameType) (err error) {
-	_, err = c.Service.Api.Play(c.Service.Context, &api.PlayRequest{Table: c.TableId,
-		Request: &api.PlayRequest_Declaration{Declaration: server.ToApiGameType(t)}})
+	_, err = c.Service.Api.Declare(c.Service.Context, &api.DeclareRequest{
+		Table:       c.TableId,
+		Declaration: server.ToApiGameType(t)})
 	return
 }
 

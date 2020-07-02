@@ -1,4 +1,4 @@
-import * as jspb from 'google-protobuf';
+import * as jspb from "google-protobuf"
 
 export class Card extends jspb.Message {
   getSuit(): Suit;
@@ -10,22 +10,16 @@ export class Card extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Card.AsObject;
   static toObject(includeInstance: boolean, msg: Card): Card.AsObject;
-  static serializeBinaryToWriter(
-    message: Card,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Card, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Card;
-  static deserializeBinaryFromReader(
-    message: Card,
-    reader: jspb.BinaryReader
-  ): Card;
+  static deserializeBinaryFromReader(message: Card, reader: jspb.BinaryReader): Card;
 }
 
 export namespace Card {
   export type AsObject = {
-    suit: Suit;
-    rank: Rank;
-  };
+    suit: Suit,
+    rank: Rank,
+  }
 }
 
 export class PlayerValue extends jspb.Message {
@@ -34,25 +28,16 @@ export class PlayerValue extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PlayerValue.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: PlayerValue
-  ): PlayerValue.AsObject;
-  static serializeBinaryToWriter(
-    message: PlayerValue,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: PlayerValue): PlayerValue.AsObject;
+  static serializeBinaryToWriter(message: PlayerValue, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): PlayerValue;
-  static deserializeBinaryFromReader(
-    message: PlayerValue,
-    reader: jspb.BinaryReader
-  ): PlayerValue;
+  static deserializeBinaryFromReader(message: PlayerValue, reader: jspb.BinaryReader): PlayerValue;
 }
 
 export namespace PlayerValue {
   export type AsObject = {
-    userId: string;
-  };
+    userId: string,
+  }
 }
 
 export class Declaration extends jspb.Message {
@@ -69,27 +54,18 @@ export class Declaration extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Declaration.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: Declaration
-  ): Declaration.AsObject;
-  static serializeBinaryToWriter(
-    message: Declaration,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: Declaration): Declaration.AsObject;
+  static serializeBinaryToWriter(message: Declaration, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Declaration;
-  static deserializeBinaryFromReader(
-    message: Declaration,
-    reader: jspb.BinaryReader
-  ): Declaration;
+  static deserializeBinaryFromReader(message: Declaration, reader: jspb.BinaryReader): Declaration;
 }
 
 export namespace Declaration {
   export type AsObject = {
-    userId: string;
-    vorbehalt: boolean;
-    definedgamemode?: Mode.AsObject;
-  };
+    userId: string,
+    vorbehalt: boolean,
+    definedgamemode?: Mode.AsObject,
+  }
 }
 
 export class PlayedCard extends jspb.Message {
@@ -108,27 +84,18 @@ export class PlayedCard extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PlayedCard.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: PlayedCard
-  ): PlayedCard.AsObject;
-  static serializeBinaryToWriter(
-    message: PlayedCard,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: PlayedCard): PlayedCard.AsObject;
+  static serializeBinaryToWriter(message: PlayedCard, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): PlayedCard;
-  static deserializeBinaryFromReader(
-    message: PlayedCard,
-    reader: jspb.BinaryReader
-  ): PlayedCard;
+  static deserializeBinaryFromReader(message: PlayedCard, reader: jspb.BinaryReader): PlayedCard;
 }
 
 export namespace PlayedCard {
   export type AsObject = {
-    userId: string;
-    card?: Card.AsObject;
-    trickWinner?: PlayerValue.AsObject;
-  };
+    userId: string,
+    card?: Card.AsObject,
+    trickWinner?: PlayerValue.AsObject,
+  }
 }
 
 export class Bid extends jspb.Message {
@@ -143,17 +110,14 @@ export class Bid extends jspb.Message {
   static toObject(includeInstance: boolean, msg: Bid): Bid.AsObject;
   static serializeBinaryToWriter(message: Bid, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Bid;
-  static deserializeBinaryFromReader(
-    message: Bid,
-    reader: jspb.BinaryReader
-  ): Bid;
+  static deserializeBinaryFromReader(message: Bid, reader: jspb.BinaryReader): Bid;
 }
 
 export namespace Bid {
   export type AsObject = {
-    userId: string;
-    bid: BidType;
-  };
+    userId: string,
+    bid: BidType,
+  }
 }
 
 export class EndOfGame extends jspb.Message {
@@ -166,22 +130,16 @@ export class EndOfGame extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): EndOfGame.AsObject;
   static toObject(includeInstance: boolean, msg: EndOfGame): EndOfGame.AsObject;
-  static serializeBinaryToWriter(
-    message: EndOfGame,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: EndOfGame, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): EndOfGame;
-  static deserializeBinaryFromReader(
-    message: EndOfGame,
-    reader: jspb.BinaryReader
-  ): EndOfGame;
+  static deserializeBinaryFromReader(message: EndOfGame, reader: jspb.BinaryReader): EndOfGame;
 }
 
 export namespace EndOfGame {
   export type AsObject = {
-    winner: Party;
-    value: number;
-  };
+    winner: Party,
+    value: number,
+  }
 }
 
 export class Event extends jspb.Message {
@@ -225,29 +183,23 @@ export class Event extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Event.AsObject;
   static toObject(includeInstance: boolean, msg: Event): Event.AsObject;
-  static serializeBinaryToWriter(
-    message: Event,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Event, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Event;
-  static deserializeBinaryFromReader(
-    message: Event,
-    reader: jspb.BinaryReader
-  ): Event;
+  static deserializeBinaryFromReader(message: Event, reader: jspb.BinaryReader): Event;
 }
 
 export namespace Event {
   export type AsObject = {
-    welcome?: UserState.AsObject;
-    start?: MatchState.AsObject;
-    declared?: Declaration.AsObject;
-    playedCard?: PlayedCard.AsObject;
-    placedBid?: Bid.AsObject;
-    ended?: EndOfGame.AsObject;
-    member?: MemberEvent.AsObject;
-  };
+    welcome?: UserState.AsObject,
+    start?: MatchState.AsObject,
+    declared?: Declaration.AsObject,
+    playedCard?: PlayedCard.AsObject,
+    placedBid?: Bid.AsObject,
+    ended?: EndOfGame.AsObject,
+    member?: MemberEvent.AsObject,
+  }
 
-  export enum EventCase {
+  export enum EventCase { 
     EVENT_NOT_SET = 0,
     WELCOME = 1,
     START = 2,
@@ -271,22 +223,16 @@ export class UserState extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserState.AsObject;
   static toObject(includeInstance: boolean, msg: UserState): UserState.AsObject;
-  static serializeBinaryToWriter(
-    message: UserState,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: UserState, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): UserState;
-  static deserializeBinaryFromReader(
-    message: UserState,
-    reader: jspb.BinaryReader
-  ): UserState;
+  static deserializeBinaryFromReader(message: UserState, reader: jspb.BinaryReader): UserState;
 }
 
 export namespace UserState {
   export type AsObject = {
-    currenttable?: TableState.AsObject;
-    name: string;
-  };
+    currenttable?: TableState.AsObject,
+    name: string,
+  }
 }
 
 export class MemberEvent extends jspb.Message {
@@ -301,27 +247,18 @@ export class MemberEvent extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MemberEvent.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: MemberEvent
-  ): MemberEvent.AsObject;
-  static serializeBinaryToWriter(
-    message: MemberEvent,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: MemberEvent): MemberEvent.AsObject;
+  static serializeBinaryToWriter(message: MemberEvent, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): MemberEvent;
-  static deserializeBinaryFromReader(
-    message: MemberEvent,
-    reader: jspb.BinaryReader
-  ): MemberEvent;
+  static deserializeBinaryFromReader(message: MemberEvent, reader: jspb.BinaryReader): MemberEvent;
 }
 
 export namespace MemberEvent {
   export type AsObject = {
-    userId: string;
-    name: string;
-    type: MemberEventType;
-  };
+    userId: string,
+    name: string,
+    type: MemberEventType,
+  }
 }
 
 export class PlayCardRequest extends jspb.Message {
@@ -335,26 +272,17 @@ export class PlayCardRequest extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PlayCardRequest.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: PlayCardRequest
-  ): PlayCardRequest.AsObject;
-  static serializeBinaryToWriter(
-    message: PlayCardRequest,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: PlayCardRequest): PlayCardRequest.AsObject;
+  static serializeBinaryToWriter(message: PlayCardRequest, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): PlayCardRequest;
-  static deserializeBinaryFromReader(
-    message: PlayCardRequest,
-    reader: jspb.BinaryReader
-  ): PlayCardRequest;
+  static deserializeBinaryFromReader(message: PlayCardRequest, reader: jspb.BinaryReader): PlayCardRequest;
 }
 
 export namespace PlayCardRequest {
   export type AsObject = {
-    table: string;
-    card?: Card.AsObject;
-  };
+    table: string,
+    card?: Card.AsObject,
+  }
 }
 
 export class PlaceBidRequest extends jspb.Message {
@@ -366,26 +294,17 @@ export class PlaceBidRequest extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PlaceBidRequest.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: PlaceBidRequest
-  ): PlaceBidRequest.AsObject;
-  static serializeBinaryToWriter(
-    message: PlaceBidRequest,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: PlaceBidRequest): PlaceBidRequest.AsObject;
+  static serializeBinaryToWriter(message: PlaceBidRequest, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): PlaceBidRequest;
-  static deserializeBinaryFromReader(
-    message: PlaceBidRequest,
-    reader: jspb.BinaryReader
-  ): PlaceBidRequest;
+  static deserializeBinaryFromReader(message: PlaceBidRequest, reader: jspb.BinaryReader): PlaceBidRequest;
 }
 
 export namespace PlaceBidRequest {
   export type AsObject = {
-    table: string;
-    bid: BidType;
-  };
+    table: string,
+    bid: BidType,
+  }
 }
 
 export class DeclareRequest extends jspb.Message {
@@ -397,26 +316,17 @@ export class DeclareRequest extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DeclareRequest.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: DeclareRequest
-  ): DeclareRequest.AsObject;
-  static serializeBinaryToWriter(
-    message: DeclareRequest,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: DeclareRequest): DeclareRequest.AsObject;
+  static serializeBinaryToWriter(message: DeclareRequest, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): DeclareRequest;
-  static deserializeBinaryFromReader(
-    message: DeclareRequest,
-    reader: jspb.BinaryReader
-  ): DeclareRequest;
+  static deserializeBinaryFromReader(message: DeclareRequest, reader: jspb.BinaryReader): DeclareRequest;
 }
 
 export namespace DeclareRequest {
   export type AsObject = {
-    table: string;
-    declaration: GameType;
-  };
+    table: string,
+    declaration: GameType,
+  }
 }
 
 export class AuctionState extends jspb.Message {
@@ -427,25 +337,16 @@ export class AuctionState extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AuctionState.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: AuctionState
-  ): AuctionState.AsObject;
-  static serializeBinaryToWriter(
-    message: AuctionState,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: AuctionState): AuctionState.AsObject;
+  static serializeBinaryToWriter(message: AuctionState, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): AuctionState;
-  static deserializeBinaryFromReader(
-    message: AuctionState,
-    reader: jspb.BinaryReader
-  ): AuctionState;
+  static deserializeBinaryFromReader(message: AuctionState, reader: jspb.BinaryReader): AuctionState;
 }
 
 export namespace AuctionState {
   export type AsObject = {
-    declarationsList: Array<Declaration.AsObject>;
-  };
+    declarationsList: Array<Declaration.AsObject>,
+  }
 }
 
 export class Mode extends jspb.Message {
@@ -468,24 +369,18 @@ export class Mode extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Mode.AsObject;
   static toObject(includeInstance: boolean, msg: Mode): Mode.AsObject;
-  static serializeBinaryToWriter(
-    message: Mode,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Mode, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Mode;
-  static deserializeBinaryFromReader(
-    message: Mode,
-    reader: jspb.BinaryReader
-  ): Mode;
+  static deserializeBinaryFromReader(message: Mode, reader: jspb.BinaryReader): Mode;
 }
 
 export namespace Mode {
   export type AsObject = {
-    type: GameType;
-    soloist?: PlayerValue.AsObject;
-    spouse?: PlayerValue.AsObject;
-    forehand: string;
-  };
+    type: GameType,
+    soloist?: PlayerValue.AsObject,
+    spouse?: PlayerValue.AsObject,
+    forehand: string,
+  }
 }
 
 export class Trick extends jspb.Message {
@@ -505,23 +400,17 @@ export class Trick extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Trick.AsObject;
   static toObject(includeInstance: boolean, msg: Trick): Trick.AsObject;
-  static serializeBinaryToWriter(
-    message: Trick,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Trick, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Trick;
-  static deserializeBinaryFromReader(
-    message: Trick,
-    reader: jspb.BinaryReader
-  ): Trick;
+  static deserializeBinaryFromReader(message: Trick, reader: jspb.BinaryReader): Trick;
 }
 
 export namespace Trick {
   export type AsObject = {
-    cardsList: Array<Card.AsObject>;
-    userIdForehand: string;
-    userIdWinner?: PlayerValue.AsObject;
-  };
+    cardsList: Array<Card.AsObject>,
+    userIdForehand: string,
+    userIdWinner?: PlayerValue.AsObject,
+  }
 }
 
 export class GameState extends jspb.Message {
@@ -551,25 +440,19 @@ export class GameState extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GameState.AsObject;
   static toObject(includeInstance: boolean, msg: GameState): GameState.AsObject;
-  static serializeBinaryToWriter(
-    message: GameState,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: GameState, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): GameState;
-  static deserializeBinaryFromReader(
-    message: GameState,
-    reader: jspb.BinaryReader
-  ): GameState;
+  static deserializeBinaryFromReader(message: GameState, reader: jspb.BinaryReader): GameState;
 }
 
 export namespace GameState {
   export type AsObject = {
-    bidsList: Array<Bid.AsObject>;
-    completedTricks: number;
-    currentTrick?: Trick.AsObject;
-    previousTrick?: Trick.AsObject;
-    mode?: Mode.AsObject;
-  };
+    bidsList: Array<Bid.AsObject>,
+    completedTricks: number,
+    currentTrick?: Trick.AsObject,
+    previousTrick?: Trick.AsObject,
+    mode?: Mode.AsObject,
+  }
 }
 
 export class Cards extends jspb.Message {
@@ -581,21 +464,15 @@ export class Cards extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Cards.AsObject;
   static toObject(includeInstance: boolean, msg: Cards): Cards.AsObject;
-  static serializeBinaryToWriter(
-    message: Cards,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Cards, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Cards;
-  static deserializeBinaryFromReader(
-    message: Cards,
-    reader: jspb.BinaryReader
-  ): Cards;
+  static deserializeBinaryFromReader(message: Cards, reader: jspb.BinaryReader): Cards;
 }
 
 export namespace Cards {
   export type AsObject = {
-    cardsList: Array<Card.AsObject>;
-  };
+    cardsList: Array<Card.AsObject>,
+  }
 }
 
 export class MatchState extends jspb.Message {
@@ -638,39 +515,30 @@ export class MatchState extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MatchState.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: MatchState
-  ): MatchState.AsObject;
-  static serializeBinaryToWriter(
-    message: MatchState,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: MatchState): MatchState.AsObject;
+  static serializeBinaryToWriter(message: MatchState, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): MatchState;
-  static deserializeBinaryFromReader(
-    message: MatchState,
-    reader: jspb.BinaryReader
-  ): MatchState;
+  static deserializeBinaryFromReader(message: MatchState, reader: jspb.BinaryReader): MatchState;
 }
 
 export namespace MatchState {
   export type AsObject = {
-    phase: MatchPhase;
-    turn?: PlayerValue.AsObject;
-    players?: Players.AsObject;
-    spectator?: Empty.AsObject;
-    ownCards?: Cards.AsObject;
-    auctionState?: AuctionState.AsObject;
-    gameState?: GameState.AsObject;
-  };
+    phase: MatchPhase,
+    turn?: PlayerValue.AsObject,
+    players?: Players.AsObject,
+    spectator?: Empty.AsObject,
+    ownCards?: Cards.AsObject,
+    auctionState?: AuctionState.AsObject,
+    gameState?: GameState.AsObject,
+  }
 
-  export enum RoleCase {
+  export enum RoleCase { 
     ROLE_NOT_SET = 0,
     SPECTATOR = 4,
     OWN_CARDS = 5,
   }
 
-  export enum DetailsCase {
+  export enum DetailsCase { 
     DETAILS_NOT_SET = 0,
     AUCTION_STATE = 6,
     GAME_STATE = 7,
@@ -693,24 +561,18 @@ export class Players extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Players.AsObject;
   static toObject(includeInstance: boolean, msg: Players): Players.AsObject;
-  static serializeBinaryToWriter(
-    message: Players,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Players, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Players;
-  static deserializeBinaryFromReader(
-    message: Players,
-    reader: jspb.BinaryReader
-  ): Players;
+  static deserializeBinaryFromReader(message: Players, reader: jspb.BinaryReader): Players;
 }
 
 export namespace Players {
   export type AsObject = {
-    userIdSelf: string;
-    userIdLeft: string;
-    userIdFace: string;
-    userIdRight: string;
-  };
+    userIdSelf: string,
+    userIdLeft: string,
+    userIdFace: string,
+    userIdRight: string,
+  }
 }
 
 export class TableData extends jspb.Message {
@@ -736,25 +598,19 @@ export class TableData extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TableData.AsObject;
   static toObject(includeInstance: boolean, msg: TableData): TableData.AsObject;
-  static serializeBinaryToWriter(
-    message: TableData,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: TableData, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): TableData;
-  static deserializeBinaryFromReader(
-    message: TableData,
-    reader: jspb.BinaryReader
-  ): TableData;
+  static deserializeBinaryFromReader(message: TableData, reader: jspb.BinaryReader): TableData;
 }
 
 export namespace TableData {
   export type AsObject = {
-    tableId: string;
-    owner: string;
-    inviteCode: string;
-    membersList: Array<TableMember.AsObject>;
-    created?: Timestamp.AsObject;
-  };
+    tableId: string,
+    owner: string,
+    inviteCode: string,
+    membersList: Array<TableMember.AsObject>,
+    created?: Timestamp.AsObject,
+  }
 }
 
 export class Timestamp extends jspb.Message {
@@ -764,21 +620,15 @@ export class Timestamp extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Timestamp.AsObject;
   static toObject(includeInstance: boolean, msg: Timestamp): Timestamp.AsObject;
-  static serializeBinaryToWriter(
-    message: Timestamp,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Timestamp, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Timestamp;
-  static deserializeBinaryFromReader(
-    message: Timestamp,
-    reader: jspb.BinaryReader
-  ): Timestamp;
+  static deserializeBinaryFromReader(message: Timestamp, reader: jspb.BinaryReader): Timestamp;
 }
 
 export namespace Timestamp {
   export type AsObject = {
-    nanos: number;
-  };
+    nanos: number,
+  }
 }
 
 export class TableState extends jspb.Message {
@@ -797,27 +647,18 @@ export class TableState extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TableState.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: TableState
-  ): TableState.AsObject;
-  static serializeBinaryToWriter(
-    message: TableState,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: TableState): TableState.AsObject;
+  static serializeBinaryToWriter(message: TableState, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): TableState;
-  static deserializeBinaryFromReader(
-    message: TableState,
-    reader: jspb.BinaryReader
-  ): TableState;
+  static deserializeBinaryFromReader(message: TableState, reader: jspb.BinaryReader): TableState;
 }
 
 export namespace TableState {
   export type AsObject = {
-    phase: TablePhase;
-    currentMatch?: MatchState.AsObject;
-    data?: TableData.AsObject;
-  };
+    phase: TablePhase,
+    currentMatch?: MatchState.AsObject,
+    data?: TableData.AsObject,
+  }
 }
 
 export class TableMember extends jspb.Message {
@@ -832,46 +673,32 @@ export class TableMember extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TableMember.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: TableMember
-  ): TableMember.AsObject;
-  static serializeBinaryToWriter(
-    message: TableMember,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: TableMember): TableMember.AsObject;
+  static serializeBinaryToWriter(message: TableMember, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): TableMember;
-  static deserializeBinaryFromReader(
-    message: TableMember,
-    reader: jspb.BinaryReader
-  ): TableMember;
+  static deserializeBinaryFromReader(message: TableMember, reader: jspb.BinaryReader): TableMember;
 }
 
 export namespace TableMember {
   export type AsObject = {
-    userId: string;
-    name: string;
-    online: boolean;
-  };
+    userId: string,
+    name: string,
+    online: boolean,
+  }
 }
 
 export class Empty extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Empty.AsObject;
   static toObject(includeInstance: boolean, msg: Empty): Empty.AsObject;
-  static serializeBinaryToWriter(
-    message: Empty,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: Empty, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Empty;
-  static deserializeBinaryFromReader(
-    message: Empty,
-    reader: jspb.BinaryReader
-  ): Empty;
+  static deserializeBinaryFromReader(message: Empty, reader: jspb.BinaryReader): Empty;
 }
 
 export namespace Empty {
-  export type AsObject = {};
+  export type AsObject = {
+  }
 }
 
 export class UserName extends jspb.Message {
@@ -881,21 +708,15 @@ export class UserName extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserName.AsObject;
   static toObject(includeInstance: boolean, msg: UserName): UserName.AsObject;
-  static serializeBinaryToWriter(
-    message: UserName,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: UserName, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): UserName;
-  static deserializeBinaryFromReader(
-    message: UserName,
-    reader: jspb.BinaryReader
-  ): UserName;
+  static deserializeBinaryFromReader(message: UserName, reader: jspb.BinaryReader): UserName;
 }
 
 export namespace UserName {
   export type AsObject = {
-    name: string;
-  };
+    name: string,
+  }
 }
 
 export class RegisterReply extends jspb.Message {
@@ -907,26 +728,17 @@ export class RegisterReply extends jspb.Message {
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RegisterReply.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: RegisterReply
-  ): RegisterReply.AsObject;
-  static serializeBinaryToWriter(
-    message: RegisterReply,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: RegisterReply): RegisterReply.AsObject;
+  static serializeBinaryToWriter(message: RegisterReply, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): RegisterReply;
-  static deserializeBinaryFromReader(
-    message: RegisterReply,
-    reader: jspb.BinaryReader
-  ): RegisterReply;
+  static deserializeBinaryFromReader(message: RegisterReply, reader: jspb.BinaryReader): RegisterReply;
 }
 
 export namespace RegisterReply {
   export type AsObject = {
-    id: string;
-    secret: string;
-  };
+    id: string,
+    secret: string,
+  }
 }
 
 export class TableId extends jspb.Message {
@@ -936,78 +748,59 @@ export class TableId extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TableId.AsObject;
   static toObject(includeInstance: boolean, msg: TableId): TableId.AsObject;
-  static serializeBinaryToWriter(
-    message: TableId,
-    writer: jspb.BinaryWriter
-  ): void;
+  static serializeBinaryToWriter(message: TableId, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): TableId;
-  static deserializeBinaryFromReader(
-    message: TableId,
-    reader: jspb.BinaryReader
-  ): TableId;
+  static deserializeBinaryFromReader(message: TableId, reader: jspb.BinaryReader): TableId;
 }
 
 export namespace TableId {
   export type AsObject = {
-    value: string;
-  };
+    value: string,
+  }
 }
 
 export class JoinTableRequest extends jspb.Message {
-  getTableId(): string;
-  setTableId(value: string): JoinTableRequest;
-
   getInviteCode(): string;
   setInviteCode(value: string): JoinTableRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): JoinTableRequest.AsObject;
-  static toObject(
-    includeInstance: boolean,
-    msg: JoinTableRequest
-  ): JoinTableRequest.AsObject;
-  static serializeBinaryToWriter(
-    message: JoinTableRequest,
-    writer: jspb.BinaryWriter
-  ): void;
+  static toObject(includeInstance: boolean, msg: JoinTableRequest): JoinTableRequest.AsObject;
+  static serializeBinaryToWriter(message: JoinTableRequest, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): JoinTableRequest;
-  static deserializeBinaryFromReader(
-    message: JoinTableRequest,
-    reader: jspb.BinaryReader
-  ): JoinTableRequest;
+  static deserializeBinaryFromReader(message: JoinTableRequest, reader: jspb.BinaryReader): JoinTableRequest;
 }
 
 export namespace JoinTableRequest {
   export type AsObject = {
-    tableId: string;
-    inviteCode: string;
-  };
+    inviteCode: string,
+  }
 }
 
-export enum MemberEventType {
+export enum MemberEventType { 
   JOIN_TABLE = 0,
   LEAVE_TABLE = 1,
   GO_OFFLINE = 2,
   GO_ONLINE = 3,
 }
-export enum TablePhase {
+export enum TablePhase { 
   NOT_STARTED = 0,
   PLAYING = 1,
   BETWEEN_GAMES = 2,
   TABLE_ENDED = 3,
 }
-export enum MatchPhase {
+export enum MatchPhase { 
   AUCTION = 0,
   GAME = 1,
   FINISHED = 2,
 }
-export enum Suit {
+export enum Suit { 
   DIAMONDS = 0,
   HEARTS = 1,
   SPADES = 2,
   CLUBS = 3,
 }
-export enum Rank {
+export enum Rank { 
   NINE = 0,
   JACK = 1,
   QUEEN = 2,
@@ -1015,11 +808,11 @@ export enum Rank {
   TEN = 4,
   ACE = 5,
 }
-export enum Party {
+export enum Party { 
   RE = 0,
   CONTRA = 1,
 }
-export enum BidType {
+export enum BidType { 
   RE_BID = 0,
   CONTRA_BID = 1,
   RE_NO_NINETY = 2,
@@ -1031,7 +824,7 @@ export enum BidType {
   CONTRA_NO_THIRTY = 8,
   CONTRA_SCHWARZ = 9,
 }
-export enum GameType {
+export enum GameType { 
   NORMAL_GAME = 0,
   MARRIAGE = 1,
   DIAMONDS_SOLO = 2,

@@ -92,9 +92,8 @@ func NewTableView(ts *api.TableState) *TableView {
 	for _, m := range ts.Data.Members {
 		ans.MemberNamesById[m.UserId] = m.Name
 	}
-	switch state := ts.State.(type) {
-	case *api.TableState_InMatch:
-		ans.Match = NewMatchView(state.InMatch)
+	if ts.CurrentMatch != nil {
+		ans.Match = NewMatchView(ts.CurrentMatch)
 	}
 	return &ans
 }

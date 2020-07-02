@@ -5,6 +5,7 @@ package main
 import (
 	crand "crypto/rand"
 	"encoding/binary"
+	"flag"
 	"fmt"
 	"github.com/supermihi/karlchencloud/server"
 	"log"
@@ -13,10 +14,14 @@ import (
 )
 
 const (
-	port = ":50501"
+	port     = ":50501"
+	httpPort = ":8080"
 )
 
 func main() {
+	var noHttpServer bool
+	flag.BoolVar(&noHttpServer, "no-http-server", false, "")
+	flag.Parse()
 	var v int64
 	randErr := binary.Read(crand.Reader, binary.BigEndian, &v)
 	if randErr != nil {
@@ -37,19 +42,36 @@ func main() {
 	if cloudErr != nil {
 		log.Fatal(cloudErr)
 	}
-	table, cloudErr = room.JoinTable(table.Id, "dummy 2", table.InviteCode)
+	table, cloudErr = room.JoinTable("dummy 2", table.InviteCode)
 	if cloudErr != nil {
 		log.Fatal(cloudErr)
 	}
 	srv := server.CreateServer(users, room)
-	log.Printf("starting raw")
 
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+	startServer := func() {
+		log.Printf("starting grpc server")
+		lis, err := net.Listen("tcp", port)
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
+		}
+		if err := srv.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
 	}
-	if err := srv.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	startHttp := func() {
+		httpServer := server.WrapServer(srv)
+		lisHttp, err := net.Listen("tcp", httpPort)
+		if err != nil {
+			log.Fatalf("failed to listen HTTP: %v", err)
+		}
+		log.Printf("starting HTTP proxy server")
+		if err := httpServer.Serve(lisHttp); err != nil {
+			log.Fatalf("failed to serve HTTP: %v", err)
+		}
 	}
+	if !noHttpServer {
+		go startHttp()
+	}
+	startServer()
 
 }

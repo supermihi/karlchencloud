@@ -2,6 +2,9 @@ version: "3.8"
 
 services:
   envoy:
+    image: envoyproxy/envoy:v1.14.3
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
     build:
       context: .
       dockerfile: envoy.Dockerfile

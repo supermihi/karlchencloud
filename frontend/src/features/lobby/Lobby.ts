@@ -1,11 +1,14 @@
 import { connect } from 'react-redux';
 import LobbyView from './LobbyView';
 import { createSelector } from '@reduxjs/toolkit';
-import { selectSession } from 'app/session';
-import { createTable } from 'app/session/lobby';
 
-const mapState = createSelector(selectSession, (s) => ({
+import { selectLobby } from './slice';
+import { selectGame } from 'app/game/slice';
+import { createTable } from 'app/game/thunks';
+
+const mapState = createSelector(selectGame, selectLobby, (s, l) => ({
   activeTable: s.currentTable,
+  suppliedInviteCode: l.suppliedInviteCode,
 }));
 const mapDispatch = {
   createTable,

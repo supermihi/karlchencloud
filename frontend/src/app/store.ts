@@ -1,11 +1,15 @@
-import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import { Action, configureStore, ThunkAction, ThunkDispatch } from '@reduxjs/toolkit';
 import authReducer from './auth/slice';
 import sessionReducer from './session';
+import lobbyReducer from 'features/lobby/slice';
+import gameReducer from './game/slice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     session: sessionReducer,
+    lobby: lobbyReducer,
+    game: gameReducer,
   },
 });
 
@@ -17,3 +21,4 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
+export type AppDispatch = ThunkDispatch<RootState, {}, Action>;

@@ -15,6 +15,12 @@ export function toTable(t: api.TableData): Table {
   };
 }
 
+export function getCurrentTableState(u: api.UserState): TableState | null {
+  return u.hasCurrenttable()
+    ? toTableState(u.getCurrenttable() as api.TableState)
+    : null;
+}
+
 export function toTableState(t: api.TableState): TableState {
   return {
     table: toTable(t.getData() as api.TableData),

@@ -20,7 +20,7 @@ import {
 } from 'model/table';
 import { TablePhase } from 'api/karlchen_pb';
 import GrowDiv from 'components/GrowDiv';
-import InviteDialog from './InviteDialog';
+import InviteDialog from './InviteLinkDialog';
 
 interface Props {
   table: TableState;

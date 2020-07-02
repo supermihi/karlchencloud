@@ -43,12 +43,18 @@ func (r *Room) GetTable(tableId string) (table *TableData, err error) {
 	return nil, NewCloudError(TableDoesNotExist)
 }
 
-func (r *Room) JoinTable(tableId string, userId string, inviteCode string) (*TableData, error) {
-	t, tableExists := r.tables[tableId]
-	if !tableExists {
-		return nil, NewCloudError(TableDoesNotExist)
+func (r *Room) findTableWithInviteCode(inviteCode string) *Table {
+	for _, t := range r.tables {
+		if t.InviteCode == inviteCode {
+			return t
+		}
 	}
-	if inviteCode != t.InviteCode {
+	return nil
+}
+
+func (r *Room) JoinTable(userId string, inviteCode string) (*TableData, error) {
+	t := r.findTableWithInviteCode(inviteCode)
+	if t == nil {
 		return nil, NewCloudError(InvalidInviteCode)
 	}
 	if r.ActiveTableOf(userId) != nil {
@@ -191,11 +197,26 @@ func (r *Room) getMatchAndPlayer(tableId string, user string) (match *TableMatch
 	return table.CurrentMatch, p, nil
 }
 
-func (r *Room) ActiveTableOf(user string) *TableData {
+func (r *Room) activeTableOf(user string) *Table {
 	for _, table := range r.tables {
 		if table.ContainsPlayer(user) {
-			return GetData(table)
+			return table
 		}
 	}
 	return nil
+}
+func (r *Room) ActiveTableOf(user string) *TableData {
+	t := r.activeTableOf(user)
+	if t != nil {
+		return GetData(t)
+	}
+	return nil
+}
+
+func (r *Room) RelatedUsers(userId string) []string {
+	table := r.activeTableOf(userId)
+	if table == nil {
+		return []string{}
+	}
+	return stringsExcept(table.players, userId)
 }

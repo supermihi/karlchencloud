@@ -9,13 +9,13 @@ import ForwardIcon from '@material-ui/icons/Forward';
 import { formatError } from 'api/client';
 import MainPaper from 'components/MainPaper';
 
-import { LoginData } from 'app/auth';
+import { MyUserData, Credentials } from 'app/auth';
 
 interface Props {
-  currentLogin: LoginData;
+  currentLogin: MyUserData;
   loading: boolean;
   error: any;
-  login: (login: LoginData) => void;
+  login: (login: Credentials) => void;
   forgetLogin: () => void;
   resetError: () => void;
 }

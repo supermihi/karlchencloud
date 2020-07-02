@@ -19,7 +19,11 @@ interface Props {
   open: boolean;
   inviteCode: string;
 }
-export default function InviteDialog({ open, handleClose, inviteCode }: Props) {
+export default function InviteLinkDialog({
+  open,
+  handleClose,
+  inviteCode,
+}: Props) {
   const link = inviteLink(inviteCode);
   const [copySnackOpen, setCopySnackOpen] = useState(false);
   return (

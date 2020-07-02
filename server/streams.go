@@ -17,20 +17,19 @@ func newStreams() clientStreams {
 	return clientStreams{streams: make(map[string]chan *api.Event, 1000)}
 }
 
-func (s *clientStreams) send(user string, event *api.Event) {
+func (s *clientStreams) sendSingle(user string, event *api.Event) {
 	stream, ok := s.streams[user]
 	if ok {
 		stream <- event
 	}
 }
 
-func (s *clientStreams) sendToAll(users []string, event *api.Event) {
+func (s *clientStreams) send(users []string, event *api.Event) {
 	s.mtx.RLock()
 	defer s.mtx.RUnlock()
 	for _, user := range users {
-		s.send(user, event)
+		s.sendSingle(user, event)
 	}
-
 }
 
 func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user string) {

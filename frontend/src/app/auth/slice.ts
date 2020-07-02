@@ -1,20 +1,16 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunk, RootState } from 'app/store';
-import * as api from 'api/client';
-import {
-  getLoginDataFromLocalStorage,
-  writeLoginDataToLocalStorage,
-  deleteLoginDataInLocalStorage,
-} from './localstorage';
-import { LoginData } from '.';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from 'app/store';
+import { getLoginDataFromLocalStorage } from './localstorage';
+import { MyUserData } from '.';
+import { register } from './thunks';
 
-export interface SessionState {
-  storedLogin: LoginData | null;
+export interface AuthState {
+  storedLogin: MyUserData | null;
   registering: boolean;
   registerError?: any;
 }
 
-const initialState = (): SessionState => {
+const initialState = (): AuthState => {
   const existingLogin = getLoginDataFromLocalStorage();
   return {
     registering: false,
@@ -22,35 +18,17 @@ const initialState = (): SessionState => {
   };
 };
 
-export const register = createAsyncThunk<LoginData, string>(
-  'model/register',
-  async (name, { dispatch }) => {
-    const { id, secret } = await api.register(name);
-    const ans = { name, id, secret };
-    writeLoginDataToLocalStorage(ans);
-    dispatch(localStorageUpdated(ans));
-    return ans;
-  }
-);
-
-export const forgetLogin = (): AppThunk => (dispatch) => {
-  deleteLoginDataInLocalStorage();
-  dispatch(localStorageUpdated(null));
-};
 export const authSlice = createSlice({
   name: 'auth',
   initialState: initialState(),
   reducers: {
-    localStorageUpdated: (
-      state,
-      { payload }: PayloadAction<LoginData | null>
-    ) => {
+    localStorageUpdated: (state, { payload }: PayloadAction<MyUserData | null>) => {
       state.storedLogin = payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(register.fulfilled, (state, { payload: login }) => {
+      .addCase(register.fulfilled, (state) => {
         state.registering = false;
       })
       .addCase(register.pending, (state) => {
@@ -63,6 +41,6 @@ export const authSlice = createSlice({
       });
   },
 });
-const { localStorageUpdated } = authSlice.actions;
+export const actions = authSlice.actions;
 export const selectAuth = (state: RootState) => state.auth;
 export default authSlice.reducer;
