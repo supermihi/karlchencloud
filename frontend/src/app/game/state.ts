@@ -4,6 +4,7 @@ export enum ActionKind {
   noAction = 0,
   joinTable = 1,
   createTable = 2,
+  startTable = 3,
 }
 
 export interface ActionError {

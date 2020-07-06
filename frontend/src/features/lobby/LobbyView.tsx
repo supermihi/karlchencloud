@@ -8,9 +8,11 @@ import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import CurrentTableView from './CurrentTableView';
 import AcceptInviteDialog from './AcceptInviteDialog';
+import { User } from 'model/core';
 
 interface Props {
   activeTable: TableState | null;
+  me: User;
   createTable: () => void;
   suppliedInviteCode: string | null;
 }
@@ -27,10 +29,10 @@ const useStyles = makeStyles((theme) => ({
   } as const,
   buttons: {
     marginBottom: theme.spacing(2),
-  },
+  } as const,
 }));
 
-export default ({ activeTable, createTable, suppliedInviteCode }: Props) => {
+export default ({ activeTable, createTable, me, suppliedInviteCode }: Props) => {
   const classes = useStyles();
   return (
     <div className={classes.main}>
@@ -57,7 +59,7 @@ export default ({ activeTable, createTable, suppliedInviteCode }: Props) => {
         </Grid>
       </Grid>
       {suppliedInviteCode && <AcceptInviteDialog />}
-      {activeTable && <CurrentTableView table={activeTable} />}
+      {activeTable && <CurrentTableView me={me} table={activeTable} />}
     </div>
   );
 };

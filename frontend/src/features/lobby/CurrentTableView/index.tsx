@@ -5,40 +5,35 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 
-import {
-  canStartTable,
-  TableState,
-  canContinueTable,
-  waitingForPlayers,
-} from 'model/table';
+import { canStartTable, TableState, canContinueTable, waitingForPlayers } from 'model/table';
 import { TablePhase } from 'api/karlchen_pb';
 import GrowDiv from 'components/GrowDiv';
-import InviteDialog from './InviteLinkDialog';
+import InviteDialog from '../InviteLinkDialog';
+import PlayerItem from './PlayerItem';
+import { User } from 'model/core';
+import { useDispatch } from 'react-redux';
+import { startTable } from 'app/game/table';
 
 interface Props {
   table: TableState;
+  me: User;
 }
 const useStyles = makeStyles((theme) => ({
   continueButton: {
     marginLeft: 'auto',
   } as const,
-  online: {
-    color: theme.palette.success.main,
-  } as const,
   note: {
     color: theme.palette.text.hint,
-  },
+  } as const,
 }));
 
-export default function CurrentTableView({ table }: Props) {
+export default function CurrentTableView({ table, me }: Props) {
   const { table: data } = table;
+  const dispatch = useDispatch();
   const owner = data.players.find((p) => p.id === data.owner);
   const classes = useStyles();
   const [inviteOpen, setInviteOpen] = React.useState(false);
@@ -46,26 +41,11 @@ export default function CurrentTableView({ table }: Props) {
   return (
     <Card variant="outlined">
       <CardContent>
-        <Typography
-          variant="h4"
-          component="h2"
-        >{`${owner?.name}'s Tisch`}</Typography>
-        <Typography color="textSecondary">
-          Created {data.created.toLocaleString()}
-        </Typography>
+        <Typography variant="h4" component="h2">{`${owner?.name}'s Tisch`}</Typography>
+        <Typography color="textSecondary">Created {data.created.toLocaleString()}</Typography>
         <List>
           {data.players.map((player) => (
-            <ListItem key={player.id}>
-              <ListItemAvatar>
-                <Avatar>{player.name[0].toUpperCase()}</Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={player.name}
-                secondary={
-                  player.online && <em className={classes.online}>online</em>
-                }
-              />
-            </ListItem>
+            <PlayerItem me={player.id === me.id} player={player} key={player.id} />
           ))}
         </List>
         {waitingForPlayers(table) && (
@@ -77,9 +57,7 @@ export default function CurrentTableView({ table }: Props) {
       <CardActions>
         {!started && (
           <>
-            <Button onClick={() => setInviteOpen(true)}>
-              Mitspieler einladen
-            </Button>
+            <Button onClick={() => setInviteOpen(true)}>Mitspieler einladen</Button>
             <InviteDialog
               open={inviteOpen}
               handleClose={() => setInviteOpen(false)}
@@ -98,6 +76,7 @@ export default function CurrentTableView({ table }: Props) {
             variant="contained"
             color="primary"
             disabled={!canStartTable(table)}
+            onClick={() => dispatch(startTable.thunk(data.id))}
           >
             Starten
           </Button>

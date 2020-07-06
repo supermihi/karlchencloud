@@ -3,20 +3,21 @@ import { selectAuthenticatedClientOrThrow } from 'app/session';
 import { toTable, toTableState } from 'model/apiconv';
 import { AuthenticatedClient } from 'api/client';
 import * as api from 'api/karlchen_pb';
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, AsyncThunk } from '@reduxjs/toolkit';
+import { ActionKind } from './state';
 
-export const createTable = createGameThunk('lobby/createTable', async (_, { client, meta }) => {
-  const result = await client.createTable(new api.Empty(), meta);
-  return toTable(result);
-});
-
-type GameThunkPayloadCreator<Returned, ThunkArg = void> = (
-  arg: ThunkArg,
-  client: AuthenticatedClient
-) => Promise<Returned>;
+export const createTable = createGameThunk(
+  'lobby/createTable',
+  ActionKind.createTable,
+  async (_, { client, meta }) => {
+    const result = await client.createTable(new api.Empty(), meta);
+    return toTable(result);
+  }
+);
 
 export const joinTable = createGameThunk(
   'game/joinTable',
+  ActionKind.joinTable,
   async (inviteCode: string, { client, meta }) => {
     const req = new api.JoinTableRequest();
     req.setInviteCode(inviteCode);
@@ -25,12 +26,28 @@ export const joinTable = createGameThunk(
   }
 );
 
+type GameThunkPayloadCreator<Returned, ThunkArg = void> = (
+  arg: ThunkArg,
+  client: AuthenticatedClient
+) => Promise<Returned>;
+export type AsyncGameThunk<Returned, ThunkArg = void> = AsyncThunk<
+  Returned,
+  ThunkArg,
+  AsyncThunkConfig
+>;
+export type GameThunk<Returned, ThunkArg> = {
+  thunk: AsyncGameThunk<Returned, ThunkArg>;
+  kind: ActionKind;
+};
+
 export function createGameThunk<Returned, ThunkArg = void>(
   name: string,
+  kind: ActionKind,
   payloadCreator: GameThunkPayloadCreator<Returned, ThunkArg>
-) {
-  return createAsyncThunk<Returned, ThunkArg, AsyncThunkConfig>(name, (arg, api) => {
+): GameThunk<Returned, ThunkArg> {
+  const thunk = createAsyncThunk<Returned, ThunkArg, AsyncThunkConfig>(name, (arg, api) => {
     const AuthenticatedClient = selectAuthenticatedClientOrThrow(api.getState());
     return payloadCreator(arg, AuthenticatedClient);
   });
+  return { thunk, kind };
 }

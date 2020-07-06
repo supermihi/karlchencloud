@@ -65,6 +65,7 @@ const slice = createSlice({
     sessionEnded: () => initialState,
     sessionError: (state, { payload: error }: PayloadAction<GrpcError>) => {
       state.starting = null;
+      state.session = null;
       state.error = error;
     },
   },

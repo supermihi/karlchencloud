@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/supermihi/karlchencloud/api"
 	"testing"
 )
 
@@ -15,4 +16,5 @@ func TestTable_Start(t *testing.T) {
 	assert.Contains(t, table.CurrentMatch.Players, "user2")
 	assert.Contains(t, table.CurrentMatch.Players, "user3")
 	assert.Contains(t, table.CurrentMatch.Players, "user4")
+	assert.Equal(t, api.TablePhase_PLAYING, table.Phase)
 }

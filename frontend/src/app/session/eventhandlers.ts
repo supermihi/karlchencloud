@@ -2,6 +2,7 @@ import * as api from 'api/karlchen_pb';
 import { AppThunk, AppDispatch } from 'app/store';
 import { actions } from '.';
 import { actions as gameActions } from '../game/slice';
+import { actions as tableActions } from '../game/table';
 import { getCurrentTableState, toMatch } from 'model/apiconv';
 
 const { EventCase } = api.Event;
@@ -34,20 +35,20 @@ function onMember(event: api.MemberEvent, dispatch: AppDispatch) {
   const id = event.getUserId();
   switch (event.getType()) {
     case api.MemberEventType.JOIN_TABLE:
-      dispatch(gameActions.memberJoined({ name, id }));
+      dispatch(tableActions.memberJoined({ name, id }));
       return;
     case api.MemberEventType.LEAVE_TABLE:
-      dispatch(gameActions.memberLeft(id));
+      dispatch(tableActions.memberLeft(id));
       return;
     case api.MemberEventType.GO_OFFLINE:
-      dispatch(gameActions.memberStatusChanged({ name, id, online: false }));
+      dispatch(tableActions.memberStatusChanged({ name, id, online: false }));
       return;
     case api.MemberEventType.GO_ONLINE:
-      dispatch(gameActions.memberStatusChanged({ name, id, online: true }));
+      dispatch(tableActions.memberStatusChanged({ name, id, online: true }));
       return;
   }
 }
 
 function onStart(ms: api.MatchState, dispatch: AppDispatch) {
-  dispatch(gameActions.matchStarted(toMatch(ms)));
+  dispatch(tableActions.matchStarted(toMatch(ms)));
 }

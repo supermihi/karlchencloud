@@ -71,6 +71,7 @@ func (t *Table) StartMatch() error {
 	pa := t.round.CurrentPlayerAssignment()
 
 	t.CurrentMatch = &TableMatch{nextMatch, getActivePlayerIds(t.playersInOrder, pa)}
+	t.Phase = api.TablePhase_PLAYING;
 	return nil
 }
 

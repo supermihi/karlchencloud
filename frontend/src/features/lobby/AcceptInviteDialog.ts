@@ -5,7 +5,7 @@ import { joinTable } from 'app/game/thunks';
 
 const mapDispatch = {
   clearInviteCode,
-  joinTable,
+  joinTable: joinTable.thunk,
 };
 
 export default connect(selectLobby, mapDispatch, (state, dispatch) => ({
