@@ -7,6 +7,7 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
+	github.com/ilyakaznacheev/cleanenv v1.2.4
 	github.com/improbable-eng/grpc-web v0.12.0
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/stretchr/testify v1.5.1

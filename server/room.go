@@ -14,11 +14,11 @@ func NewRoom(users Users) *Room {
 	return &Room{users, make(map[string]*Table)}
 }
 
-func (r *Room) CreateTable(owner string) (table *TableData, err error) {
+func (r *Room) CreateTable(owner string, fixedTableId *string, fixedInviteCode *string) (table *TableData, err error) {
 	if r.ActiveTableOf(owner) != nil {
 		return nil, NewCloudError(TableAlreadyExists)
 	}
-	t := NewTable(owner)
+	t := NewTable(owner, fixedTableId, fixedInviteCode)
 	r.tables[t.Id] = t
 	return GetData(t), nil
 }

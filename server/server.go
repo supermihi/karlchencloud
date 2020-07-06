@@ -2,17 +2,14 @@ package server
 
 import (
 	"context"
-	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 	"log"
 	"sync"
-	"time"
 )
 
 type dokoserver struct {
@@ -21,23 +18,13 @@ type dokoserver struct {
 	roomMtx sync.RWMutex
 	auth    Auth
 	streams clientStreams
+	config  ServerConfig
 }
 
-func newDokoserver(room Room, auth Auth) *dokoserver {
-	return &dokoserver{
-		room: room, auth: auth, streams: newStreams(),
-	}
-}
-
-func CreateServer(users Users, room *Room) *grpc.Server {
-	if room == nil {
-		room = NewRoom(users)
-	}
+func CreateServer(users Users, room *Room, config ServerConfig) *grpc.Server {
 	auth := NewAuth(users)
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpcauth.UnaryServerInterceptor(auth.Authenticate)),
-		grpc.StreamInterceptor(grpcauth.StreamServerInterceptor(auth.Authenticate)),
-		grpc.KeepaliveParams(keepalive.ServerParameters{Timeout: time.Hour * 24}))
-	serv := newDokoserver(*room, auth)
+	grpcServer := CreateGrpcServerForAuth(auth)
+	serv := &dokoserver{room: *room, auth: auth, streams: newStreams(), config: config}
 	api.RegisterDokoServer(grpcServer, serv)
 	return grpcServer
 }
@@ -62,7 +49,7 @@ func (s *dokoserver) CreateTable(ctx context.Context, _ *api.Empty) (*api.TableD
 	user, _ := GetAuthenticatedUser(ctx)
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
-	table, err := s.room.CreateTable(user.Id)
+	table, err := s.room.CreateTable(user.Id, &s.config.Room.ConstantTableId, &s.config.Room.ConstantInviteCode)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}

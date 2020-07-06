@@ -28,11 +28,23 @@ func (t *Table) String() string {
 	return fmt.Sprintf("Table %v", t.Id)
 }
 
-func NewTable(owner string) *Table {
-	id := RandomLetters(6)
-	inviteCode := RandomLetters(12)
-	table := Table{id, time.Now(), inviteCode, api.TablePhase_NOT_STARTED, []string{owner}, nil, nil, nil}
+func NewTable(owner string, fixedTableId *string, fixedInviteCode *string) *Table {
+	table := Table{
+		getStringWithDefault(fixedTableId, randomTableId),
+		time.Now(),
+		getStringWithDefault(fixedInviteCode, randomInviteCode),
+		api.TablePhase_NOT_STARTED,
+		[]string{owner},
+		nil, nil, nil}
 	return &table
+}
+
+func randomTableId() string {
+	return RandomLetters(6)
+}
+
+func randomInviteCode() string {
+	return RandomLetters(12)
 }
 
 func (t *Table) Start() error {

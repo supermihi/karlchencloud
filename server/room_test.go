@@ -8,7 +8,7 @@ import (
 func TestRoom_JoinTable(t *testing.T) {
 	r := NewRoom(NewMemoryUserDb())
 	assert.True(t, r.users.Add("owner", "owner", "secret"))
-	table, err := r.CreateTable("owner")
+	table, err := r.CreateTable("owner", nil, nil)
 	assert.Nil(t, err)
 	_, err = r.JoinTable("player 2", "not the invite code")
 	assert.NotNil(t, err)

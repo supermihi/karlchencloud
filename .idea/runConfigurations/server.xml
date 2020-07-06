@@ -2,11 +2,9 @@
   <configuration default="false" name="server" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="karlchencloud" />
     <working_directory value="$PROJECT_DIR$" />
-    <parameters value="--no-http-server" />
     <envs>
-      <env name="GRPC_GO_LOG_VERBOSITY_LEVEL" value="2" />
-      <env name="GRPC_GO_LOG_SEVERITY_LEVEL" value="info" />
-      <env name="GODEBUG" value="http2debug=1" />
+      <env name="CONSTANT_TABLE_ID" value="mytable" />
+      <env name="CONSTANT_INVITE_CODE" value="invited" />
     </envs>
     <kind value="PACKAGE" />
     <filePath value="$PROJECT_DIR$/cmd/server/main.go" />

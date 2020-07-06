@@ -2,7 +2,11 @@
   <configuration default="false" name="bot_client" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="karlchencloud" />
     <working_directory value="$PROJECT_DIR$" />
-    <parameters value="--num 3 --table 9mq7yz --code bb4xrg5Q1Akc" />
+    <envs>
+      <env name="TABLE_ID" value="mytable" />
+      <env name="INVITE_CODE" value="invited" />
+      <env name="NUMBER_OF_BOTS" value="3" />
+    </envs>
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/cmd/bot_client/main.go" />
     <package value="github.com/supermihi/karlchencloud/cmd/bot_client" />

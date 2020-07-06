@@ -6,9 +6,11 @@ import (
 	grpcAuth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 	"log"
 	"strings"
+	"time"
 )
 
 type Auth struct {
@@ -73,4 +75,10 @@ func GetAuthenticatedUser(ctx context.Context) (UserData, bool) {
 	default:
 		return UserData{}, false
 	}
+}
+
+func CreateGrpcServerForAuth(auth Auth) *grpc.Server {
+	return grpc.NewServer(grpc.UnaryInterceptor(grpcAuth.UnaryServerInterceptor(auth.Authenticate)),
+		grpc.StreamInterceptor(grpcAuth.StreamServerInterceptor(auth.Authenticate)),
+		grpc.KeepaliveParams(keepalive.ServerParameters{Timeout: time.Hour * 24}))
 }

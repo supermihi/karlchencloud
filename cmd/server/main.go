@@ -5,7 +5,6 @@ package main
 import (
 	crand "crypto/rand"
 	"encoding/binary"
-	"flag"
 	"fmt"
 	"github.com/supermihi/karlchencloud/server"
 	"log"
@@ -19,9 +18,10 @@ const (
 )
 
 func main() {
-	var noHttpServer bool
-	flag.BoolVar(&noHttpServer, "no-http-server", false, "")
-	flag.Parse()
+	config, err := server.ReadConfig()
+	if err != nil {
+		log.Fatalf("Error reading configuration: %v", err)
+	}
 	var v int64
 	randErr := binary.Read(crand.Reader, binary.BigEndian, &v)
 	if randErr != nil {
@@ -38,15 +38,7 @@ func main() {
 		}
 	}
 	room := server.NewRoom(users)
-	table, cloudErr := room.CreateTable("dummy 1")
-	if cloudErr != nil {
-		log.Fatal(cloudErr)
-	}
-	table, cloudErr = room.JoinTable("dummy 2", table.InviteCode)
-	if cloudErr != nil {
-		log.Fatal(cloudErr)
-	}
-	srv := server.CreateServer(users, room)
+	srv := server.CreateServer(users, room, config)
 
 	startServer := func() {
 		log.Printf("starting grpc server")
@@ -69,7 +61,7 @@ func main() {
 			log.Fatalf("failed to serve HTTP: %v", err)
 		}
 	}
-	if !noHttpServer {
+	if !config.NoProxy {
 		go startHttp()
 	}
 	startServer()

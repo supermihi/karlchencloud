@@ -23,3 +23,10 @@ func stringsExcept(strings []string, except string) []string {
 	}
 	return ans
 }
+
+func getStringWithDefault(value *string, def func() string) string {
+	if value != nil && *value != "" {
+		return *value
+	}
+	return def()
+}
