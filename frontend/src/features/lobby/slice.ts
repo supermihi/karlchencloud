@@ -20,7 +20,7 @@ const lobbySlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(joinTable.thunk.fulfilled, (state) => {
+    builder.addCase(joinTable.fulfilled, (state) => {
       state.suppliedInviteCode = null;
     });
   },

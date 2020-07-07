@@ -1,22 +1,23 @@
-import { AsyncThunkConfig } from 'app/store';
+import { RootState } from 'app/store';
 import { selectAuthenticatedClientOrThrow } from 'app/session';
 import { toTable, toTableState } from 'model/apiconv';
 import { AuthenticatedClient } from 'api/client';
 import * as api from 'api/karlchen_pb';
-import { createAsyncThunk, AsyncThunk } from '@reduxjs/toolkit';
+import {
+  createAction,
+  ThunkAction,
+  Action,
+  PayloadActionCreator,
+  PrepareAction,
+} from '@reduxjs/toolkit';
 import { ActionKind } from './state';
 
-export const createTable = createGameThunk(
-  'lobby/createTable',
-  ActionKind.createTable,
-  async (_, { client, meta }) => {
-    const result = await client.createTable(new api.Empty(), meta);
-    return toTable(result);
-  }
-);
+export const createTable = createGameThunk(ActionKind.createTable, async (_, { client, meta }) => {
+  const result = await client.createTable(new api.Empty(), meta);
+  return toTable(result);
+});
 
 export const joinTable = createGameThunk(
-  'game/joinTable',
   ActionKind.joinTable,
   async (inviteCode: string, { client, meta }) => {
     const req = new api.JoinTableRequest();
@@ -30,24 +31,42 @@ type GameThunkPayloadCreator<Returned, ThunkArg = void> = (
   arg: ThunkArg,
   client: AuthenticatedClient
 ) => Promise<Returned>;
-export type AsyncGameThunk<Returned, ThunkArg = void> = AsyncThunk<
-  Returned,
-  ThunkArg,
-  AsyncThunkConfig
->;
-export type GameThunk<Returned, ThunkArg> = {
-  thunk: AsyncGameThunk<Returned, ThunkArg>;
-  kind: ActionKind;
+
+export type GameThunk<Returned, ThunkArg> = ((
+  arg: ThunkArg
+) => ThunkAction<any, RootState, any, Action<string>>) & {
+  fulfilled: PayloadActionCreator<Returned, string, PrepareAction<Returned>>;
 };
+export const gameActionPending = createAction('game/action/pending', (kind: ActionKind) => ({
+  payload: kind,
+}));
+export const gameActionError = createAction(
+  'game/action/error',
+  (kind: ActionKind, error: any) => ({
+    payload: { kind, error },
+  })
+);
 
 export function createGameThunk<Returned, ThunkArg = void>(
-  name: string,
   kind: ActionKind,
   payloadCreator: GameThunkPayloadCreator<Returned, ThunkArg>
 ): GameThunk<Returned, ThunkArg> {
-  const thunk = createAsyncThunk<Returned, ThunkArg, AsyncThunkConfig>(name, (arg, api) => {
-    const AuthenticatedClient = selectAuthenticatedClientOrThrow(api.getState());
-    return payloadCreator(arg, AuthenticatedClient);
+  const fulfilled = createAction('game/action/' + kind, (result: Returned) => {
+    return { payload: result };
   });
-  return { thunk, kind };
+  const actionCreator = function (
+    arg: ThunkArg
+  ): ThunkAction<any, RootState, undefined, Action<string>> {
+    return async (dispatch, getState) => {
+      dispatch(gameActionPending(kind));
+      try {
+        const authenticatedClient = selectAuthenticatedClientOrThrow(getState());
+        const result = await payloadCreator(arg, authenticatedClient);
+        dispatch(fulfilled(result));
+      } catch (error) {
+        dispatch(gameActionError(kind, error));
+      }
+    };
+  };
+  return Object.assign(actionCreator, { fulfilled });
 }

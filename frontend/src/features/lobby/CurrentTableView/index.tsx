@@ -76,7 +76,7 @@ export default function CurrentTableView({ table, me }: Props) {
             variant="contained"
             color="primary"
             disabled={!canStartTable(table)}
-            onClick={() => dispatch(startTable.thunk(data.id))}
+            onClick={() => dispatch(startTable(data.id))}
           >
             Starten
           </Button>

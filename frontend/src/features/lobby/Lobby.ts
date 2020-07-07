@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import LobbyView from './LobbyView';
-import { createSelector } from '@reduxjs/toolkit';
+import { createSelector, ThunkDispatch } from '@reduxjs/toolkit';
 
 import { selectLobby } from './slice';
 import { selectGame } from 'app/game/slice';
@@ -13,7 +13,7 @@ const mapState = createSelector(selectGame, selectLobby, selectSession, (s, l, s
   suppliedInviteCode: l.suppliedInviteCode,
   me: sess.session as User,
 }));
-const mapDispatch = {
-  createTable: createTable.thunk,
-};
+const mapDispatch = (dispatch: ThunkDispatch<any, any, any>) => ({
+  createTable: () => dispatch(createTable()),
+});
 export default connect(mapState, mapDispatch)(LobbyView);

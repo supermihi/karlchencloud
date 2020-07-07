@@ -11,7 +11,6 @@ import { TablePhase } from 'api/karlchen_pb';
 export const name = 'game/table';
 
 export const startTable = createGameThunk(
-  name + '/start',
   ActionKind.startTable,
   async (id: string, { client, meta }) => {
     const match = await client.startTable(tableId(id), meta);
@@ -43,7 +42,7 @@ const slice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(startTable.thunk.fulfilled, (table, { payload }) => {
+    builder.addCase(startTable.fulfilled, (table, { payload }) => {
       table.match = payload;
       table.phase = TablePhase.PLAYING;
     });
