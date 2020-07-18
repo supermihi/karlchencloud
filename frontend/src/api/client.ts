@@ -24,10 +24,7 @@ export function getAuthMeta(user: string, secret: string): Metadata {
   return { authorization: `basic ${encoded}` };
 }
 
-export function getAuthenticatedClient(
-  user: string,
-  secret: string
-): AuthenticatedClient {
+export function getAuthenticatedClient(user: string, secret: string): AuthenticatedClient {
   return { client: getClient(), meta: getAuthMeta(user, secret) };
 }
 

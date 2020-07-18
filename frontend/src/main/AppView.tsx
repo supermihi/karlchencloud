@@ -3,7 +3,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Login from 'features/auth/Login';
 import Register from 'features/auth/Register';
 import Lobby from 'features/lobby/Lobby';
-import TableView from 'features/table/Main';
+import Table from 'features/table/Main';
 import { Location } from '../app/routing';
 import AppBar from './AppBar';
 const useStyles = makeStyles((theme) => ({
@@ -44,6 +44,6 @@ function Content({ location }: { location: Location }) {
     case Location.lobby:
       return <Lobby />;
     case Location.table:
-      return <TableView />;
+      return <Table />;
   }
 }

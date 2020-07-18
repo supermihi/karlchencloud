@@ -14,18 +14,10 @@ interface Props {
 }
 export default function AcceptInviteDialog({ open, confirm, reject }: Props) {
   return (
-    <Dialog
-      onClose={reject}
-      aria-labelledby="accept-invite-dialog-title"
-      open={open}
-    >
-      <DialogTitle id="accept-invite-dialog-title">
-        Einladung annehmen
-      </DialogTitle>
+    <Dialog onClose={reject} aria-labelledby="accept-invite-dialog-title" open={open}>
+      <DialogTitle id="accept-invite-dialog-title">Einladung annehmen</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          Möchtest du die Tisch-Einladung annehmen?
-        </DialogContentText>
+        <DialogContentText>Möchtest du die Tisch-Einladung annehmen?</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={reject} color="primary">

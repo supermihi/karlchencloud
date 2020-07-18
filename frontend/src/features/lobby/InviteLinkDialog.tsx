@@ -19,24 +19,15 @@ interface Props {
   open: boolean;
   inviteCode: string;
 }
-export default function InviteLinkDialog({
-  open,
-  handleClose,
-  inviteCode,
-}: Props) {
+export default function InviteLinkDialog({ open, handleClose, inviteCode }: Props) {
   const link = inviteLink(inviteCode);
   const [copySnackOpen, setCopySnackOpen] = useState(false);
   return (
-    <Dialog
-      onClose={handleClose}
-      aria-labelledby="invite-dialog-title"
-      open={open}
-    >
+    <Dialog onClose={handleClose} aria-labelledby="invite-dialog-title" open={open}>
       <DialogTitle id="invite-dialog-title">Mitspieler Einladen</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Über diesen persönlichen Einladungslink kannst du Freunde direkt an
-          deinen Tisch holen:
+          Über diesen persönlichen Einladungslink kannst du Freunde direkt an deinen Tisch holen:
         </DialogContentText>
 
         <div style={{ display: 'flex' }}>

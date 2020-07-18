@@ -20,14 +20,7 @@ interface Props {
   resetError: () => void;
 }
 
-export default ({
-  login,
-  forgetLogin,
-  loading,
-  currentLogin,
-  error,
-  resetError,
-}: Props) => {
+export default ({ login, forgetLogin, loading, currentLogin, error, resetError }: Props) => {
   return (
     <>
       <MainPaper>

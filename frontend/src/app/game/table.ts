@@ -51,7 +51,10 @@ const slice = createSlice({
 
 export interface TableAction extends Action<string> {}
 export function isTableAction(action: AnyAction): action is TableAction {
-  return typeof action.type === 'string' && action.type.startsWith(name);
+  return (
+    typeof action.type === 'string' &&
+    (action.type.startsWith(name) || action.type === startTable.fulfilled.type)
+  );
 }
 
 export const { actions, reducer } = slice;

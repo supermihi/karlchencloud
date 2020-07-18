@@ -16,17 +16,13 @@ export function toTable(t: api.TableData): Table {
 }
 
 export function getCurrentTableState(u: api.UserState): TableState | null {
-  return u.hasCurrenttable()
-    ? toTableState(u.getCurrenttable() as api.TableState)
-    : null;
+  return u.hasCurrenttable() ? toTableState(u.getCurrenttable() as api.TableState) : null;
 }
 
 export function toTableState(t: api.TableState): TableState {
   return {
     table: toTable(t.getData() as api.TableData),
-    match: t.hasCurrentMatch()
-      ? toMatch(t.getCurrentMatch() as api.MatchState)
-      : undefined,
+    match: t.hasCurrentMatch() ? toMatch(t.getCurrentMatch() as api.MatchState) : undefined,
     phase: t.getPhase(),
   };
 }
@@ -40,22 +36,14 @@ export function toUser(member: api.TableMember): User {
 }
 
 function toPlayers(p: api.Players): Players {
-  return [
-    p.getUserIdSelf(),
-    p.getUserIdLeft(),
-    p.getUserIdFace(),
-    p.getUserIdRight(),
-  ];
+  return [p.getUserIdSelf(), p.getUserIdLeft(), p.getUserIdFace(), p.getUserIdRight()];
 }
 export function toAuction(m: api.AuctionState): Auction {
   return {
     declarations: fromPairs(
       m
         .getDeclarationsList()
-        .map((d) => [
-          d.getUserId(),
-          d.getVorbehalt() ? Declaration.vorbehalt : Declaration.gesund,
-        ])
+        .map((d) => [d.getUserId(), d.getVorbehalt() ? Declaration.vorbehalt : Declaration.gesund])
     ),
   };
 }
@@ -104,9 +92,7 @@ export function toCard(c: api.Card): Card {
 
 export function toMatch(m: api.MatchState): Match {
   const players = toPlayers(m.getPlayers() as api.Players);
-  const cards = m.hasOwnCards()
-    ? (m.getOwnCards() as api.Cards).getCardsList().map(toCard)
-    : undefined;
+  const cards = m.hasOwnCards() ? (m.getOwnCards() as api.Cards).getCardsList().map(toCard) : [];
   return {
     phase: m.getPhase(),
     turn: m.hasTurn() ? m.getTurn()?.getUserId() : undefined,

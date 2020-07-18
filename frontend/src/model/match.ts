@@ -6,7 +6,7 @@ export interface Match {
   phase: MatchPhase;
   turn?: string;
   players: Players;
-  cards?: Card[];
+  cards: Card[];
   details: Auction | Game;
 }
 
