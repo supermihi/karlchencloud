@@ -4,11 +4,12 @@ import { Rank, Suit } from 'api/karlchen_pb';
 import {action} from "@storybook/addon-actions";
 
 export default {
-  title: 'Cards',
+  title: 'Match/Cards',
   component: CardsView,
 };
 export const Card = () => (
   <CardsView
+    cardHeight="8cm"
     cards={[
       { rank: Rank.ACE, suit: Suit.DIAMONDS },
       { rank: Rank.KING, suit: Suit.CLUBS },
