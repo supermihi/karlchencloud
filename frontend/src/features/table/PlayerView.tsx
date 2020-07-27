@@ -1,21 +1,19 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
+import Card, { CardProps } from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import Typography from '@material-ui/core/Typography';
 import { User } from 'model/core';
 
-interface Props {
+interface Props extends CardProps {
   user: User;
 }
 
-export default function PlayerView({ user }: Props) {
+export default function PlayerView({ user, ...props }: Props) {
   return (
-    <Card variant="outlined">
-      <CardHeader title={user.name}></CardHeader>
-      <CardContent>
-        <Typography variant="body2">Re Contra bla überlegt</Typography>
-      </CardContent>
+    <Card variant="outlined" {...props}>
+      <CardHeader titleTypographyProps={{ variant: 'h6' }} title={user.name}></CardHeader>
+      <CardContent></CardContent>
     </Card>
   );
 }

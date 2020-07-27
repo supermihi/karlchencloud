@@ -1,31 +1,54 @@
 import React from 'react';
 import { Trick } from 'model/match';
-import {Players} from "model/table";
-import {Card} from "../../model/core";
-import SvgCard, {svgCardHeight, svgCardWidth} from "../../components/SvgCards";
+import { Players } from 'model/table';
+import { Card } from '../../model/core';
+import { getCardUrl } from 'components/UrlCards';
 
 interface Props {
   trick: Trick;
   players: Players;
-  cardHeight: string | number;
+  cardWidth: number;
+  center: [string, string];
 }
 
-export default function TrickView({ trick, players, cardHeight }: Props) {
+export default function TrickView({ trick, players, cardWidth, center: [x, y] }: Props) {
   const forehandIndex = players.indexOf(trick.forehand);
-  const forehandRotation = (180+90*forehandIndex);
-  const excenter = svgCardWidth / 5;
-  const horizontalPlus = (svgCardHeight + 2*excenter) - svgCardWidth;
-  const size = svgCardHeight + 2*excenter;
-  const height = `calc(${(size / svgCardHeight)} * ${cardHeight})`;
+  const excenter = cardWidth / 4;
   const cards: Card[] = [];
   for (let i = 0; i < players.length; i += 1) {
     const player = players[(forehandIndex + i) % 4];
-    if (!trick.cards[player])
-      break;
+    if (!trick.cards[player]) break;
     cards.push(trick.cards[player]);
   }
-  return <svg height={height} viewBox={`${-horizontalPlus/2} ${-excenter} ${size} ${size}`}>
-    {cards.map((card, i) => <SvgCard card={card}  transform={`translate(0,${-excenter}) rotate(${(forehandRotation + 90*i) % 360},${svgCardWidth/2},${svgCardHeight/2+excenter})`}/>)}
 
-  </svg>
+  return (
+    <>
+      {cards.map((card, i) => (
+        <img
+          src={getCardUrl(card)}
+          width={cardWidth}
+          style={{
+            left: x,
+            top: y,
+            position: 'absolute',
+            transform: cardTransform((forehandIndex + i) % 4, excenter),
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
+function cardTransform(i: number, excenter: number): string {
+  switch (i) {
+    case 2:
+      return `translate(-50%, calc(-50% - ${excenter}px)) rotate(5deg)`;
+    case 3:
+      return `translate(calc(-50% + ${excenter}px), -50%) rotate(87deg)`;
+    case 0:
+      return `translate(-50%, calc(-50% + ${excenter}px)) rotate(182deg)`;
+    case 1:
+      return `translate(calc(-50% - ${excenter}px), -50%) rotate(276deg)`;
+  }
+  throw new Error(`invalid i in cardTranstorm: ${i}`);
 }
