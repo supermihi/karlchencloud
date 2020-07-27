@@ -10,17 +10,26 @@ import { formatError } from 'api/client';
 import MainPaper from 'components/MainPaper';
 
 import { MyUserData, Credentials } from 'app/auth';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 
 interface Props {
   currentLogin: MyUserData;
   loading: boolean;
-  error: any;
+  error?: any;
   login: (login: Credentials) => void;
   forgetLogin: () => void;
-  resetError: () => void;
+  resetError?: () => void;
 }
 
+const useStyles = makeStyles((theme) => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+}));
+
 export default ({ login, forgetLogin, loading, currentLogin, error, resetError }: Props) => {
+  const classes = useStyles();
   return (
     <>
       <MainPaper>
@@ -46,12 +55,12 @@ export default ({ login, forgetLogin, loading, currentLogin, error, resetError }
           </Grid>
         </Grid>
 
-        <Backdrop open={loading}>
+        <Backdrop open={loading} className={classes.backdrop}>
           <CircularProgress />
         </Backdrop>
       </MainPaper>
       {error && (
-        <Alert onClose={() => resetError()} severity="error" elevation={6}>
+        <Alert onClose={() => resetError && resetError()} severity="error" elevation={6}>
           Error logging in: {formatError(error)}
         </Alert>
       )}

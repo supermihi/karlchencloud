@@ -43,6 +43,7 @@ export function getCardUrl(card: Card) {
         case Suit.CLUBS:
           return Club9;
       }
+      break;
     case Rank.TEN:
       switch (card.suit) {
         case Suit.DIAMONDS:
@@ -54,6 +55,7 @@ export function getCardUrl(card: Card) {
         case Suit.CLUBS:
           return Club10;
       }
+      break;
     case Rank.JACK:
       switch (card.suit) {
         case Suit.DIAMONDS:
@@ -65,6 +67,7 @@ export function getCardUrl(card: Card) {
         case Suit.CLUBS:
           return ClubJ;
       }
+      break;
     case Rank.QUEEN:
       switch (card.suit) {
         case Suit.DIAMONDS:
@@ -76,6 +79,7 @@ export function getCardUrl(card: Card) {
         case Suit.CLUBS:
           return ClubQ;
       }
+      break;
     case Rank.KING:
       switch (card.suit) {
         case Suit.DIAMONDS:
@@ -87,6 +91,7 @@ export function getCardUrl(card: Card) {
         case Suit.CLUBS:
           return ClubK;
       }
+      break;
     case Rank.ACE:
       switch (card.suit) {
         case Suit.DIAMONDS:

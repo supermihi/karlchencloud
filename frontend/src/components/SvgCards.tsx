@@ -1,45 +1,45 @@
-import React, {SVGProps} from "react";
-import {ReactComponent as Diamonds9} from "./resources/cards/9D.svg";
-import {ReactComponent as Heart9} from "./resources/cards/9H.svg";
-import {ReactComponent as Spade9} from "./resources/cards/9S.svg";
-import {ReactComponent as Club9} from "./resources/cards/9C.svg";
+import React, { SVGProps } from 'react';
+import { ReactComponent as Diamonds9 } from './resources/cards/9D.svg';
+import { ReactComponent as Heart9 } from './resources/cards/9H.svg';
+import { ReactComponent as Spade9 } from './resources/cards/9S.svg';
+import { ReactComponent as Club9 } from './resources/cards/9C.svg';
 
-import {ReactComponent as Diamonds10} from "./resources/cards/TD.svg";
-import {ReactComponent as Heart10} from "./resources/cards/TH.svg";
-import {ReactComponent as Spade10} from "./resources/cards/TS.svg";
-import {ReactComponent as Club10} from "./resources/cards/TC.svg";
+import { ReactComponent as Diamonds10 } from './resources/cards/TD.svg';
+import { ReactComponent as Heart10 } from './resources/cards/TH.svg';
+import { ReactComponent as Spade10 } from './resources/cards/TS.svg';
+import { ReactComponent as Club10 } from './resources/cards/TC.svg';
 
-import {ReactComponent as DiamondsJ} from "./resources/cards/JD.svg";
-import {ReactComponent as HeartJ} from "./resources/cards/JH.svg";
-import {ReactComponent as SpadeJ} from "./resources/cards/JS.svg";
-import {ReactComponent as ClubJ} from "./resources/cards/JC.svg";
+import { ReactComponent as DiamondsJ } from './resources/cards/JD.svg';
+import { ReactComponent as HeartJ } from './resources/cards/JH.svg';
+import { ReactComponent as SpadeJ } from './resources/cards/JS.svg';
+import { ReactComponent as ClubJ } from './resources/cards/JC.svg';
 
-import {ReactComponent as DiamondsQ} from "./resources/cards/QD.svg";
-import {ReactComponent as HeartQ} from "./resources/cards/QH.svg";
-import {ReactComponent as SpadeQ} from "./resources/cards/QS.svg";
-import {ReactComponent as ClubQ} from "./resources/cards/QC.svg";
+import { ReactComponent as DiamondsQ } from './resources/cards/QD.svg';
+import { ReactComponent as HeartQ } from './resources/cards/QH.svg';
+import { ReactComponent as SpadeQ } from './resources/cards/QS.svg';
+import { ReactComponent as ClubQ } from './resources/cards/QC.svg';
 
-import {ReactComponent as DiamondsK} from "./resources/cards/KD.svg";
-import {ReactComponent as HeartK} from "./resources/cards/KH.svg";
-import {ReactComponent as SpadeK} from "./resources/cards/KS.svg";
-import {ReactComponent as ClubK} from "./resources/cards/KC.svg";
+import { ReactComponent as DiamondsK } from './resources/cards/KD.svg';
+import { ReactComponent as HeartK } from './resources/cards/KH.svg';
+import { ReactComponent as SpadeK } from './resources/cards/KS.svg';
+import { ReactComponent as ClubK } from './resources/cards/KC.svg';
 
-import {ReactComponent as DiamondsA} from "./resources/cards/AD.svg";
-import {ReactComponent as HeartA} from "./resources/cards/AH.svg";
-import {ReactComponent as SpadeA} from "./resources/cards/AS.svg";
-import {ReactComponent as ClubA} from "./resources/cards/AC.svg";
+import { ReactComponent as DiamondsA } from './resources/cards/AD.svg';
+import { ReactComponent as HeartA } from './resources/cards/AH.svg';
+import { ReactComponent as SpadeA } from './resources/cards/AS.svg';
+import { ReactComponent as ClubA } from './resources/cards/AC.svg';
 
-import {Card} from "../model/core";
-import {Rank, Suit} from "../api/karlchen_pb";
+import { Card } from '../model/core';
+import { Rank, Suit } from '../api/karlchen_pb';
 
 export const svgCardWidth = 212;
 export const svgCardHeight = 329;
 export const cardAspectRatio = svgCardWidth / svgCardHeight;
 
 interface Props extends SVGProps<SVGSVGElement> {
-  card: Card
+  card: Card;
 }
-export default function SvgCard ({card, ...props}: Props) {
+export default function SvgCard({ card, ...props }: Props) {
   const CardComponent = getComponent(card);
   return <CardComponent {...props} />;
   /*return <svg {...props}>
@@ -125,7 +125,6 @@ function getComponent(card: Card) {
           return ClubA;
       }
       break;
-      
   }
-  throw "nix";
+  throw new Error('unexpected rank');
 }

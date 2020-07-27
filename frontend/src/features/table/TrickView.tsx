@@ -3,6 +3,7 @@ import { Trick } from 'model/match';
 import { Players } from 'model/table';
 import { Card } from '../../model/core';
 import { getCardUrl } from 'components/UrlCards';
+import { cardString } from 'model/cards';
 
 interface Props {
   trick: Trick;
@@ -25,6 +26,7 @@ export default function TrickView({ trick, players, cardWidth, center: [x, y] }:
     <>
       {cards.map((card, i) => (
         <img
+          alt={cardString(card)}
           src={getCardUrl(card)}
           width={cardWidth}
           style={{

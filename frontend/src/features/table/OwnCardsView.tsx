@@ -1,7 +1,8 @@
-import React, { HTMLProps, useState } from 'react';
+import React, { useState } from 'react';
 import { Card } from 'model/core';
 import { getCardUrl } from 'components/UrlCards';
 import { cardAspectRatio } from 'components/SvgCards';
+import { cardString } from 'model/cards';
 
 interface Props {
   cards: Card[];
@@ -16,6 +17,7 @@ export default function OwnCardsView({ cards, cardWidth, onClick }: Props) {
     <>
       {cards.map((card, i) => (
         <img
+          alt={cardString(card)}
           src={getCardUrl(card)}
           width={cardWidth}
           onMouseEnter={(_) => setHoveredIndex(i)}

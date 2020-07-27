@@ -1,6 +1,6 @@
 import React from 'react';
 import TrickView from 'features/table/TrickView';
-import { Diamond10, Diamond9, DiamondA, DiamondQ, SpadeA } from '../model/cards';
+import { Diamond10, Diamond9, DiamondA, DiamondQ, SpadeA } from 'model/cards';
 
 export default {
   title: 'Match/Trick',
