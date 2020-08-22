@@ -24,7 +24,7 @@ export const startSession = (creds: Credentials): AppThunk => async (dispatch) =
   const { id, secret } = creds;
   const authMeta = getAuthMeta(id, secret);
   try {
-    _stream = client.startSession(new api.Empty(), authMeta);
+    _stream = client.startSession(new api.Empty(), authMeta) as ClientReadableStream<api.Event>;
     _stream
       .on('data', (e) => dispatch(onEvent(e)))
       .on('error', (e) => {

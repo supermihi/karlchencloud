@@ -1,9 +1,10 @@
 import * as api from 'api/karlchen_pb';
-import { Table, Players, nthNext, TableState } from './table';
+import { Table, TableState } from './table';
 import { User, Card } from './core';
 import { fromPairs, mapValues, groupBy } from 'lodash';
 import { Auction, Declaration, Game, Match, Mode, Trick } from './match';
 import { toDate } from 'api/helpers';
+import { getPosition, Pos, Players } from './players';
 
 export function toTable(t: api.TableData): Table {
   return {
@@ -36,7 +37,12 @@ export function toUser(member: api.TableMember): User {
 }
 
 function toPlayers(p: api.Players): Players {
-  return [p.getUserIdSelf(), p.getUserIdLeft(), p.getUserIdFace(), p.getUserIdRight()];
+  return {
+    [Pos.bottom]: p.getUserIdSelf(),
+    [Pos.left]: p.getUserIdLeft(),
+    [Pos.top]: p.getUserIdFace(),
+    [Pos.right]: p.getUserIdRight(),
+  };
 }
 export function toAuction(m: api.AuctionState): Auction {
   return {
@@ -57,10 +63,11 @@ function toMode(m: api.Mode): Mode {
   };
 }
 function toGame(g: api.GameState, players: Players): Game {
-  const bids = mapValues(
+  const bidsById = mapValues(
     groupBy(g.getBidsList(), (b) => b.getUserId()),
     (bids) => bids.map((bid) => bid.getBid())
   );
+  const bids = mapValues(players, (id) => bidsById[id]);
   return {
     bids,
     completedTricks: g.getCompletedTricks(),
@@ -73,15 +80,13 @@ function toGame(g: api.GameState, players: Players): Game {
 }
 
 function toTrick(t: api.Trick, players: Players): Trick {
-  const forehand = t.getUserIdForehand();
-  const cards = fromPairs(
-    t.getCardsList().map((c, i) => [nthNext(players, forehand, i), toCard(c)])
-  );
-  return {
-    forehand,
-    cards,
-    winner: t.hasUserIdWinner() ? t.getUserIdWinner()?.getUserId() : undefined,
-  };
+  const forehand = getPosition(players, t.getUserIdForehand());
+  let winner: Pos | undefined = undefined;
+  if (t.hasUserIdWinner()) {
+    winner = getPosition(players, (t.getUserIdWinner() as api.PlayerValue).getUserId());
+  }
+  const cards = t.getCardsList().map(toCard);
+  return { forehand, cards, winner };
 }
 export function toCard(c: api.Card): Card {
   return {
@@ -95,7 +100,9 @@ export function toMatch(m: api.MatchState): Match {
   const cards = m.hasOwnCards() ? (m.getOwnCards() as api.Cards).getCardsList().map(toCard) : [];
   return {
     phase: m.getPhase(),
-    turn: m.hasTurn() ? m.getTurn()?.getUserId() : undefined,
+    turn: m.hasTurn()
+      ? getPosition(players, (m.getTurn() as api.PlayerValue).getUserId())
+      : undefined,
     players,
     cards,
     details: m.hasAuctionState()

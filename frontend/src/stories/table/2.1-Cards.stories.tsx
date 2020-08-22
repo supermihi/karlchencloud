@@ -1,8 +1,7 @@
 import React from 'react';
 import { Rank, Suit } from 'api/karlchen_pb';
-import { action, decorate } from '@storybook/addon-actions';
+import { action } from '@storybook/addon-actions';
 import OwnCardsView from 'features/table/OwnCardsView';
-import { cardString } from 'model/cards';
 
 export default {
   title: 'Match/Cards',

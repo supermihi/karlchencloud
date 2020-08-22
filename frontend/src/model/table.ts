@@ -25,12 +25,3 @@ export interface TableState {
   match?: Match;
   phase: TablePhase;
 }
-
-export type Players = [string, string, string, string]; // from self
-export function nthNext(players: Players, player: string, i: number): string {
-  const playerIndex = players.indexOf(player);
-  if (playerIndex === -1) {
-    throw new Error('user id not in players list');
-  }
-  return players[(playerIndex + i) % players.length];
-}

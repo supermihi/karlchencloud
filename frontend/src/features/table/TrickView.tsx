@@ -1,27 +1,21 @@
 import React from 'react';
 import { Trick } from 'model/match';
-import { Players } from 'model/table';
-import { Card } from '../../model/core';
 import { getCardUrl } from 'components/UrlCards';
 import { cardString } from 'model/cards';
+import { nthNext, Pos } from 'model/players';
 
 interface Props {
   trick: Trick;
-  players: Players;
   cardWidth: number;
-  center: [string, string];
+  center: string[];
 }
 
-export default function TrickView({ trick, players, cardWidth, center: [x, y] }: Props) {
-  const forehandIndex = players.indexOf(trick.forehand);
+export default function TrickView({
+  trick: { cards, forehand },
+  cardWidth,
+  center: [x, y],
+}: Props) {
   const excenter = cardWidth / 4;
-  const cards: Card[] = [];
-  for (let i = 0; i < players.length; i += 1) {
-    const player = players[(forehandIndex + i) % 4];
-    if (!trick.cards[player]) break;
-    cards.push(trick.cards[player]);
-  }
-
   return (
     <>
       {cards.map((card, i) => (
@@ -33,7 +27,7 @@ export default function TrickView({ trick, players, cardWidth, center: [x, y] }:
             left: x,
             top: y,
             position: 'absolute',
-            transform: cardTransform((forehandIndex + i) % 4, excenter),
+            transform: cardTransform(nthNext(forehand, i), excenter),
           }}
         />
       ))}
@@ -41,16 +35,15 @@ export default function TrickView({ trick, players, cardWidth, center: [x, y] }:
   );
 }
 
-function cardTransform(i: number, excenter: number): string {
-  switch (i) {
-    case 2:
+function cardTransform(pos: Pos, excenter: number): string {
+  switch (pos) {
+    case Pos.top:
       return `translate(-50%, calc(-50% - ${excenter}px)) rotate(5deg)`;
-    case 3:
+    case Pos.right:
       return `translate(calc(-50% + ${excenter}px), -50%) rotate(87deg)`;
-    case 0:
+    case Pos.bottom:
       return `translate(-50%, calc(-50% + ${excenter}px)) rotate(182deg)`;
-    case 1:
+    case Pos.left:
       return `translate(calc(-50% - ${excenter}px), -50%) rotate(276deg)`;
   }
-  throw new Error(`invalid i in cardTranstorm: ${i}`);
 }

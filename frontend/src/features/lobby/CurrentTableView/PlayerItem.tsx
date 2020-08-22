@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   } as const,
 }));
 
-export default function PlayerItem({ player, me, ...props }: Props) {
+export default function PlayerItem({ player, me }: Props) {
   const classes = useStyles();
   return (
     <ListItem>

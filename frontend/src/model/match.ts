@@ -1,10 +1,10 @@
 import { BidType, GameType, MatchPhase } from '../api/karlchen_pb';
 import { Card } from './core';
-import { Players } from './table';
+import { Pos, Players } from './players';
 
 export interface Match {
   phase: MatchPhase;
-  turn?: string;
+  turn?: Pos;
   players: Players;
   cards: Card[];
   details: Auction | Game;
@@ -15,7 +15,7 @@ export function isAuction(aog: Auction | Game): aog is Auction {
 }
 
 export interface Game {
-  bids: { [player: string]: BidType[] };
+  bids: Record<Pos, BidType[]>;
   completedTricks: number;
   currentTrick: Trick;
   previousTrick?: Trick;
@@ -23,9 +23,9 @@ export interface Game {
 }
 
 export interface Trick {
-  forehand: string;
-  winner?: string;
-  cards: { [player: string]: Card };
+  forehand: Pos;
+  winner?: Pos;
+  cards: Card[];
 }
 
 export interface Mode {
