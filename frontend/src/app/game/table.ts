@@ -1,24 +1,24 @@
-import { createSlice, PayloadAction, AnyAction, Action } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TableState } from 'model/table';
 import { User } from 'model/core';
 import { Match } from 'model/match';
-import { createGameThunk } from './thunks';
 import { ActionKind } from './state';
 import { toMatch } from 'model/apiconv';
 import { tableId } from 'api/helpers';
-import { TablePhase } from 'api/karlchen_pb';
-
-export const name = 'game/table';
+import * as pb from 'api/karlchen_pb';
+import { createGameThunk, isMatchAction } from './constants';
+import matchReducer from './match';
 
 export const startTable = createGameThunk(
   ActionKind.startTable,
-  async (id: string, { client, meta }) => {
+  async (id: string, { client: { client, meta } }) => {
     const match = await client.startTable(tableId(id), meta);
     return toMatch(match);
   }
 );
+
 const slice = createSlice({
-  name,
+  name: 'game/table',
   initialState: {} as TableState,
   reducers: {
     memberJoined: (state, { payload }: PayloadAction<User>) => {
@@ -38,23 +38,20 @@ const slice = createSlice({
     },
     matchStarted: (table, { payload: match }: PayloadAction<Match>) => {
       table.match = match;
-      table.phase = TablePhase.PLAYING;
+      table.phase = pb.TablePhase.PLAYING;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(startTable.fulfilled, (table, { payload }) => {
       table.match = payload;
-      table.phase = TablePhase.PLAYING;
+      table.phase = pb.TablePhase.PLAYING;
+    });
+    builder.addMatcher(isMatchAction, (state, action) => {
+      if (state.match === null) {
+        return;
+      }
+      matchReducer(state.match, action);
     });
   },
 });
-
-export interface TableAction extends Action<string> {}
-export function isTableAction(action: AnyAction): action is TableAction {
-  return (
-    typeof action.type === 'string' &&
-    (action.type.startsWith(name) || action.type === startTable.fulfilled.type)
-  );
-}
-
 export const { actions, reducer } = slice;

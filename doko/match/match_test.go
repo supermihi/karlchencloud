@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func TestSampleMatch(t *testing.T) {
-	var cards Cards = [NumPlayers]Hand{
+func sampleCards() Cards {
+	return [NumPlayers]Hand{
 		[]Card{
 			HerzK, HerzA, PikK, Pik10, PikA, KreuzK, KaroK, KaroA, HerzB, KreuzB, KreuzD, Herz10,
 		},
@@ -22,7 +22,9 @@ func TestSampleMatch(t *testing.T) {
 			HerzA, Pik9, Pik9, PikA, KreuzK, KreuzA, KreuzA, Karo9, Karo10, HerzB, PikB, KreuzB,
 		},
 	}
-	match := NewMatch(Player3, cards)
+}
+func TestSampleMatch(t *testing.T) {
+	match := NewMatch(Player3, sampleCards())
 	play := func(player Player, card Card) {
 		for _, otherPlayer := range Players() {
 			if otherPlayer != player {
@@ -139,4 +141,11 @@ func TestSampleMatch(t *testing.T) {
 	assert.Equal(t, -5, points[Player3])
 	assert.Equal(t, -5, points[Player4])
 
+}
+
+func TestMatch_PlayCard_InAuction(t *testing.T) {
+	cards := sampleCards()
+	match := NewMatch(Player1, cards)
+	ok := match.PlayCard(Player1, cards[Player1][0])
+	assert.False(t, ok)
 }

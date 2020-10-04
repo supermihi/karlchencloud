@@ -1,3 +1,6 @@
+import { mapValues } from 'lodash';
+import { User } from './core';
+
 export type Players = Record<Pos, string>;
 
 export enum Pos {
@@ -17,4 +20,9 @@ export function getPosition(players: Players, id: string): Pos {
     }
   }
   throw new Error(`no position for player with id ${id}`);
+}
+export type PlayerMap = Record<Pos, User>;
+
+export function toPlayerMap(players: Players, users: Record<string, User>): PlayerMap {
+  return mapValues(players, (id) => users[id]);
 }

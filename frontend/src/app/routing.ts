@@ -1,7 +1,7 @@
 import { RootState } from './store';
 import { selectAuth } from 'app/auth/slice';
 import { selectSession } from './session';
-import { selectGame } from './game/slice';
+import { selectGame } from './game';
 
 export enum Location {
   register,

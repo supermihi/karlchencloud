@@ -9,15 +9,27 @@ import AppBar from './AppBar';
 const useStyles = makeStyles((theme) => ({
   layout: {
     width: 'auto',
+    flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-      width: 600,
+    [theme.breakpoints.up(800 + theme.spacing(2) * 2)]: {
+      width: 800,
       marginLeft: 'auto',
       marginRight: 'auto',
     },
   } as const,
+  '@global': {
+    body: {
+      margin: 0,
+    },
+    '#root': {
+      height: '100vh',
+      width: '100vw',
+      display: 'flex',
+      flexDirection: 'column',
+    },
+  },
 }));
 
 interface Props {

@@ -1,7 +1,7 @@
 import * as api from 'api/karlchen_pb';
 import { AppThunk, AppDispatch } from 'app/store';
 import { actions } from '.';
-import { actions as gameActions } from '../game/slice';
+import { actions as gameActions } from '../game';
 import { actions as tableActions } from '../game/table';
 import { getCurrentTableState, toMatch } from 'model/apiconv';
 

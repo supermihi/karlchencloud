@@ -193,6 +193,7 @@ func (s *dokoserver) PlayCard(ctx context.Context, r *api.PlayCardRequest) (*api
 
 	m, err := s.room.PlayCard(r.Table, user.Id, ToCard(r.Card))
 	if err != nil {
+		log.Printf("%s failed to play %s: %s", user.Name, ToCard(r.Card), err)
 		return nil, toGrpcError(err)
 	}
 	log.Printf("%s plays %s", user.Name, ToCard(r.Card))

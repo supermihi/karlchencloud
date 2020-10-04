@@ -5,6 +5,7 @@ export enum ActionKind {
   joinTable = 'joinTable',
   createTable = 'createTable',
   startTable = 'startTable',
+  playCard = 'playCard',
 }
 
 export interface ActionError {

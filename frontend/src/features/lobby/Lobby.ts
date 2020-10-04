@@ -3,7 +3,7 @@ import LobbyView from './LobbyView';
 import { createSelector, ThunkDispatch } from '@reduxjs/toolkit';
 
 import { selectLobby } from './slice';
-import { selectGame } from 'app/game/slice';
+import { selectGame } from 'app/game';
 import { createTable } from 'app/game/thunks';
 import { selectSession } from 'app/session';
 import { User } from 'model/core';

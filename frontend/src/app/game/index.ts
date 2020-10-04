@@ -3,10 +3,11 @@ import { TableState } from 'model/table';
 import { initialState, ActionKind } from './state';
 import * as api from 'api/karlchen_pb';
 import type { RootState } from 'app/store';
-import { createTable, joinTable, gameActionPending, gameActionError } from './thunks';
+import { createTable, joinTable } from './thunks';
 import * as table from './table';
+import { gameActionError, gameActionPending, isTableAction } from './constants';
 
-const gameSlice = createSlice({
+const slice = createSlice({
   name: 'game',
   initialState,
   reducers: {
@@ -26,12 +27,13 @@ const gameSlice = createSlice({
       })
       .addCase(gameActionPending, (state, { payload }) => {
         state.pendingAction = payload;
+        state.error = undefined;
       })
       .addCase(gameActionError, (state, { payload: { error, kind } }) => {
         state.pendingAction = ActionKind.noAction;
         state.error = { action: kind, error };
       });
-    builder.addMatcher(table.isTableAction, (state, action) => {
+    builder.addMatcher(isTableAction, (state, action) => {
       if (state.currentTable === null) {
         return;
       }
@@ -45,6 +47,6 @@ function clearPendingAndError(state: typeof initialState) {
   state.error = undefined;
 }
 
-export const actions = gameSlice.actions;
+export const actions = slice.actions;
 export const selectGame = (state: RootState) => state.game;
-export default gameSlice.reducer;
+export default slice.reducer;

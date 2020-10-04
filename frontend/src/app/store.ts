@@ -2,7 +2,7 @@ import { Action, configureStore, ThunkAction, ThunkDispatch } from '@reduxjs/too
 import authReducer from './auth/slice';
 import sessionReducer from './session';
 import lobbyReducer from 'features/lobby/slice';
-import gameReducer from './game/slice';
+import gameReducer from './game';
 
 export const store = configureStore({
   reducer: {

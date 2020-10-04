@@ -66,6 +66,9 @@ func (m *Match) AnnounceGameType(player game.Player, t game.AnnouncedGameType) b
 }
 
 func (m *Match) PlayCard(player game.Player, card game.Card) bool {
+	if m.Phase() != InGame {
+		return false
+	}
 	result := m.Game.TryPlayCard(player, card)
 	return result == game.CardPlayed
 }

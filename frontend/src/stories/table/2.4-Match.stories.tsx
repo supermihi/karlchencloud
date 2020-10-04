@@ -3,7 +3,8 @@ import MatchView from 'features/table/MatchView';
 import { Match, Game } from 'model/match';
 import { MatchPhase, GameType, BidType } from 'api/karlchen_pb';
 import * as data from './mocks';
-import { Pos } from 'model/players';
+import { Pos, toPlayerMap } from 'model/players';
+import { action } from '@storybook/addon-actions';
 
 export default {
   title: 'Match/Match',
@@ -23,7 +24,7 @@ const game: Game = {
   },
   completedTricks: 0,
   mode,
-  currentTrick: data.trick(1, 4),
+  currentTrick: data.trick(Pos.left, 3),
 };
 
 const match: Match = {
@@ -31,7 +32,15 @@ const match: Match = {
   players: data.players,
   cards: data.fullHand,
   details: game,
+  turn: Pos.bottom,
 };
-export const MatchTable = () => (
-  <MatchView style={{ width: '60vw', height: '95vh' }} match={match} users={data.userMap} />
-);
+export const MatchTable = () => {
+  return (
+    <MatchView
+      playCard={action('play card')}
+      style={{ width: '60vw', height: '95vh' }}
+      match={match}
+      players={toPlayerMap(match.players, data.userMap)}
+    />
+  );
+};
