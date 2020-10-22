@@ -1,13 +1,13 @@
 import * as api from 'api/karlchen_pb';
-import { AppThunk, AppDispatch } from 'app/store';
-import { actions } from '.';
-import { actions as gameActions } from '../game';
-import { actions as tableActions } from '../game/table';
-import { getCurrentTableState, toMatch } from 'model/apiconv';
-
+import { selectPlayers } from 'app/game/selectors';
+import { AppThunk, AppDispatch, RootState } from 'app/store';
+import { getCurrentTableState, toMatch, toMode } from 'model/apiconv';
+import { Declaration, DeclareResult } from 'model/auction';
+import { getPosition } from 'model/players';
+import * as events from './events';
 const { EventCase } = api.Event;
 
-export const onEvent = (event: api.Event): AppThunk => (dispatch) => {
+export const onEvent = (event: api.Event): AppThunk => (dispatch, getState) => {
   switch (event.getEventCase()) {
     case EventCase.WELCOME:
       onWelcome(event.getWelcome() as api.UserState, dispatch);
@@ -18,6 +18,9 @@ export const onEvent = (event: api.Event): AppThunk => (dispatch) => {
     case EventCase.START:
       onStart(event.getStart() as api.MatchState, dispatch);
       return;
+    case EventCase.DECLARED:
+      onDeclared(event.getDeclared() as api.Declaration, dispatch, getState);
+      return;
     default:
       console.log(`unimplemented event: ${event}`);
   }
@@ -25,9 +28,9 @@ export const onEvent = (event: api.Event): AppThunk => (dispatch) => {
 
 function onWelcome(userState: api.UserState, dispatch: AppDispatch) {
   const name = userState.getName();
-  dispatch(actions.sessionStarted(name));
+  dispatch(events.sessionStarted(name));
   const table = getCurrentTableState(userState);
-  dispatch(gameActions.currentTableChanged(table));
+  dispatch(events.tableChanged(table));
 }
 
 function onMember(event: api.MemberEvent, dispatch: AppDispatch) {
@@ -35,20 +38,32 @@ function onMember(event: api.MemberEvent, dispatch: AppDispatch) {
   const id = event.getUserId();
   switch (event.getType()) {
     case api.MemberEventType.JOIN_TABLE:
-      dispatch(tableActions.memberJoined({ name, id }));
+      dispatch(events.memberJoined({ name, id }));
       return;
     case api.MemberEventType.LEAVE_TABLE:
-      dispatch(tableActions.memberLeft(id));
+      dispatch(events.memberLeft(id));
       return;
     case api.MemberEventType.GO_OFFLINE:
-      dispatch(tableActions.memberStatusChanged({ name, id, online: false }));
+      dispatch(events.memberStatusChanged({ name, id, online: false }));
       return;
     case api.MemberEventType.GO_ONLINE:
-      dispatch(tableActions.memberStatusChanged({ name, id, online: true }));
+      dispatch(events.memberStatusChanged({ name, id, online: true }));
       return;
   }
 }
 
 function onStart(ms: api.MatchState, dispatch: AppDispatch) {
-  dispatch(tableActions.matchStarted(toMatch(ms)));
+  dispatch(events.matchStarted(toMatch(ms)));
+}
+
+function onDeclared(decl: api.Declaration, dispatch: AppDispatch, getState: () => RootState) {
+  const apiMode = decl.getDefinedgamemode();
+  const players = selectPlayers(getState());
+  const mode = apiMode === undefined ? null : toMode(apiMode, players);
+  const declaration: DeclareResult = {
+    mode,
+    player: getPosition(players, decl.getUserId()),
+    declaration: decl.getVorbehalt() ? Declaration.vorbehalt : Declaration.gesund,
+  };
+  dispatch(events.playerDeclared(declaration));
 }

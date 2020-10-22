@@ -3,7 +3,7 @@ import { parseInviteCode } from 'model/invitation';
 import { AppThunk, RootState } from 'app/store';
 import { joinTable } from 'app/game/thunks';
 
-interface LobbyState {
+export interface LobbyState {
   suppliedInviteCode: string | null;
 }
 

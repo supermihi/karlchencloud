@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { TableState } from 'model/table';
+import { Table } from 'model/table';
 import { Card, toUserMap } from 'model/core';
 import MatchView from './MatchView';
 import { toPlayerMap } from 'model/players';
 import { makeStyles } from '@material-ui/core';
+import { Match } from 'model/match';
+import { TablePhase } from 'api/karlchen_pb';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -15,13 +17,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 interface Props {
-  table: TableState;
+  table: Table;
+  match: Match;
   playCard: (card: Card) => void;
 }
 
-export default function TableView({ table: { match, table }, playCard }: Props) {
+export default function TableView({ table, match, playCard }: Props) {
   const classes = useStyles();
-  if (!match) {
+  if (table.phase !== TablePhase.PLAYING) {
     return <span className={classes.main}>'no match'</span>;
   }
 

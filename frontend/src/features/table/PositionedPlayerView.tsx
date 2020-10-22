@@ -1,5 +1,6 @@
+import { MatchPhase } from 'api/karlchen_pb';
 import { User } from 'model/core';
-import { isAuction, Match } from 'model/match';
+import { Match } from 'model/match';
 import { Pos } from 'model/players';
 import React from 'react';
 import PlayerView, { Props as PlayerViewProps } from './PlayerView';
@@ -20,12 +21,13 @@ export default function PositionedPlayerView({ user, pos, match }: Props) {
 
 function getPlayerProps(match: Match, pos: Pos, user: User): PlayerViewProps {
   const turn = match.turn === pos;
-  const bids = isAuction(match.details) ? [] : match.details.bids[pos] || [];
-  const soloGame = isAuction(match.details)
-    ? undefined
-    : match.details.mode.soloist === user.id
-    ? match.details.mode.type
-    : undefined;
+  const bids = match.game.bids[pos];
+  const soloGame =
+    match.phase === MatchPhase.GAME
+      ? match.game.mode.soloist === pos
+        ? match.game.mode.type
+        : undefined
+      : undefined;
   return {
     user,
     turn,

@@ -9,7 +9,7 @@ import { selectSession } from 'app/session';
 import { User } from 'model/core';
 
 const mapState = createSelector(selectGame, selectLobby, selectSession, (s, l, sess) => ({
-  activeTable: s.currentTable,
+  activeTable: s.table,
   suppliedInviteCode: l.suppliedInviteCode,
   me: sess.session as User,
 }));

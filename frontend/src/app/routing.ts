@@ -2,6 +2,7 @@ import { RootState } from './store';
 import { selectAuth } from 'app/auth/slice';
 import { selectSession } from './session';
 import { selectGame } from './game';
+import { TablePhase } from 'api/karlchen_pb';
 
 export enum Location {
   register,
@@ -11,7 +12,7 @@ export enum Location {
 }
 export function selectLocation(state: RootState): Location {
   if (selectSession(state).session) {
-    if (selectGame(state).currentTable?.match) {
+    if (selectGame(state).table?.phase === TablePhase.PLAYING) {
       return Location.table;
     }
     return Location.lobby;

@@ -15,3 +15,17 @@ export function newPlayCardRequest(c: Card, tableId: string): api.PlayCardReques
   req.setTable(tableId);
   return req;
 }
+
+export function newPlacBidRequest(bid: api.BidType, tableId: string): api.PlaceBidRequest {
+  const req = new api.PlaceBidRequest();
+  req.setTable(tableId);
+  req.setBid(bid);
+  return req;
+}
+
+export function newDeclareRequest(gt: api.GameType, tableId: string): api.DeclareRequest {
+  const req = new api.DeclareRequest();
+  req.setTable(tableId);
+  req.setDeclaration(gt);
+  return req;
+}

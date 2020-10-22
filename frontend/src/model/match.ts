@@ -1,17 +1,15 @@
 import { BidType, GameType, MatchPhase } from '../api/karlchen_pb';
+import { Auction } from './auction';
 import { Card } from './core';
-import { Pos, Players } from './players';
+import { Pos, PlayerIds, newPlayerMap } from './players';
 
 export interface Match {
   phase: MatchPhase;
   turn?: Pos;
-  players: Players;
+  players: PlayerIds;
   cards: Card[];
-  details: Auction | Game;
-}
-
-export function isAuction(aog: Auction | Game): aog is Auction {
-  return 'declarations' in aog;
+  game: Game;
+  auction: Auction;
 }
 
 export interface Game {
@@ -22,24 +20,31 @@ export interface Game {
   mode: Mode;
 }
 
+export function newGame(mode: Mode): Game {
+  return {
+    mode,
+    bids: newPlayerMap(() => [] as BidType[]),
+    completedTricks: 0,
+    currentTrick: newTrick(mode.forehand),
+  };
+}
+export function dummyGame(): Game {
+  return newGame({ type: GameType.NORMAL_GAME, forehand: Pos.bottom });
+}
+
 export interface Trick {
   forehand: Pos;
   winner?: Pos;
   cards: Card[];
 }
 
+export function newTrick(forehand: Pos): Trick {
+  return { forehand, cards: [] };
+}
+
 export interface Mode {
   type: GameType;
-  soloist?: string;
-  spouse?: string;
-  forehand: string;
-}
-
-export enum Declaration {
-  gesund,
-  vorbehalt,
-}
-
-export interface Auction {
-  declarations: { [player: string]: Declaration };
+  soloist?: Pos;
+  spouse?: Pos;
+  forehand: Pos;
 }

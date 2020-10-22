@@ -1,5 +1,5 @@
 import React from 'react';
-import { TableState } from 'model/table';
+import { Table } from 'model/table';
 import AddIcon from '@material-ui/icons/Add';
 import SearchIcon from '@material-ui/icons/Search';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
@@ -11,7 +11,7 @@ import AcceptInviteDialog from './AcceptInviteDialog';
 import { User } from 'model/core';
 
 interface Props {
-  activeTable: TableState | null;
+  activeTable: Table | null;
   me: User;
   createTable: () => void;
   suppliedInviteCode: string | null;

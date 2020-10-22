@@ -20,6 +20,7 @@ export default function TrickView({
     <>
       {cards.map((card, i) => (
         <img
+          key={`${i}-${card.rank}-${card.suit}`}
           alt={cardString(card)}
           src={getCardUrl(card)}
           width={cardWidth}

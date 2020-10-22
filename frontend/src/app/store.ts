@@ -1,10 +1,10 @@
 import { Action, configureStore, ThunkAction, ThunkDispatch } from '@reduxjs/toolkit';
-import authReducer from './auth/slice';
-import sessionReducer from './session';
-import lobbyReducer from 'features/lobby/slice';
-import gameReducer from './game';
+import authReducer, { AuthState } from './auth/slice';
+import sessionReducer, { SessionState } from './session';
+import lobbyReducer, { LobbyState } from 'features/lobby/slice';
+import gameReducer, { GameState } from './game';
 
-export const store = configureStore({
+export const store = configureStore<RootState>({
   reducer: {
     auth: authReducer,
     session: sessionReducer,
@@ -12,8 +12,12 @@ export const store = configureStore({
     game: gameReducer,
   },
 });
-
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = {
+  auth: AuthState;
+  session: SessionState;
+  lobby: LobbyState;
+  game: GameState;
+};
 export type AsyncThunkConfig = { state: RootState };
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,

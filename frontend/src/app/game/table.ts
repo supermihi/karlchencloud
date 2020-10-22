@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TableState } from 'model/table';
+import { Table } from 'model/table';
 import { User } from 'model/core';
-import { Match } from 'model/match';
-import { ActionKind } from './state';
+import { ActionKind } from './asyncs';
 import { toMatch } from 'model/apiconv';
 import { tableId } from 'api/helpers';
-import * as pb from 'api/karlchen_pb';
-import { createGameThunk, isMatchAction } from './constants';
-import matchReducer from './match';
+import * as api from 'api/karlchen_pb';
+import { createGameThunk } from './constants';
+import * as events from 'app/session/events';
+import { createTable, joinTable } from './thunks';
+import { AsyncState } from './asyncs';
 
 export const startTable = createGameThunk(
   ActionKind.startTable,
@@ -17,41 +18,41 @@ export const startTable = createGameThunk(
   }
 );
 
+export type TableState = (Table & AsyncState) | null;
 const slice = createSlice({
   name: 'game/table',
-  initialState: {} as TableState,
-  reducers: {
-    memberJoined: (state, { payload }: PayloadAction<User>) => {
-      state.table.players.push(payload);
-    },
-    memberLeft: ({ table }, { payload: id }: PayloadAction<string>) => {
-      const index = table.players.findIndex((p) => p.id === id);
-      if (index !== -1) {
-        table.players.splice(index, 1);
-      }
-    },
-    memberStatusChanged: ({ table }, { payload: user }: PayloadAction<User>) => {
-      const index = table.players.findIndex((p) => p.id === user.id);
-      if (index !== -1) {
-        table.players.splice(index, 1, user);
-      }
-    },
-    matchStarted: (table, { payload: match }: PayloadAction<Match>) => {
-      table.match = match;
-      table.phase = pb.TablePhase.PLAYING;
-    },
-  },
+  initialState: null as TableState,
+  reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(startTable.fulfilled, (table, { payload }) => {
-      table.match = payload;
-      table.phase = pb.TablePhase.PLAYING;
-    });
-    builder.addMatcher(isMatchAction, (state, action) => {
-      if (state.match === null) {
-        return;
-      }
-      matchReducer(state.match, action);
-    });
+    builder
+      .addCase(events.tableChanged, (_, { payload }) => payload?.table ?? null)
+      .addCase(events.memberJoined, (table, { payload }) => {
+        table?.players.push(payload);
+      })
+      .addCase(events.memberLeft, (table, { payload: id }: PayloadAction<string>) => {
+        if (table === null) return;
+        const index = table.players.findIndex((p) => p.id === id);
+        if (index !== -1) {
+          table.players.splice(index, 1);
+        }
+      })
+      .addCase(events.memberStatusChanged, (table, { payload: user }: PayloadAction<User>) => {
+        if (table === null) return;
+        const index = table.players.findIndex((p) => p.id === user.id);
+        if (index !== -1) {
+          table.players.splice(index, 1, user);
+        }
+      })
+      .addCase(events.matchStarted, (table) => {
+        if (table === null) return;
+        table.phase = api.TablePhase.PLAYING;
+      })
+      .addCase(startTable.fulfilled, (table) => {
+        if (table === null) return;
+        table.phase = api.TablePhase.PLAYING;
+      })
+      .addCase(createTable.fulfilled, (_, { payload: table }) => table)
+      .addCase(joinTable.fulfilled, (_, { payload: table }) => table.table);
   },
 });
 export const { actions, reducer } = slice;

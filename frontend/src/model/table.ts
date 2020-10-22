@@ -8,20 +8,20 @@ export interface Table {
   invite?: string;
   players: User[];
   created: string;
+  phase: TablePhase;
 }
 
-export function canStartTable(t: TableState) {
-  return t.phase === TablePhase.NOT_STARTED && t.table.players.length >= 4;
+export function canStartTable(t: Table) {
+  return t.phase === TablePhase.NOT_STARTED && t.players.length >= 4;
 }
-export function canContinueTable(t: TableState) {
+export function canContinueTable(t: Table) {
   return t.phase === TablePhase.BETWEEN_GAMES || t.phase === TablePhase.PLAYING;
 }
-export function waitingForPlayers(t: TableState) {
-  return t.phase === TablePhase.NOT_STARTED && t.table.players.length < 4;
+export function waitingForPlayers(t: Table) {
+  return t.phase === TablePhase.NOT_STARTED && t.players.length < 4;
 }
 
 export interface TableState {
   table: Table;
   match?: Match;
-  phase: TablePhase;
 }

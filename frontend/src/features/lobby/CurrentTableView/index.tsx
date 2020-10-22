@@ -9,7 +9,7 @@ import List from '@material-ui/core/List';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 
-import { canStartTable, TableState, canContinueTable, waitingForPlayers } from 'model/table';
+import { canStartTable, canContinueTable, waitingForPlayers, Table } from 'model/table';
 import { TablePhase } from 'api/karlchen_pb';
 import GrowDiv from 'components/GrowDiv';
 import InviteDialog from '../InviteLinkDialog';
@@ -19,7 +19,7 @@ import { useDispatch } from 'react-redux';
 import { startTable } from 'app/game/table';
 
 interface Props {
-  table: TableState;
+  table: Table;
   me: User;
 }
 const useStyles = makeStyles((theme) => ({
@@ -32,9 +32,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CurrentTableView({ table, me }: Props) {
-  const { table: data } = table;
   const dispatch = useDispatch();
-  const owner = data.players.find((p) => p.id === data.owner);
+  const owner = table.players.find((p) => p.id === table.owner);
   const classes = useStyles();
   const [inviteOpen, setInviteOpen] = React.useState(false);
   const started = table.phase !== TablePhase.NOT_STARTED;
@@ -42,9 +41,9 @@ export default function CurrentTableView({ table, me }: Props) {
     <Card variant="outlined">
       <CardContent>
         <Typography variant="h4" component="h2">{`${owner?.name}'s Tisch`}</Typography>
-        <Typography color="textSecondary">Created {data.created.toLocaleString()}</Typography>
+        <Typography color="textSecondary">Created {table.created.toLocaleString()}</Typography>
         <List>
-          {data.players.map((player) => (
+          {table.players.map((player) => (
             <PlayerItem me={player.id === me.id} player={player} key={player.id} />
           ))}
         </List>
@@ -61,7 +60,7 @@ export default function CurrentTableView({ table, me }: Props) {
             <InviteDialog
               open={inviteOpen}
               handleClose={() => setInviteOpen(false)}
-              inviteCode={table.table.invite || ''}
+              inviteCode={table.invite || ''}
             />
           </>
         )}
@@ -76,7 +75,7 @@ export default function CurrentTableView({ table, me }: Props) {
             variant="contained"
             color="primary"
             disabled={!canStartTable(table)}
-            onClick={() => dispatch(startTable(data.id))}
+            onClick={() => dispatch(startTable(table.id))}
           >
             Starten
           </Button>

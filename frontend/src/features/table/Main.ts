@@ -1,11 +1,12 @@
 import TableView from './MainView';
 import { connect } from 'react-redux';
-import { selectGame } from 'app/game';
 import { createSelector } from '@reduxjs/toolkit';
 import { playCard } from 'app/game/match';
+import { selectCurrentTableOrThrow, selectMatch } from 'app/game/selectors';
 
-const mapState = createSelector(selectGame, (g) => ({
-  table: g.currentTable as any,
+const mapState = createSelector(selectCurrentTableOrThrow, selectMatch, (t, m) => ({
+  table: t,
+  match: m,
 }));
 const mapDispatch = {
   playCard,
