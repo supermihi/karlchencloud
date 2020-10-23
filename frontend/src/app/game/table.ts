@@ -1,11 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Table } from 'model/table';
 import { User } from 'model/core';
-import { ActionKind } from './asyncs';
+import { ActionKind, createGameThunk } from './asyncs';
 import { toMatch } from 'model/apiconv';
 import { tableId } from 'api/helpers';
 import * as api from 'api/karlchen_pb';
-import { createGameThunk } from './constants';
 import * as events from 'app/session/events';
 import { createTable, joinTable } from './thunks';
 import { AsyncState } from './asyncs';
