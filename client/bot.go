@@ -7,6 +7,8 @@ import (
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"log"
+	"math/rand"
+	"time"
 )
 
 func StartBots(address string, numBots int, table string, inviteCode string) {
@@ -20,6 +22,7 @@ func StartBots(address string, numBots int, table string, inviteCode string) {
 		}
 		clients[i] = NewBotHandler()
 		log.Printf("starting bot %d", i)
+		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 		go clients[i].Run(connect, table, inviteCode)
 	}
 	for i := 0; i < numBots; i++ {
@@ -67,6 +70,7 @@ func (h *BotHandler) OnMatchStart(_ *api.MatchState) {
 }
 
 func (h *BotHandler) OnMyTurn() {
+	time.Sleep(500 * time.Millisecond)
 	switch h.Match().Phase {
 	case match.InAuction:
 		h.makeTurnAuction()
