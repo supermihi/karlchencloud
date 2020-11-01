@@ -28,11 +28,13 @@ function getPlayerProps(match: Match, pos: Pos, user: User): PlayerViewProps {
         ? match.game.mode.type
         : undefined
       : undefined;
+  const declaration = match.auction.declarations[pos];
   return {
     user,
     turn,
     bids,
     soloGame,
+    declaration,
   };
 }
 

@@ -1,11 +1,12 @@
 import { MyUserData, Credentials } from 'app/auth';
-import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createSelector, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
 import { getClient, getAuthMeta, getAuthenticatedClient } from 'api/client';
 import * as api from 'api/karlchen_pb';
 import { AppThunk, RootState } from 'app/store';
 
 import { ClientReadableStream, Error as GrpcError } from 'grpc-web';
 import { onEvent } from './eventhandlers';
+import * as events from './events';
 import { register } from 'app/auth/thunks';
 
 export interface SessionState {
@@ -44,6 +45,14 @@ export const endSession = (): AppThunk => (dispatch) => {
   }
 };
 
+const reduceSessionStarted: CaseReducer<SessionState> = (state, { payload: name }) => {
+  if (!state.starting) {
+    return;
+  }
+  state.session = { ...state.starting, name };
+  state.starting = null;
+};
+
 const slice = createSlice({
   name: 'session',
   initialState,
@@ -55,13 +64,7 @@ const slice = createSlice({
       ...initialState,
       starting: creds,
     }),
-    sessionStarted: (state, { payload: name }: PayloadAction<string>) => {
-      if (!state.starting) {
-        return;
-      }
-      state.session = { ...state.starting, name };
-      state.starting = null;
-    },
+    sessionStarted: reduceSessionStarted,
     sessionEnded: () => initialState,
     sessionError: (state, { payload: error }: PayloadAction<GrpcError>) => {
       state.starting = null;
@@ -70,11 +73,14 @@ const slice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(register.fulfilled, (state) => {
-      state.error = undefined;
-    });
+    builder
+      .addCase(register.fulfilled, (state) => {
+        state.error = undefined;
+      })
+      .addCase(events.sessionStarted, reduceSessionStarted);
   },
 });
+
 export const selectSession = (state: RootState) => state.session;
 export const selectClient = createSelector(selectSession, ({ session }) =>
   session !== null ? getAuthenticatedClient(session.id, session.secret) : null

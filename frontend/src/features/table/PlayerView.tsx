@@ -7,10 +7,11 @@ import { gameTypeString, bidString } from 'api/helpers';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import { Declaration } from 'model/auction';
 
 export interface Props {
   user: User;
-  vorbehalt?: boolean;
+  declaration?: Declaration;
   bids: BidType[];
   soloGame?: GameType;
   turn: boolean;
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 export default function PlayerView({
   user: { name, online },
   soloGame,
-  vorbehalt,
+  declaration,
   bids,
   turn,
 }: Props) {
@@ -41,7 +42,11 @@ export default function PlayerView({
         </span>
       </Typography>
       {soloGame && <Typography variant="subtitle2">spielt {gameTypeString(soloGame)}</Typography>}
-      {vorbehalt && <Typography variant="subtitle2">vorbehalt</Typography>}
+      {declaration !== undefined && (
+        <Typography variant="subtitle2">
+          {declaration === Declaration.vorbehalt ? 'vorbehalt' : 'gesund'}
+        </Typography>
+      )}
 
       {bids.length > 0 && <Typography variant="body2">{bids.map(bidString).join(', ')}</Typography>}
     </Paper>

@@ -1,9 +1,9 @@
 import { toTable, toTableState } from 'model/apiconv';
 import * as api from 'api/karlchen_pb';
-import { ActionKind } from './asyncs';
-import { createGameThunk } from './constants';
+import { ActionKind, createGameThunk } from './asyncs';
+import { Table } from 'model/table';
 
-export const createTable = createGameThunk(
+export const createTable = createGameThunk<void, Table>(
   ActionKind.createTable,
   async (_, { client: { client, meta } }) => {
     const result = await client.createTable(new api.Empty(), meta);

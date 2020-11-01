@@ -1,8 +1,8 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { selectGame } from '.';
 
-export const selectTable = createSelector(selectGame, (g) => g.table);
-export const selectMatch = createSelector(selectGame, (g) => g.match);
+const selectTable = createSelector(selectGame, (g) => g.table);
+const selectMatch = createSelector(selectGame, (g) => g.match);
 export const selectCurrentTableOrThrow = createSelector(selectTable, (t) => {
   if (t === null) {
     throw new Error('no current table');
@@ -11,10 +11,10 @@ export const selectCurrentTableOrThrow = createSelector(selectTable, (t) => {
 });
 
 export const selectCurrentMatchOrThrow = createSelector(selectMatch, (m) => {
-  if (m === null) {
+  if (m.match === null) {
     throw new Error('no current match');
   }
-  return m;
+  return m.match;
 });
 
-export const selectPlayers = createSelector(selectCurrentMatchOrThrow, (m) => m && m.players);
+export const selectPlayers = createSelector(selectCurrentMatchOrThrow, (m) => m.players);
