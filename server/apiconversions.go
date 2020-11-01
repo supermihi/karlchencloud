@@ -202,6 +202,7 @@ func ToApiTrick(t *game.IncompleteTrick, m game.Mode, users PlayerUserMap) *api.
 	for i := 0; i < len(cards); i++ {
 		cards[i] = ToApiCard(t.NthCard(i))
 	}
+	result.Cards = cards
 	if t.IsComplete() {
 		result.UserIdWinner = ToPlayerValue(game.WinnerOfTrick(t.CardsByPlayer(), t.Forehand, m), users)
 	}

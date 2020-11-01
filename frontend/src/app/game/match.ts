@@ -1,10 +1,10 @@
-import { createSlice, Draft } from '@reduxjs/toolkit';
+import { CaseReducer, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import { Card } from 'model/core';
-import { Match, newGame } from 'model/match';
+import { Match, newGame, PlayedCard } from 'model/match';
 import { ActionKind, AsyncState, createGameThunk } from './asyncs';
 import { newDeclareRequest, newPlayCardRequest } from 'api/modelToPb';
 import * as api from 'api/karlchen_pb';
-import { nextPos } from 'model/players';
+import { getPosition, nextPos, Pos } from 'model/players';
 import { toDeclareResult } from 'model/apiconv';
 import * as events from 'app/session/events';
 import { startTable } from './table';
@@ -12,35 +12,59 @@ import { DeclareResult } from 'model/auction';
 import { selectCurrentTableOrThrow, selectPlayers } from './selectors';
 import { selectAuthenticatedClientOrThrow } from 'app/session';
 
-export const playCard = createGameThunk(
+export const playCard = createGameThunk<Card, PlayedCard>(
   ActionKind.playCard,
-  async (card: Card, { client: { client, meta }, getState }) => {
+  async (card, { client: { client, meta }, getState }) => {
     const tableId = selectCurrentTableOrThrow(getState()).id;
     const req = newPlayCardRequest(card, tableId);
-    await client.playCard(req, meta);
-    return card;
+    const result = await client.playCard(req, meta);
+    let winner: Pos | undefined = undefined;
+    if (result.hasTrickWinner()) {
+      const winnerId = (result.getTrickWinner() as api.PlayerValue).getUserId();
+      const players = selectPlayers(getState());
+      winner = getPosition(players, winnerId);
+    }
+    return { card, player: Pos.bottom, trickWinner: winner };
   }
 );
-
-export interface CurrentMatchState extends AsyncState {
-  match: Match | null;
-}
 
 export const declare = createGameThunk<api.GameType, DeclareResult & { gametype: api.GameType }>(
   ActionKind.declare,
   async (gametype: api.GameType, thunkAPI) => {
     const state = thunkAPI.getState();
     const table = selectCurrentTableOrThrow(state);
-    const players = selectPlayers(state);
     const req = newDeclareRequest(gametype, table.id);
     const { client, meta } = selectAuthenticatedClientOrThrow(state);
     const ans = await client.declare(req, meta);
+    const players = selectPlayers(state);
     return { ...toDeclareResult(ans, players), gametype };
   }
 );
+export interface CurrentMatchState extends AsyncState {
+  match: Match | null;
+}
 
 const initialState: CurrentMatchState = {
   match: null,
+};
+
+const reducePlayedCard: CaseReducer<CurrentMatchState, PayloadAction<PlayedCard>> = (
+  state,
+  { payload }
+) => {
+  if (state.match === null) {
+    return;
+  }
+  const trick = state.match.game.currentTrick;
+  trick.cards.push(payload.card);
+  trick.winner = payload.trickWinner;
+  if (payload.player === Pos.bottom) {
+    const card = state.match.cards.findIndex(
+      (c) => c.rank === payload.card.rank && c.suit === payload.card.suit
+    );
+    state.match.cards.splice(card);
+  }
+  state.match.turn = nextPos(payload.player);
 };
 
 const matchSlice = createSlice({
@@ -52,13 +76,8 @@ const matchSlice = createSlice({
       .addCase(events.matchStarted, (_, { payload }) => ({ match: payload }))
       .addCase(startTable.fulfilled, (_, { payload }) => ({ match: payload }))
       .addCase(events.tableChanged, (_, { payload }) => ({ match: payload?.match ?? null }))
-      .addCase(playCard.fulfilled, ({ match }, { payload }) => {
-        if (match === null) return;
-        const card = match.cards.findIndex(
-          (c) => c.rank === payload.rank && c.suit === payload.suit
-        );
-        match.cards.splice(card);
-      })
+      .addCase(playCard.fulfilled, reducePlayedCard)
+      .addCase(events.cardPlayed, reducePlayedCard)
       .addCase(events.playerDeclared, ({ match }, { payload }) => {
         if (match === null) return;
         reduceDeclaration(match, payload);
@@ -76,8 +95,10 @@ function reduceDeclaration(match: Draft<Match>, { declaration, mode, player }: D
   if (mode !== null) {
     match.phase = api.MatchPhase.GAME;
     match.game = newGame(mode);
-  } else if (match.turn !== undefined) {
-    match.turn = nextPos(match.turn);
+    match.turn = mode.forehand;
+  } else {
+    match.turn = nextPos(player);
   }
 }
+
 export const { actions, reducer } = matchSlice;

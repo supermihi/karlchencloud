@@ -1,7 +1,7 @@
 import * as api from 'api/karlchen_pb';
 import { selectPlayers } from 'app/game/selectors';
 import { AppThunk, AppDispatch, RootState } from 'app/store';
-import { getCurrentTableState, toMatch, toMode } from 'model/apiconv';
+import { getCurrentTableState, toCard, toMatch, toMode } from 'model/apiconv';
 import { Declaration, DeclareResult } from 'model/auction';
 import { getPosition } from 'model/players';
 import * as events from './events';
@@ -21,8 +21,11 @@ export const onEvent = (event: api.Event): AppThunk => (dispatch, getState) => {
     case EventCase.DECLARED:
       onDeclared(event.getDeclared() as api.Declaration, dispatch, getState);
       return;
+    case EventCase.PLAYED_CARD:
+      onPlayedCard(event.getPlayedCard() as api.PlayedCard, dispatch, getState);
+      return;
     default:
-      console.log(`unimplemented event: ${event}`);
+      console.log(`unimplemented event: ${event.getEventCase()}: ${event}`);
   }
 };
 
@@ -66,4 +69,18 @@ function onDeclared(decl: api.Declaration, dispatch: AppDispatch, getState: () =
     declaration: decl.getVorbehalt() ? Declaration.vorbehalt : Declaration.gesund,
   };
   dispatch(events.playerDeclared(declaration));
+}
+
+function onPlayedCard(event: api.PlayedCard, dispatch: AppDispatch, getState: () => RootState) {
+  const card = toCard(event.getCard() as api.Card);
+  const players = selectPlayers(getState());
+  const winner = event.hasTrickWinner() ? (event.getTrickWinner() as api.PlayerValue) : null;
+  const player = getPosition(players, event.getUserId());
+  dispatch(
+    events.cardPlayed({
+      card,
+      player,
+      trickWinner: winner === null ? undefined : getPosition(players, winner.getUserId()),
+    })
+  );
 }

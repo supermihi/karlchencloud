@@ -7,6 +7,7 @@ import { PlayingUsers, Pos } from 'model/players';
 import PositionedPlayerView from './PositionedPlayerView';
 import { Card } from 'model/core';
 import { MatchPhase } from 'api/karlchen_pb';
+import DeclarationDialogContainer from './DeclarationDialogContainer';
 
 interface Props extends HTMLProps<HTMLDivElement> {
   match: Match;
@@ -49,6 +50,7 @@ export default function MatchView({ match, players, style, playCard, ...props }:
         {[Pos.left, Pos.right, Pos.top, Pos.bottom].map((p) => (
           <PositionedPlayerView key={p} user={players[p]} pos={p} match={match} />
         ))}
+        <DeclarationDialogContainer />
       </div>
     </div>
   );

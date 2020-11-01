@@ -45,7 +45,10 @@ export const endSession = (): AppThunk => (dispatch) => {
   }
 };
 
-const reduceSessionStarted: CaseReducer<SessionState> = (state, { payload: name }) => {
+const reduceSessionStarted: CaseReducer<SessionState, PayloadAction<string>> = (
+  state,
+  { payload: name }
+) => {
   if (!state.starting) {
     return;
   }

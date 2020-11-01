@@ -75,7 +75,7 @@ function toGame(g: api.GameState, players: PlayerIds): Game {
     groupBy(g.getBidsList(), (b) => b.getUserId()),
     (bids) => bids.map((bid) => bid.getBid())
   );
-  const bids = mapValues(players, (id) => bidsById[id]);
+  const bids = mapValues(players, (id) => bidsById[id] || []);
   return {
     bids,
     completedTricks: g.getCompletedTricks(),

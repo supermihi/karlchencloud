@@ -32,6 +32,11 @@ export function dummyGame(): Game {
   return newGame({ type: GameType.NORMAL_GAME, forehand: Pos.bottom });
 }
 
+export interface PlayedCard {
+  card: Card;
+  player: Pos;
+  trickWinner?: Pos;
+}
 export interface Trick {
   forehand: Pos;
   winner?: Pos;
