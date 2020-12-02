@@ -35,7 +35,7 @@ type ConnectData struct {
 func GetClientService(c ConnectData, ctx context.Context) (ClientService, error) {
 	creds := EmptyClientCredentials()
 	if c.ExistingUserId != nil {
-		creds.UpdateLogin(*c.ExistingUserId, *c.ExistingUserId)
+		creds.UpdateLogin(*c.ExistingUserId, *c.ExistingSecret)
 	}
 	conn, err := grpc.DialContext(ctx, c.Address, grpc.WithInsecure(), grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(creds))

@@ -3,6 +3,7 @@ import { Rank, Suit } from 'api/karlchen_pb';
 import { action } from '@storybook/addon-actions';
 import OwnCardsView from 'features/table/OwnCardsView';
 
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
   title: 'Match/Cards',
   component: OwnCardsView,

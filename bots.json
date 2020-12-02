@@ -1,0 +1,24 @@
+{
+  "Bots": [
+    {
+      "Id": "2",
+      "Name": "dummy 2",
+      "Secret": "123"
+    },
+    {
+      "Id": "3",
+      "Name": "dummy 3",
+      "Secret": "123"
+    },
+    {
+      "Id": "4",
+      "Name": "dummy 4",
+      "Secret": "123"
+    },
+    {
+      "Id": "1",
+      "Name": "dummy 1",
+      "Secret": "123"
+    }
+  ]
+}

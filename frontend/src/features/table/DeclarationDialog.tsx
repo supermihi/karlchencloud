@@ -16,7 +16,7 @@ interface Props {
   declare: (gt: GameType) => void;
   open: boolean;
 }
-export default function ({ declare, open }: Props) {
+export default function DeclarationDialog({ declare, open }: Props) {
   const classes = useStyles();
   return (
     <Dialog open={open}>

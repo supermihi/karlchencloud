@@ -3,6 +3,7 @@ import TrickView from 'features/table/TrickView';
 import { Diamond10, Diamond9, DiamondA, DiamondQ, SpadeA } from 'model/cards';
 import { Pos } from 'model/players';
 
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
   title: 'Match/Trick',
   component: TrickView,

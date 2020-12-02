@@ -50,21 +50,21 @@ const initialState: CurrentMatchState = {
 
 const reducePlayedCard: CaseReducer<CurrentMatchState, PayloadAction<PlayedCard>> = (
   state,
-  { payload }
+  { payload: { card, trickWinner, player } }
 ) => {
   if (state.match === null) {
     return;
   }
   const trick = state.match.game.currentTrick;
-  trick.cards.push(payload.card);
-  trick.winner = payload.trickWinner;
-  if (payload.player === Pos.bottom) {
-    const card = state.match.cards.findIndex(
-      (c) => c.rank === payload.card.rank && c.suit === payload.card.suit
+  trick.cards.push(card);
+  trick.winner = trickWinner;
+  if (player === Pos.bottom) {
+    const cardIndex = state.match.cards.findIndex(
+      (c) => c.rank === card.rank && c.suit === card.suit
     );
-    state.match.cards.splice(card);
+    state.match.cards.splice(cardIndex, 1);
   }
-  state.match.turn = nextPos(payload.player);
+  state.match.turn = nextPos(player);
 };
 
 const matchSlice = createSlice({

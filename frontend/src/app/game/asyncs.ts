@@ -51,7 +51,7 @@ export function createGameThunk<TArg, Returned = void>(
   actionKind: ActionKind,
   creator: (thunkArg: TArg, api: GameThunkConfig) => Promise<Returned>
 ): GameThunk<Returned, TArg> {
-  const action = createAction('game' + actionKind, (result: Returned) => ({
+  const action = createAction('game/' + actionKind, (result: Returned) => ({
     payload: result,
   }));
   const thunk: (arg: TArg) => AppThunk = (arg) => async (dispatch, getState) => {

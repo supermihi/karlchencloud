@@ -28,7 +28,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default ({ login, forgetLogin, loading, currentLogin, error, resetError }: Props) => {
+export default function LoginView({
+  login,
+  forgetLogin,
+  loading,
+  currentLogin,
+  error,
+  resetError,
+}: Props) {
   const classes = useStyles();
   return (
     <>
@@ -66,4 +73,4 @@ export default ({ login, forgetLogin, loading, currentLogin, error, resetError }
       )}
     </>
   );
-};
+}

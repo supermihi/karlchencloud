@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default ({ register, loading, error }: Props) => {
+export default function RegisterView({ register, loading, error }: Props) {
   const classes = useStyles();
   const [name, setName] = useState('');
   const valid = name.trim() !== '';
@@ -71,4 +71,4 @@ export default ({ register, loading, error }: Props) => {
       )}
     </>
   );
-};
+}

@@ -13,7 +13,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default (props: PaperProps) => {
+const MainPaper = (props: PaperProps) => {
   const classes = useStyles();
   return <Paper {...props} className={classes.paper} />;
 };
+export default MainPaper;

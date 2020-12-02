@@ -3,6 +3,7 @@ import PlayerView from 'features/table/PlayerView';
 import { User } from 'model/core';
 import { BidType, GameType } from 'api/karlchen_pb';
 
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
   title: 'Match/Player',
   component: PlayerView,

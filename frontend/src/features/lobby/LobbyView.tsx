@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   } as const,
 }));
 
-export default ({ activeTable, createTable, me, suppliedInviteCode }: Props) => {
+export default function LobbyView({ activeTable, createTable, me, suppliedInviteCode }: Props) {
   const classes = useStyles();
   return (
     <div className={classes.main}>
@@ -62,4 +62,4 @@ export default ({ activeTable, createTable, me, suppliedInviteCode }: Props) => 
       {activeTable && <CurrentTableView me={me} table={activeTable} />}
     </div>
   );
-};
+}

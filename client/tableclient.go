@@ -100,18 +100,24 @@ func (c *TableClient) checkMyTurn() {
 		c.handler.OnMyTurn()
 	}
 }
-func (c *TableClient) PlayCard(card game.Card) (err error) {
-	_, err = c.Service.Api.PlayCard(
+func (c *TableClient) PlayCard(card game.Card) error {
+	result, err := c.Service.Api.PlayCard(
 		c.Service.Context,
 		&api.PlayCardRequest{Table: c.TableId, Card: server.ToApiCard(card)})
-	return
+	if err == nil {
+		c.View.Match.UpdateTrick(result)
+	}
+	return err
 }
 
-func (c *TableClient) Declare(t game.AnnouncedGameType) (err error) {
-	_, err = c.Service.Api.Declare(c.Service.Context, &api.DeclareRequest{
+func (c *TableClient) Declare(t game.AnnouncedGameType) error {
+	result, err := c.Service.Api.Declare(c.Service.Context, &api.DeclareRequest{
 		Table:       c.TableId,
 		Declaration: server.ToApiGameType(t)})
-	return
+	if err == nil {
+		c.View.Match.UpdateOnDeclare(result)
+	}
+	return err
 }
 
 func (c *TableClient) Api() api.DokoClient {

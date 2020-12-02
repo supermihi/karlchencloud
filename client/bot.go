@@ -11,13 +11,19 @@ import (
 	"time"
 )
 
-func StartBots(address string, numBots int, table string, inviteCode string) {
+func StartBots(address string, numBots int, table string, inviteCode string,
+	logins []BotLogin) {
 	clients := make([]*BotHandler, numBots)
 	for i := 0; i < numBots; i++ {
+		var user, secret *string
+		if len(logins) > i {
+			user = &logins[i].Id
+			secret = &logins[i].Secret
+		}
 		connect := ConnectData{
 			DisplayName:    fmt.Sprintf("Bot %v", i+1),
-			ExistingUserId: nil,
-			ExistingSecret: nil,
+			ExistingUserId: user,
+			ExistingSecret: secret,
 			Address:        address,
 		}
 		clients[i] = NewBotHandler()
@@ -114,10 +120,11 @@ func (h *BotHandler) makeTurnGame() {
 		cardIndex = 0 // no matchnig card -> can play anything
 	}
 	card := m.DrawCard(cardIndex)
-	if err := h.PlayCard(card); err != nil {
+	h.Logf("playing card '%s'...", card)
+	err := h.PlayCard(card)
+	if err != nil {
 		log.Fatalf("could not play card: %v", err)
 	}
-
 }
 
 func (h *BotHandler) OnMemberEvent(_ *api.MemberEvent) {

@@ -8,6 +8,7 @@ import { action } from '@storybook/addon-actions';
 import DeclarationDialog from 'features/table/DeclarationDialog';
 import { emptyAuction } from 'model/auction';
 
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
   title: 'Match/Auction',
   component: DeclarationDialog,

@@ -7,6 +7,7 @@ import { Pos, toPlayerMap } from 'model/players';
 import { action } from '@storybook/addon-actions';
 import { emptyAuction } from 'model/auction';
 
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
   title: 'Match/Match',
   component: MatchView,

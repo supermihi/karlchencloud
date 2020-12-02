@@ -2,6 +2,8 @@ import React from 'react';
 import LoginView from 'features/auth/LoginView';
 import { action } from '@storybook/addon-actions';
 import { MyUserData } from 'app/auth';
+
+/* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
   title: 'Auth/LoginView',
   component: LoginView,
