@@ -1,18 +1,15 @@
 import React from 'react';
-import MatchView from 'features/table/MatchView';
 import { Match, Game } from 'model/match';
 import { MatchPhase, GameType, BidType } from 'api/karlchen_pb';
 import * as data from './mocks';
-import { Pos, toPlayerMap } from 'model/players';
-import { action } from '@storybook/addon-actions';
+import { Pos } from 'model/players';
 import { emptyAuction } from 'model/auction';
-import { withProvider } from '../provider';
+import PositionedPlayerView from 'features/table/PositionedPlayerView';
 
 /* eslint import/no-anonymous-default-export: [2, {"allowObject": true}] */
 export default {
-  title: 'Match/Match',
-  component: MatchView,
-  decorators: [withProvider],
+  title: 'Match/PlayerView',
+  component: PositionedPlayerView,
 };
 
 const mode = {
@@ -39,14 +36,7 @@ const match: Match = {
   auction: emptyAuction(),
   turn: Pos.bottom,
 };
-export const MatchTable = () => {
-  return (
-    <div style={{ width: '60vw', height: '95vh' }}>
-      <MatchView
-        playCard={action('play card')}
-        match={match}
-        players={toPlayerMap(match.players, data.userMap)}
-      />
-    </div>
-  );
+
+export const PositionedPV = () => {
+  return <PositionedPlayerView user={data.users[0]} pos={Pos.bottom} match={match} />;
 };

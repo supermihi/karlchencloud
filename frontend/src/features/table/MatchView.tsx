@@ -1,12 +1,13 @@
 import React, { HTMLProps } from 'react';
 import { Match } from 'model/match';
-import tabletop from './Pine_wood_Table_Top.jpg';
+
 import OwnCardsView from './OwnCardsView';
 import TrickView from './TrickView';
 import { PlayingUsers, Pos } from 'model/players';
 import PositionedPlayerView from './PositionedPlayerView';
 import { Card } from 'model/core';
 import { MatchPhase } from 'api/karlchen_pb';
+import tabletop from './Pine_wood_Table_Top.jpg';
 import DeclarationDialogContainer from './DeclarationDialogContainer';
 
 interface Props extends HTMLProps<HTMLDivElement> {
@@ -15,7 +16,7 @@ interface Props extends HTMLProps<HTMLDivElement> {
   playCard: (card: Card) => void;
 }
 
-export default function MatchView({ match, players, style, playCard, ...props }: Props) {
+export default function MatchView({ match, players, playCard, style, ...props }: Props) {
   const myTurn = match.turn === Pos.bottom;
   const inGame = match.phase === MatchPhase.GAME;
   return (
@@ -30,6 +31,7 @@ export default function MatchView({ match, players, style, playCard, ...props }:
         backgroundSize: 'cover',
       }}
     >
+      <DeclarationDialogContainer />
       <div
         style={{
           position: 'absolute',
@@ -50,7 +52,6 @@ export default function MatchView({ match, players, style, playCard, ...props }:
         {[Pos.left, Pos.right, Pos.top, Pos.bottom].map((p) => (
           <PositionedPlayerView key={p} user={players[p]} pos={p} match={match} />
         ))}
-        <DeclarationDialogContainer />
       </div>
     </div>
   );

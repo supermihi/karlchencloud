@@ -13,32 +13,18 @@
 
 import * as grpcWeb from 'grpc-web';
 
-import {
-  Bid,
-  Declaration,
-  DeclareRequest,
-  Empty,
-  Event,
-  JoinTableRequest,
-  MatchState,
-  PlaceBidRequest,
-  PlayCardRequest,
-  PlayedCard,
-  RegisterReply,
-  TableData,
-  TableId,
-  TableState,
-  UserName} from './karlchen_pb';
+import * as karlchen_pb from './karlchen_pb';
+
 
 export class DokoClient {
   client_: grpcWeb.AbstractClientBase;
   hostname_: string;
   credentials_: null | { [index: string]: string; };
-  options_: null | { [index: string]: string; };
+  options_: null | { [index: string]: any; };
 
   constructor (hostname: string,
                credentials?: null | { [index: string]: string; },
-               options?: null | { [index: string]: string; }) {
+               options?: null | { [index: string]: any; }) {
     if (!options) options = {};
     if (!credentials) credentials = {};
     options['format'] = 'text';
@@ -50,28 +36,28 @@ export class DokoClient {
   }
 
   methodInfoRegister = new grpcWeb.AbstractClientBase.MethodInfo(
-    RegisterReply,
-    (request: UserName) => {
+    karlchen_pb.RegisterReply,
+    (request: karlchen_pb.UserName) => {
       return request.serializeBinary();
     },
-    RegisterReply.deserializeBinary
+    karlchen_pb.RegisterReply.deserializeBinary
   );
 
   register(
-    request: UserName,
-    metadata: grpcWeb.Metadata | null): Promise<RegisterReply>;
+    request: karlchen_pb.UserName,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.RegisterReply>;
 
   register(
-    request: UserName,
+    request: karlchen_pb.UserName,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: RegisterReply) => void): grpcWeb.ClientReadableStream<RegisterReply>;
+               response: karlchen_pb.RegisterReply) => void): grpcWeb.ClientReadableStream<karlchen_pb.RegisterReply>;
 
   register(
-    request: UserName,
+    request: karlchen_pb.UserName,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: RegisterReply) => void) {
+               response: karlchen_pb.RegisterReply) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -90,28 +76,28 @@ export class DokoClient {
   }
 
   methodInfoCheckLogin = new grpcWeb.AbstractClientBase.MethodInfo(
-    UserName,
-    (request: Empty) => {
+    karlchen_pb.UserName,
+    (request: karlchen_pb.Empty) => {
       return request.serializeBinary();
     },
-    UserName.deserializeBinary
+    karlchen_pb.UserName.deserializeBinary
   );
 
   checkLogin(
-    request: Empty,
-    metadata: grpcWeb.Metadata | null): Promise<UserName>;
+    request: karlchen_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.UserName>;
 
   checkLogin(
-    request: Empty,
+    request: karlchen_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: UserName) => void): grpcWeb.ClientReadableStream<UserName>;
+               response: karlchen_pb.UserName) => void): grpcWeb.ClientReadableStream<karlchen_pb.UserName>;
 
   checkLogin(
-    request: Empty,
+    request: karlchen_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: UserName) => void) {
+               response: karlchen_pb.UserName) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -130,28 +116,28 @@ export class DokoClient {
   }
 
   methodInfoCreateTable = new grpcWeb.AbstractClientBase.MethodInfo(
-    TableData,
-    (request: Empty) => {
+    karlchen_pb.TableData,
+    (request: karlchen_pb.Empty) => {
       return request.serializeBinary();
     },
-    TableData.deserializeBinary
+    karlchen_pb.TableData.deserializeBinary
   );
 
   createTable(
-    request: Empty,
-    metadata: grpcWeb.Metadata | null): Promise<TableData>;
+    request: karlchen_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.TableData>;
 
   createTable(
-    request: Empty,
+    request: karlchen_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: TableData) => void): grpcWeb.ClientReadableStream<TableData>;
+               response: karlchen_pb.TableData) => void): grpcWeb.ClientReadableStream<karlchen_pb.TableData>;
 
   createTable(
-    request: Empty,
+    request: karlchen_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: TableData) => void) {
+               response: karlchen_pb.TableData) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -170,28 +156,28 @@ export class DokoClient {
   }
 
   methodInfoStartTable = new grpcWeb.AbstractClientBase.MethodInfo(
-    MatchState,
-    (request: TableId) => {
+    karlchen_pb.MatchState,
+    (request: karlchen_pb.TableId) => {
       return request.serializeBinary();
     },
-    MatchState.deserializeBinary
+    karlchen_pb.MatchState.deserializeBinary
   );
 
   startTable(
-    request: TableId,
-    metadata: grpcWeb.Metadata | null): Promise<MatchState>;
+    request: karlchen_pb.TableId,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.MatchState>;
 
   startTable(
-    request: TableId,
+    request: karlchen_pb.TableId,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: MatchState) => void): grpcWeb.ClientReadableStream<MatchState>;
+               response: karlchen_pb.MatchState) => void): grpcWeb.ClientReadableStream<karlchen_pb.MatchState>;
 
   startTable(
-    request: TableId,
+    request: karlchen_pb.TableId,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: MatchState) => void) {
+               response: karlchen_pb.MatchState) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -210,28 +196,28 @@ export class DokoClient {
   }
 
   methodInfoJoinTable = new grpcWeb.AbstractClientBase.MethodInfo(
-    TableState,
-    (request: JoinTableRequest) => {
+    karlchen_pb.TableState,
+    (request: karlchen_pb.JoinTableRequest) => {
       return request.serializeBinary();
     },
-    TableState.deserializeBinary
+    karlchen_pb.TableState.deserializeBinary
   );
 
   joinTable(
-    request: JoinTableRequest,
-    metadata: grpcWeb.Metadata | null): Promise<TableState>;
+    request: karlchen_pb.JoinTableRequest,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.TableState>;
 
   joinTable(
-    request: JoinTableRequest,
+    request: karlchen_pb.JoinTableRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: TableState) => void): grpcWeb.ClientReadableStream<TableState>;
+               response: karlchen_pb.TableState) => void): grpcWeb.ClientReadableStream<karlchen_pb.TableState>;
 
   joinTable(
-    request: JoinTableRequest,
+    request: karlchen_pb.JoinTableRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: TableState) => void) {
+               response: karlchen_pb.TableState) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -250,28 +236,28 @@ export class DokoClient {
   }
 
   methodInfoPlayCard = new grpcWeb.AbstractClientBase.MethodInfo(
-    PlayedCard,
-    (request: PlayCardRequest) => {
+    karlchen_pb.PlayedCard,
+    (request: karlchen_pb.PlayCardRequest) => {
       return request.serializeBinary();
     },
-    PlayedCard.deserializeBinary
+    karlchen_pb.PlayedCard.deserializeBinary
   );
 
   playCard(
-    request: PlayCardRequest,
-    metadata: grpcWeb.Metadata | null): Promise<PlayedCard>;
+    request: karlchen_pb.PlayCardRequest,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.PlayedCard>;
 
   playCard(
-    request: PlayCardRequest,
+    request: karlchen_pb.PlayCardRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: PlayedCard) => void): grpcWeb.ClientReadableStream<PlayedCard>;
+               response: karlchen_pb.PlayedCard) => void): grpcWeb.ClientReadableStream<karlchen_pb.PlayedCard>;
 
   playCard(
-    request: PlayCardRequest,
+    request: karlchen_pb.PlayCardRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: PlayedCard) => void) {
+               response: karlchen_pb.PlayedCard) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -290,28 +276,28 @@ export class DokoClient {
   }
 
   methodInfoPlaceBid = new grpcWeb.AbstractClientBase.MethodInfo(
-    Bid,
-    (request: PlaceBidRequest) => {
+    karlchen_pb.Bid,
+    (request: karlchen_pb.PlaceBidRequest) => {
       return request.serializeBinary();
     },
-    Bid.deserializeBinary
+    karlchen_pb.Bid.deserializeBinary
   );
 
   placeBid(
-    request: PlaceBidRequest,
-    metadata: grpcWeb.Metadata | null): Promise<Bid>;
+    request: karlchen_pb.PlaceBidRequest,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.Bid>;
 
   placeBid(
-    request: PlaceBidRequest,
+    request: karlchen_pb.PlaceBidRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: Bid) => void): grpcWeb.ClientReadableStream<Bid>;
+               response: karlchen_pb.Bid) => void): grpcWeb.ClientReadableStream<karlchen_pb.Bid>;
 
   placeBid(
-    request: PlaceBidRequest,
+    request: karlchen_pb.PlaceBidRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: Bid) => void) {
+               response: karlchen_pb.Bid) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -330,28 +316,28 @@ export class DokoClient {
   }
 
   methodInfoDeclare = new grpcWeb.AbstractClientBase.MethodInfo(
-    Declaration,
-    (request: DeclareRequest) => {
+    karlchen_pb.Declaration,
+    (request: karlchen_pb.DeclareRequest) => {
       return request.serializeBinary();
     },
-    Declaration.deserializeBinary
+    karlchen_pb.Declaration.deserializeBinary
   );
 
   declare(
-    request: DeclareRequest,
-    metadata: grpcWeb.Metadata | null): Promise<Declaration>;
+    request: karlchen_pb.DeclareRequest,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.Declaration>;
 
   declare(
-    request: DeclareRequest,
+    request: karlchen_pb.DeclareRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: Declaration) => void): grpcWeb.ClientReadableStream<Declaration>;
+               response: karlchen_pb.Declaration) => void): grpcWeb.ClientReadableStream<karlchen_pb.Declaration>;
 
   declare(
-    request: DeclareRequest,
+    request: karlchen_pb.DeclareRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: Declaration) => void) {
+               response: karlchen_pb.Declaration) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -370,15 +356,15 @@ export class DokoClient {
   }
 
   methodInfoStartSession = new grpcWeb.AbstractClientBase.MethodInfo(
-    Event,
-    (request: Empty) => {
+    karlchen_pb.Event,
+    (request: karlchen_pb.Empty) => {
       return request.serializeBinary();
     },
-    Event.deserializeBinary
+    karlchen_pb.Event.deserializeBinary
   );
 
   startSession(
-    request: Empty,
+    request: karlchen_pb.Empty,
     metadata?: grpcWeb.Metadata) {
     return this.client_.serverStreaming(
       this.hostname_ +

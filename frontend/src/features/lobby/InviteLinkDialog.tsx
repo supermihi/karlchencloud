@@ -10,7 +10,7 @@ import AssignmentOutlinedIcon from '@material-ui/icons/AssignmentOutlined';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
-import * as copy from 'copy-to-clipboard';
+import copy from 'copy-to-clipboard';
 import { inviteLink } from 'model/invitation';
 import { useState } from 'react';
 
