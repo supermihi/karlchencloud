@@ -24,6 +24,7 @@ workflows:
       - node/test:
           app-dir: ~/project/frontend
           pkg-manager: yarn
+          version: 10.23.0
 
 orbs:
   go: circleci/go@1.3.0
