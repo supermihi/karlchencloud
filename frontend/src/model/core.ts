@@ -1,5 +1,5 @@
-import * as api from 'api/karlchen_pb';
-import { fromPairs } from 'lodash';
+import * as api from "api/karlchen_pb";
+import fromPairs from "lodash.frompairs";
 
 export interface User {
   name: string;
