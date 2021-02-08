@@ -1,4 +1,4 @@
-import { MyUserData } from 'model/session';
+import { MyUserData } from 'session/model';
 
 const key_id = 'auth_id';
 const key_secret = 'auth_secret';

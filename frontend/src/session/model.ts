@@ -1,7 +1,5 @@
-export interface MyUserData {
+export interface MyUserData extends Credentials {
   name: string;
-  id: string;
-  secret: string;
 }
 
 export interface Credentials {

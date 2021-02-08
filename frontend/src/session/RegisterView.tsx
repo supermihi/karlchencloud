@@ -4,11 +4,10 @@ import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Alert from "@material-ui/lab/Alert";
 import { formatError } from "api/client";
 import MainPaper from "shared/MainPaper";
+import SpinBackdrop from "shared/SpinBackdrop";
+import ErrorAlert from "shared/ErrorAlert";
 
 interface Props {
   register: (name: string) => void;
@@ -60,14 +59,10 @@ export default function RegisterView({ register, loading, error }: Props) {
             Los
           </Button>
         </div>
-        <Backdrop open={loading}>
-          <CircularProgress />
-        </Backdrop>
+        <SpinBackdrop open={loading} />
       </MainPaper>
       {error && (
-        <Alert severity="error" elevation={6}>
-          Error signing up: {formatError(error)}
-        </Alert>
+        <ErrorAlert message={`Error signing up: ${formatError(error)}`} />
       )}
     </>
   );

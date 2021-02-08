@@ -1,10 +1,10 @@
-import * as karlchen from "./KarlchenServiceClientPb";
-import * as proto from "./karlchen_pb";
-import * as grpc from "grpc-web";
-import { Base64 } from "js-base64";
-import { MyUserData } from "model/session";
+import * as karlchen from './KarlchenServiceClientPb';
+import * as proto from './karlchen_pb';
+import * as grpc from 'grpc-web';
+import { Base64 } from 'js-base64';
+import { MyUserData } from 'session/model';
 
-const url = "http://localhost:8080";
+const url = 'http://localhost:8080';
 
 let _client: karlchen.DokoClient | null = null;
 
@@ -24,10 +24,7 @@ export function getAuthMeta(user: string, secret: string): grpc.Metadata {
   return { authorization: `basic ${encoded}` };
 }
 
-export function getAuthenticatedClient(
-  user: string,
-  secret: string
-): AuthenticatedClient {
+export function getAuthenticatedClient(user: string, secret: string): AuthenticatedClient {
   return { client: getClient(), meta: getAuthMeta(user, secret) };
 }
 
@@ -40,17 +37,12 @@ export async function register(name: string): Promise<MyUserData> {
 }
 
 export function isGrpcError(error: unknown): error is grpc.Error {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    "message" in error
-  );
+  return typeof error === 'object' && error !== null && 'code' in error && 'message' in error;
 }
 
 export function formatError(error: unknown): string {
   if (!error) {
-    return "";
+    return '';
   }
   if (isGrpcError(error)) {
     return `error ${error.code}: ${error.message}`;

@@ -4,11 +4,12 @@ import { mockGrpcError } from "shared/mock";
 import RegisterView from "./RegisterView";
 
 const Fixture: React.FC = () => {
-  const [error] = useValue("boolean", { defaultValue: false });
+  const [error] = useValue("error", { defaultValue: false });
+  const [loading] = useValue("loading", { defaultValue: false });
   return (
     <RegisterView
-      loading={false}
-      error={error ? mockGrpcError("error logging in") : undefined}
+      loading={loading}
+      error={error ? mockGrpcError("this is a mock") : undefined}
       register={() => console.log("login")}
     />
   );
