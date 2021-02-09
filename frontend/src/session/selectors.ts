@@ -1,8 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { getAuthenticatedClient } from 'api/client';
 import { RootState } from 'state';
+import { SessionState } from './state';
 
-export const selectSession = (state: RootState) => state.session;
+export const selectSession = (state: RootState): SessionState => state.session;
 export const selectClient = createSelector(selectSession, ({ session }) =>
   session !== null ? getAuthenticatedClient(session.id, session.secret) : null
 );

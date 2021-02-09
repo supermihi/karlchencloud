@@ -10,7 +10,7 @@ export function toDate(ts: Timestamp): Date {
   return new Date(ts.getNanos() / 1e6);
 }
 
-export function gameTypeString(t: GameType) {
+export function gameTypeString(t: GameType): string {
   switch (t) {
     case GameType.NORMAL_GAME:
       return 'Normalspiel';
@@ -29,7 +29,7 @@ export function gameTypeString(t: GameType) {
   }
 }
 
-export function bidString(b: BidType) {
+export function bidString(b: BidType): string {
   switch (b) {
     case BidType.RE_BID:
       return 'Re';

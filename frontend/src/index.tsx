@@ -1,19 +1,14 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import LoginView from "./session/LoginView";
-
-const App = () => (
-  <LoginView
-    name="Nils"
-    loading={false}
-    login={() => 1}
-    forgetLogin={() => 2}
-  />
-);
+import App from 'App';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { store } from 'state';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );

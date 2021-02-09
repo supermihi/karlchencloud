@@ -40,6 +40,10 @@ export function isGrpcError(error: unknown): error is grpc.Error {
   return typeof error === 'object' && error !== null && 'code' in error && 'message' in error;
 }
 
+export function isError(error: unknown): error is { message: string } {
+  return typeof error === 'object' && error !== null && 'message' in error;
+}
+
 export function formatError(error: unknown): string {
   if (!error) {
     return '';
@@ -47,7 +51,7 @@ export function formatError(error: unknown): string {
   if (isGrpcError(error)) {
     return `error ${error.code}: ${error.message}`;
   }
-  if (error instanceof Error) {
+  if (isError(error)) {
     return error.message;
   }
   return `${error}`;

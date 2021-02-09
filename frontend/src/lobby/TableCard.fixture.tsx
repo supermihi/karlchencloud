@@ -2,7 +2,7 @@ import React from 'react';
 import TableCard from './TableCard';
 import * as players from 'mocks/players';
 import * as table from 'mocks/table';
-import { useSelect, useValue } from 'react-cosmos/fixture';
+import { useValue } from 'react-cosmos/fixture';
 
 export default function Fixture(): React.ReactElement {
   const [own] = useValue('own table', { defaultValue: false });

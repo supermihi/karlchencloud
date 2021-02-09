@@ -2,7 +2,6 @@ import {
   Action,
   createAction,
   createReducer,
-  Draft,
   PayloadActionCreator,
   PrepareAction,
   ThunkAction,
@@ -23,7 +22,7 @@ export enum ActionKind {
 
 export interface ActionError {
   action: ActionKind;
-  error: any;
+  error: unknown;
 }
 
 interface GameThunkConfig extends AuthenticatedClient {
@@ -52,7 +51,7 @@ export const reducer = createReducer<ActionState>(
 );
 export type GameThunk<Returned, ThunkArg> = ((
   arg: ThunkArg
-) => ThunkAction<any, RootState, any, Action<string>>) & {
+) => ThunkAction<any, RootState, unknown, Action<string>>) & {
   fulfilled: PayloadActionCreator<Returned, string, PrepareAction<Returned>>;
 };
 export function createGameThunk<TArg, Returned = void>(

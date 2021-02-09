@@ -2,6 +2,7 @@ import { CaseReducer, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Credentials } from './model';
 import { initialState, SessionState } from './state';
 import * as grpc from 'grpc-web';
+import * as events from './events';
 import { localStorageUpdated, register } from './thunks/register';
 
 const reduceSessionStarted: CaseReducer<SessionState, PayloadAction<string>> = (
@@ -16,19 +17,20 @@ const reduceSessionStarted: CaseReducer<SessionState, PayloadAction<string>> = (
 };
 
 const sessionSlice = createSlice({
-  name: 'auth',
+  name: 'session',
   initialState: initialState(),
   reducers: {
     sessionStarting: (_, { payload: creds }: PayloadAction<Credentials>) => ({
       ...initialState(),
       currentLoginCredentials: creds,
     }),
-    sessionStarted: reduceSessionStarted,
-    sessionEnded: initialState,
     sessionError: (state, { payload: error }: PayloadAction<grpc.Error>) => {
       state.loading = false;
       state.session = null;
       state.error = error;
+    },
+    resetError: (state) => {
+      state.error = undefined;
     },
   },
   extraReducers: (builder) => {
@@ -46,7 +48,8 @@ const sessionSlice = createSlice({
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error;
-      });
+      })
+      .addCase(events.sessionStarted, reduceSessionStarted);
   },
 });
 

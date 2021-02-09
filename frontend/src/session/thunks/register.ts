@@ -1,5 +1,5 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { Credentials, MyUserData } from '../model';
+import { MyUserData } from '../model';
 import { writeLoginDataToLocalStorage, deleteLoginDataInLocalStorage } from '../localstorage';
 import { AppThunk } from 'state';
 import * as api from 'api/client';

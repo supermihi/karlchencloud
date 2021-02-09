@@ -14,13 +14,13 @@ export function getLoginDataFromLocalStorage(): MyUserData | null {
   return null;
 }
 
-export function writeLoginDataToLocalStorage({ id, name, secret }: MyUserData) {
+export function writeLoginDataToLocalStorage({ id, name, secret }: MyUserData): void {
   window.localStorage.setItem(key_id, id);
   window.localStorage.setItem(key_name, name);
   window.localStorage.setItem(key_secret, secret);
 }
 
-export function deleteLoginDataInLocalStorage() {
+export function deleteLoginDataInLocalStorage(): void {
   window.localStorage.removeItem(key_id);
   window.localStorage.removeItem(key_name);
   window.localStorage.removeItem(key_secret);
