@@ -1588,6 +1588,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/hoist-non-react-statics@npm:^3.3.0":
+  version: 3.3.1
+  resolution: "@types/hoist-non-react-statics@npm:3.3.1"
+  dependencies:
+    "@types/react": "*"
+    hoist-non-react-statics: ^3.3.0
+  checksum: 16ab4c45d4920fa378c8be76554b10061247fc04d2c8af11bdb7d520b3967e9c06d7ad5efd9b0f1657fbc4d095f62c6e1325f03b9141eb1ef2c8095b96fd42f8
+  languageName: node
+  linkType: hard
+
 "@types/html-minifier-terser@npm:^5.0.0":
   version: 5.1.1
   resolution: "@types/html-minifier-terser@npm:5.1.1"
@@ -1722,6 +1732,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-redux@npm:^7.1.16":
+  version: 7.1.16
+  resolution: "@types/react-redux@npm:7.1.16"
+  dependencies:
+    "@types/hoist-non-react-statics": ^3.3.0
+    "@types/react": "*"
+    hoist-non-react-statics: ^3.3.0
+    redux: ^4.0.0
+  checksum: c19c8f94dbadae42e9622c0b1b38324bbc6f5997fdc3989e71b202bf750d5869f73bb349ca4102f624188c2212c7907d3c3594449f099818abc87d1478d20996
+  languageName: node
+  linkType: hard
+
 "@types/react-transition-group@npm:^4.2.0":
   version: 4.4.0
   resolution: "@types/react-transition-group@npm:4.4.0"
@@ -1738,6 +1760,13 @@ __metadata:
     "@types/prop-types": "*"
     csstype: ^3.0.2
   checksum: 5b490728c5210ea20b20377dd8c69b12ba7283058788d431d8b35ff4d18d03aa3a0f0cc6fe83691c8b9707d3e7ee8e9aae4e50d3989e094c907030d045d0e4e2
+  languageName: node
+  linkType: hard
+
+"@types/redux@npm:^3.6.0":
+  version: 3.6.31
+  resolution: "@types/redux@npm:3.6.31"
+  checksum: cf977fc072b3b4ac527308fffd6631aeaaa5e076015e170c4865ec2cc3f6ff039b4402b9b5bf44496588f8e6b1c6394c9680e3da8a5798d34adff9231ddccc0d
   languageName: node
   linkType: hard
 
@@ -3203,6 +3232,15 @@ __metadata:
   version: 0.1.1
   resolution: "copy-descriptor@npm:0.1.1"
   checksum: c052cf571ff6b69b604607a3d41f03cb742af9472026013e690ab33e1bef5e64930c53a5f881dc79c7e4f5ccc3cea0ebb9f420315d3690989329088976b68ee9
+  languageName: node
+  linkType: hard
+
+"copy-to-clipboard@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "copy-to-clipboard@npm:3.3.1"
+  dependencies:
+    toggle-selection: ^1.0.6
+  checksum: 9707f2e405ca4019de1f4194565568acdf3d1dd8a59f7b8f63d0e7257648132b579461e7aeb6140169cb943cf4b6a243b377cf0437d8c10c6f5e5bb3935dea78
   languageName: node
   linkType: hard
 
@@ -4905,7 +4943,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"hoist-non-react-statics@npm:^3.3.2":
+"hoist-non-react-statics@npm:^3.3.0, hoist-non-react-statics@npm:^3.3.2":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2"
   dependencies:
@@ -5129,6 +5167,13 @@ fsevents@~2.3.1:
   version: 8.0.1
   resolution: "immer@npm:8.0.1"
   checksum: a8c8d531af8f968f4d5a2ec3c5eeb6dd6933c69d216b3f8c55275e34c87926d556db4e3d81f5f038e66f9886e874da4ab4f7ffe228e33d718593820e2f57b68f
+  languageName: node
+  linkType: hard
+
+"immutability-helper@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "immutability-helper@npm:3.1.1"
+  checksum: a5c54826f57a2abd81a5ed083a5a2a6a555d74a16e31c218b3f613e01f65135e5955a46b8df27b5dcbacfe7837dd57f59bd90cc3eefbab4df880e6cc66cb61bc
   languageName: node
   linkType: hard
 
@@ -5948,10 +5993,13 @@ fsevents@~2.3.1:
     "@types/material-ui": ^0.21.8
     "@types/react": ^17.0.1
     "@types/react-dom": ^17.0.0
+    "@types/react-redux": ^7.1.16
+    "@types/redux": ^3.6.0
     "@types/webpack-dev-server": ^3.11.1
     "@typescript-eslint/eslint-plugin": ^4.14.2
     "@typescript-eslint/parser": ^4.14.2
     babel-loader: ^8.2.2
+    copy-to-clipboard: ^3.3.1
     css-loader: ^5.0.1
     eslint: ^7.19.0
     eslint-plugin-react: ^7.22.0
@@ -5961,6 +6009,7 @@ fsevents@~2.3.1:
     google-protobuf: ^3.14.0
     grpc-web: ^1.2.1
     html-webpack-plugin: ^5.0.0
+    immutability-helper: ^3.1.1
     js-base64: ^3.6.0
     lodash.frompairs: ^4.0.1
     lodash.mapvalues: ^4.6.0
@@ -8849,6 +8898,13 @@ fsevents@~2.3.1:
     regex-not: ^1.0.2
     safe-regex: ^1.1.0
   checksum: ed733fdff8970628ef2d425564d1331a812e57cbb6ab7675c970046b2b792cbf2386c8292e45bb201bf85ca71a7708e3e1ffb979f5cd089ad4a82a12df75939b
+  languageName: node
+  linkType: hard
+
+"toggle-selection@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "toggle-selection@npm:1.0.6"
+  checksum: c47702aad780581f17367c413c4dc55b61a31b0c15c87a08461f4c4618457b11efce8ad9a7bf7b79fb23d17128b1c7da9248647a34dd15ae36c9afbdd2084d9f
   languageName: node
   linkType: hard
 

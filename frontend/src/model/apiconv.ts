@@ -7,12 +7,16 @@ import { toDate } from 'api/helpers';
 import { getPosition, Pos, PlayerIds } from './players';
 import { Auction, Declaration, DeclareResult, emptyAuction } from './auction';
 
+export interface TableState {
+  table: Table;
+  match: Match | null;
+}
 export function toTable(t: api.TableData, phase: api.TablePhase): Table {
   return {
     owner: t.getOwner(),
     id: t.getTableId(),
     invite: t.getInviteCode(),
-    players: t.getMembersList().map(toUser),
+    members: t.getMembersList().map(toUser),
     created: toDate(t.getCreated() as api.Timestamp).toLocaleString(),
     phase,
   };
@@ -22,10 +26,10 @@ export function getCurrentTableState(u: api.UserState): TableState | null {
   return u.hasCurrenttable() ? toTableState(u.getCurrenttable() as api.TableState) : null;
 }
 
-export function toTableState(t: api.TableState) {
+export function toTableState(t: api.TableState): TableState {
   return {
     table: toTable(t.getData() as api.TableData, t.getPhase()),
-    match: t.hasCurrentMatch() ? toMatch(t.getCurrentMatch() as api.MatchState) : undefined,
+    match: t.hasCurrentMatch() ? toMatch(t.getCurrentMatch() as api.MatchState) : null,
   };
 }
 
@@ -109,7 +113,7 @@ export function toMatch(m: api.MatchState): Match {
   const auction = m.hasAuctionState()
     ? toAuction(players, m.getAuctionState() as api.AuctionState)
     : emptyAuction();
-  const game = m.hasGameState() ? toGame(m.getGameState() as api.GameState, players) : dummyGame();
+  const game = m.hasGameState() ? toGame(m.getGameState() as api.GameState, players) : null;
   return {
     phase: m.getPhase(),
     turn: m.hasTurn()

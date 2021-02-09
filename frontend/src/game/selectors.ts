@@ -1,6 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { selectGame } from '.';
+import { RootState } from 'state';
 
+export const selectGame = (state: RootState) => state.game;
 export const selectTable = createSelector(selectGame, (g) => g.table);
 export const selectMatch = createSelector(selectGame, (g) => g.match);
 
@@ -12,10 +13,10 @@ export const selectCurrentTableOrThrow = createSelector(selectTable, (t) => {
 });
 
 export const selectCurrentMatchOrThrow = createSelector(selectMatch, (m) => {
-  if (m.match === null) {
+  if (m === null) {
     throw new Error('no current match');
   }
-  return m.match;
+  return m;
 });
 
 export const selectPlayers = createSelector(selectCurrentMatchOrThrow, (m) => m.players);

@@ -1,6 +1,7 @@
 import {
   Action,
   createAction,
+  createReducer,
   Draft,
   PayloadActionCreator,
   PrepareAction,
@@ -9,7 +10,6 @@ import {
 import { AuthenticatedClient } from 'api/client';
 import { selectAuthenticatedClientOrThrow } from 'session/selectors';
 import { RootState, AppThunk } from 'state';
-import { selectCurrentTableOrThrow, selectTable } from './selectors';
 
 export enum ActionKind {
   noAction = 'noAction',
@@ -26,22 +26,30 @@ export interface ActionError {
   error: any;
 }
 
-export interface AsyncState {
-  pendingAction?: ActionKind;
-  error?: ActionError;
-}
-export function clearPendingAndError(state: Draft<AsyncState>) {
-  state.pendingAction = ActionKind.noAction;
-  state.error = undefined;
-}
-
 interface GameThunkConfig extends AuthenticatedClient {
   getState: () => RootState;
 }
 export const actionStarted = createAction<ActionKind>('ACTION_STARTED');
 export const actionSucceeded = createAction<ActionKind>('ACTION_SUCCEEDED');
 export const actionFailed = createAction<ActionError>('ACTION_FAILED');
+export interface ActionState {
+  pending: boolean;
+  lastAction?: ActionKind;
+  error?: unknown;
+}
 
+export const reducer = createReducer<ActionState>(
+  { pending: false },
+  {
+    actionStarted: (_, { payload }) => ({ pending: true, lastAction: payload }),
+    actionSucceded: (_, { payload }) => ({ pending: false, lastAction: payload }),
+    actionFailed: (_, { payload: { action, error } }) => ({
+      pending: false,
+      lastAction: action,
+      error,
+    }),
+  }
+);
 export type GameThunk<Returned, ThunkArg> = ((
   arg: ThunkArg
 ) => ThunkAction<any, RootState, any, Action<string>>) & {

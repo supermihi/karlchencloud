@@ -8,8 +8,21 @@ export interface Match {
   turn?: Pos;
   players: PlayerIds;
   cards: Card[];
+  game: Game | null;
+  auction: Auction | null;
+}
+export interface MatchInGame extends Match {
   game: Game;
+}
+export interface MatchInAuction extends Match {
   auction: Auction;
+}
+
+export function inGame(match: Match): match is MatchInGame {
+  return match.game !== null;
+}
+export function inAuction(match: Match): match is MatchInAuction {
+  return match.auction !== null;
 }
 
 export interface Game {
@@ -28,7 +41,6 @@ export function newGame(mode: Mode): Game {
     currentTrick: newTrick(mode.forehand),
   };
 }
-
 
 export interface PlayedCard {
   card: Card;

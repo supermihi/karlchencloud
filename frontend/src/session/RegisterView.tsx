@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import { formatError } from "api/client";
-import MainPaper from "shared/MainPaper";
-import SpinBackdrop from "shared/SpinBackdrop";
-import ErrorAlert from "shared/ErrorAlert";
+import React, { useState } from 'react';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import { formatError } from 'api/client';
+import MainPaper from 'shared/MainPaper';
+import SpinBackdrop from 'shared/SpinBackdrop';
+import ErrorAlert from 'shared/ErrorAlert';
 
 interface Props {
   register: (name: string) => void;
@@ -17,16 +17,16 @@ interface Props {
 
 const useStyles = makeStyles((theme) => ({
   buttons: {
-    display: "flex",
-    justifyContent: "flex-end",
+    display: 'flex',
+    justifyContent: 'flex-end',
     marginTop: theme.spacing(3),
   },
 }));
 
-export default function RegisterView({ register, loading, error }: Props) {
+export default function RegisterView({ register, loading, error }: Props): React.ReactElement {
   const classes = useStyles();
-  const [name, setName] = useState("");
-  const valid = name.trim() !== "";
+  const [name, setName] = useState('');
+  const valid = name.trim() !== '';
   return (
     <>
       <MainPaper>
@@ -54,16 +54,14 @@ export default function RegisterView({ register, loading, error }: Props) {
             disabled={!valid}
             variant="contained"
             color="primary"
-            onClick={(_) => register(name)}
+            onClick={() => register(name)}
           >
             Los
           </Button>
         </div>
         <SpinBackdrop open={loading} />
       </MainPaper>
-      {error && (
-        <ErrorAlert message={`Error signing up: ${formatError(error)}`} />
-      )}
+      {error && <ErrorAlert message={`Error signing up: ${formatError(error)}`} />}
     </>
   );
 }

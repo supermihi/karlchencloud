@@ -1,8 +1,8 @@
 import { createAction } from '@reduxjs/toolkit';
+import { TableState } from 'model/apiconv';
 import { DeclareResult } from 'model/auction';
 import { User } from 'model/core';
 import { Match, PlayedCard } from 'model/match';
-import { TableState } from 'model/table';
 
 export const sessionStarted = createAction<string>('event/sessionStarted');
 export const tableChanged = createAction<TableState | null>('event/tableChanged');
