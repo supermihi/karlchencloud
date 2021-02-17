@@ -2,8 +2,8 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectLocation, Location } from 'routing';
-import Login from 'session/Login';
-import Register from 'session/Register';
+import Login from 'session/view/Login';
+import Register from 'session/view/Register';
 
 export default function App(): React.ReactElement {
   const location = useSelector(selectLocation);
