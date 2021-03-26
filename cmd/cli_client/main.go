@@ -52,7 +52,6 @@ func (h *CliHandler) Start(service client.ClientService) {
 	service.Logf("table %s created with invite code %s", table.TableId, table.InviteCode)
 	h.TableClient = client.NewTableClient(service, table.TableId, h)
 	go h.TableClient.Start()
-	go client.StartBots(address, 3, table.TableId, table.InviteCode)
 }
 
 func (h *CliHandler) OnTableStateReceived(_ *api.TableState) {
