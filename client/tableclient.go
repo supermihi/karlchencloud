@@ -96,7 +96,7 @@ func (c *TableClient) handleMatchEnded(end *api.EndOfGame) {
 	c.handler.OnMatchEnd(end)
 }
 func (c *TableClient) checkMyTurn() {
-	if c.View.Match != nil && c.View.Match.MyTurn {
+	if c.View.Match != nil && c.View.Match.MyTurn && len(c.View.Match.Cards) > 0 {
 		c.handler.OnMyTurn()
 	}
 }
