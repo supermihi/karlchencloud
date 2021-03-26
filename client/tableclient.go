@@ -105,7 +105,7 @@ func (c *TableClient) PlayCard(card game.Card) error {
 		c.Service.Context,
 		&api.PlayCardRequest{Table: c.TableId, Card: server.ToApiCard(card)})
 	if err == nil {
-		c.View.Match.UpdateTrick(result)
+		c.handlePlayedCard(result)
 	}
 	return err
 }
