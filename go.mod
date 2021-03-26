@@ -1,6 +1,6 @@
 module github.com/supermihi/karlchencloud
 
-go 1.14
+go 1.16
 
 require (
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
