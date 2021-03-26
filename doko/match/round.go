@@ -26,6 +26,10 @@ type MatchStats struct {
 	players    *PlayerAssignment
 }
 
+func NewMatchStats(evaluation *GameEvaluation, players *PlayerAssignment) MatchStats {
+	return MatchStats{evaluation, players}
+}
+
 type Round struct {
 	numPlayers int
 	scores     []MatchStats
@@ -48,6 +52,14 @@ func (r *Round) NextMatch() Match {
 func (r *Round) NumFinishedGames() int {
 	return len(r.scores)
 }
+
+func (r *Round) AddScores(evaluation *GameEvaluation) {
+	players := r.CurrentPlayerAssignment()
+	scores := NewMatchStats(evaluation, &players)
+	r.scores = append(r.scores, scores)
+}
+
+
 
 func Dealer(numPlayers int, round int) int {
 	return round % numPlayers

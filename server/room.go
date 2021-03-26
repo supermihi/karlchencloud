@@ -66,7 +66,8 @@ func (r *Room) JoinTable(userId string, inviteCode string) (*TableData, error) {
 	return GetData(t), nil
 
 }
-func (r *Room) StartTable(tableId string, userId string) (*TableData, error) {
+
+func (r *Room) ensureIsOwner(tableId string, userId string) (*Table, error) {
 	t, tableExists := r.tables[tableId]
 	if !tableExists {
 		return nil, NewCloudError(TableDoesNotExist)
@@ -77,7 +78,15 @@ func (r *Room) StartTable(tableId string, userId string) (*TableData, error) {
 	if t.Owner() != userId {
 		return nil, NewCloudError(NotOwnerOfTable)
 	}
-	err := t.Start()
+	return t, nil
+}
+
+func (r *Room) StartTable(tableId string, userId string) (*TableData, error) {
+	t, err := r.ensureIsOwner(tableId, userId)
+	if err != nil {
+		return nil, err
+	}
+	err = t.Start()
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +109,7 @@ type MatchData struct {
 	CurrentTrick    *game.IncompleteTrick
 	PreviousTrick   *game.Trick
 	Mode            game.Mode
+	Evaluation		*match.GameEvaluation
 }
 
 func GetMatchData(tm *TableMatch) *MatchData {
@@ -116,7 +126,8 @@ func GetMatchData(tm *TableMatch) *MatchData {
 	ans := &MatchData{Phase: tm.Match.Phase(), Turn: tm.Match.WhoseTurn(),
 		Players: tm.Players, InitialForehand: tm.Match.InitialForehand(), Declarations: declarations,
 		Bids: *tm.Match.Bids}
-	if tm.Match.Phase() == match.InGame {
+	switch tm.Match.Phase() {
+	case match.InGame:
 		g := tm.Match.Game
 		ans.CompletedTricks = g.NumCompletedTricks()
 		if g.PreviousTrick() != nil {
@@ -127,8 +138,11 @@ func GetMatchData(tm *TableMatch) *MatchData {
 		ans.CurrentTrick = &tmp
 		ans.Mode = g.Mode
 		ans.Cards = g.HandCards
-	} else {
-		ans.Cards = tm.Match.DealtCards()
+	case match.InAuction:
+			ans.Cards = tm.Match.DealtCards()
+	case match.MatchFinished:
+		evaluation := match.EvaluateGame(tm.Match.Game, tm.Match.Bids)
+		ans.Evaluation = &evaluation
 	}
 	return ans
 }
@@ -152,8 +166,11 @@ func (r *Room) PlayCard(tableId string, userId string, card game.Card) (matchDat
 	if !m.Match.PlayCard(player, card) {
 		return nil, NewCloudError(CannotPlayCard)
 	}
+	if m.Match.Phase() == match.MatchFinished {
+		table := r.activeTableOf(userId)
+		err = table.EndMatch()
+	}
 	return GetMatchData(m), nil
-
 }
 
 func (r *Room) Declare(tableId string, userId string, gameType game.AnnouncedGameType) (*MatchData, error) {
@@ -176,6 +193,18 @@ func (r *Room) PlaceBid(tableId string, userId string, bid match.Bid) (*MatchDat
 		return nil, NewCloudError(CannotPlaceBid)
 	}
 	return GetMatchData(m), nil
+}
+
+func (r *Room) StartNextMatch(tableId string, userId string) (*MatchData, error) {
+	table, err := r.ensureIsOwner(tableId, userId)
+	if err != nil {
+		return nil, err
+	}
+	err = table.StartMatch()
+	if err != nil {
+		return nil, err
+	}
+	return r.GetMatchData(tableId)
 }
 
 func (r *Room) getMatchAndPlayer(tableId string, user string) (match *TableMatch, p game.Player, err error) {

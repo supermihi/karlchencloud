@@ -63,6 +63,17 @@ func (t *Table) Start() error {
 	t.Phase = api.TablePhase_BETWEEN_GAMES
 	return t.StartMatch()
 }
+
+func (t *Table) EndMatch() error {
+	if t.Phase != api.TablePhase_PLAYING || t.CurrentMatch == nil || t.CurrentMatch.Match.Phase() != match.MatchFinished {
+		return NewCloudError(CannotEndMatch)
+	}
+	t.Phase = api.TablePhase_BETWEEN_GAMES
+	evaluation := t.CurrentMatch.Match.Evaluate()
+	t.round.AddScores(&evaluation)
+	return nil
+}
+
 func (t *Table) StartMatch() error {
 	if t.Phase != api.TablePhase_BETWEEN_GAMES {
 		return NewCloudError(CannotStartTableNow)

@@ -34,6 +34,7 @@ const (
 	TableAlreadyStarted
 	InvalidNumberOfPlayers
 	CannotStartTableNow
+	CannotEndMatch
 	CannotPlayCard
 	CannotAnnounce
 	CannotPlaceBid

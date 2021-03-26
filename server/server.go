@@ -205,9 +205,37 @@ func (s *dokoserver) PlayCard(ctx context.Context, r *api.PlayCardRequest) (*api
 	if m.CurrentTrick != nil && m.CurrentTrick.NumCardsPlayed() == 0 {
 		card.TrickWinner = &api.PlayerValue{UserId: table.Players[int(m.PreviousTrick.Winner)]}
 	}
+	if m.Phase == match.MatchFinished {
+		card.Winner = &api.PartyValue{}
+		switch m.Evaluation.Winner {
+		case game.ReParty:
+			card.Winner.Party = api.Party_RE
+		case game.ContraParty:
+			card.Winner.Party = api.Party_CONTRA
+		}
+	}
 	event := &api.Event{Event: &api.Event_PlayedCard{PlayedCard: card}}
 	s.streams.send(getOtherPlayers(table, user.Id), event)
 	return card, nil
+}
+
+func (s *dokoserver) StartNextMatch(ctx context.Context, tableId *api.TableId) (*api.MatchState, error) {
+	user, _ := GetAuthenticatedUser(ctx)
+	s.roomMtx.Lock()
+	defer s.roomMtx.Unlock()
+
+	matchData, err := s.room.StartNextMatch(tableId.Value, user.Id)
+	if err != nil {
+		return nil, toGrpcError(err)
+	}
+	matchState := ToMatchState(matchData, user.Id)
+	event := &api.Event{Event: &api.Event_Start{Start: matchState}}
+	table, err := s.room.GetTable(tableId.Value)
+	if err != nil {
+		return nil, toGrpcError(err)
+	}
+	s.streams.send(getOtherPlayers(table, user.Id), event)
+	return matchState, nil
 }
 
 func (s *dokoserver) getTableState(table *TableData, user string) (*api.TableState, error) {
