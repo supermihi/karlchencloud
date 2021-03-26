@@ -51,7 +51,7 @@ func (c *TableClient) Start() {
 			}
 			c.handler.OnMemberEvent(ev.Member)
 		case *api.Event_Start:
-			c.handleStart(ev.Start)
+			c.HandleStart(ev.Start)
 		case *api.Event_Declared:
 			c.handleDeclare(ev.Declared)
 		case *api.Event_PlayedCard:
@@ -74,7 +74,7 @@ func (c *TableClient) handleWelcome(us *api.UserState) {
 	c.checkMyTurn()
 }
 
-func (c *TableClient) handleStart(s *api.MatchState) {
+func (c *TableClient) HandleStart(s *api.MatchState) {
 	c.View.Match = NewMatchView(s)
 	c.handler.OnMatchStart(s)
 	c.checkMyTurn()
