@@ -11,8 +11,7 @@ import (
 	"time"
 )
 
-func StartBots(address string, numBots int, table string, inviteCode string,
-	logins []BotLogin) {
+func StartBots(address string, numBots int, table string, inviteCode string, initTable bool, logins []BotLogin) {
 	clients := make([]*BotHandler, numBots)
 	for i := 0; i < numBots; i++ {
 		var user, secret *string
@@ -26,7 +25,7 @@ func StartBots(address string, numBots int, table string, inviteCode string,
 			ExistingSecret: secret,
 			Address:        address,
 		}
-		clients[i] = NewBotHandler()
+		clients[i] = NewBotHandler(i == 0 && initTable)
 		log.Printf("starting bot %d", i)
 		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 		go clients[i].Run(connect, table, inviteCode)
@@ -42,13 +41,15 @@ type BotHandler struct {
 	TableClient
 	context context.Context
 	cancel  context.CancelFunc
+	isOwner bool
 }
 
-func NewBotHandler() *BotHandler {
+func NewBotHandler(isOwner bool) *BotHandler {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &BotHandler{
 		context: ctx,
-		cancel:  cancel}
+		cancel:  cancel,
+		isOwner: isOwner}
 }
 
 func (h *BotHandler) Run(conn ConnectData, table string, invite string) {
@@ -61,12 +62,22 @@ func (h *BotHandler) Run(conn ConnectData, table string, invite string) {
 	c := service.Api
 	defer h.cancel()
 	defer service.CloseConnection()
-	_, err = c.JoinTable(ctx, &api.JoinTableRequest{InviteCode: invite})
-	if err != nil {
-		service.Logf("could not join table: %v", err)
-		return
+
+	if h.isOwner {
+		tableData, err := service.Api.CreateTable(service.Context, &api.Empty{})
+		if err != nil {
+			log.Fatalf("%s could not create table: %v", service.Name, err)
+		}
+		service.Logf("table %s created with invite code %s", tableData.TableId, tableData.InviteCode)
+		table = tableData.TableId
+	} else {
+		_, err = c.JoinTable(ctx, &api.JoinTableRequest{InviteCode: invite})
+		if err != nil {
+			service.Logf("could not join table: %v", err)
+			return
+		}
+		service.Logf("joined")
 	}
-	service.Logf("joined")
 	h.TableClient = NewTableClient(service, table, h)
 	h.TableClient.Start()
 }
@@ -127,8 +138,30 @@ func (h *BotHandler) makeTurnGame() {
 	}
 }
 
-func (h *BotHandler) OnMemberEvent(_ *api.MemberEvent) {
-	// pass
+
+func (h *BotHandler) OnMemberEvent(ev *api.MemberEvent) {
+	switch ev.Type {
+	case api.MemberEventType_JOIN_TABLE:
+		if ev.UserId == h.Service.UserId() {
+			h.Logf("oh, I joined myself")
+			return
+		}
+		h.Logf("user %s joined table", ev.Name)
+
+		if len(h.View.MemberNamesById) >= 4 && h.isOwner {
+			matchState, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
+			if err != nil {
+				log.Fatalf("error starting table: %v", err)
+			}
+			h.HandleStart(matchState)
+		}
+	case api.MemberEventType_GO_ONLINE:
+		h.Logf("user %s is now online", h.View.MemberNamesById[ev.UserId])
+	case api.MemberEventType_GO_OFFLINE:
+		h.Logf("user %s is now offline", h.View.MemberNamesById[ev.UserId])
+	default:
+		h.Logf("unexpected MemberEvent: %v", ev)
+	}
 }
 
 func (h *BotHandler) OnDeclaration(_ *api.Declaration) {

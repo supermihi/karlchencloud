@@ -19,5 +19,5 @@ func main() {
 	if err == nil {
 		bots = botConfig.Bots
 	}
-	client.StartBots(address, config.NumberOfBots, config.TableId, config.InviteCode, bots)
+	client.StartBots(address, config.NumberOfBots, config.TableId, config.InviteCode, config.InitTable, bots)
 }

@@ -11,6 +11,7 @@ type ClientConfig struct {
 	TableId      string `env:"TABLE_ID" env-default:""`
 	InviteCode   string `env:"INVITE_CODE" env-default:""`
 	NumberOfBots int    `env:"NUM_BOTS" env-default:"3"`
+	InitTable    bool   `env:"INIT_TABLE" env-default:"0"`
 }
 
 func ReadConfig() (cfg ClientConfig, err error) {
