@@ -98,11 +98,6 @@ func (h *CliHandler) OnPlayedCard(ev *api.PlayedCard) {
 	}
 }
 
-func (h *CliHandler) OnMatchEnd(_ *api.EndOfGame) {
-	h.Logf("the match has ended.")
-	h.Service.CloseConnection()
-}
-
 func (h *CliHandler) OnDeclaration(_ *api.Declaration) {
 	if h.Match().Phase == match.InGame {
 		h.Logf("now in game! Forehand: %s", h.View.MemberNamesById[h.Match().Trick.Forehand])

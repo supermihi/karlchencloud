@@ -172,10 +172,6 @@ func (h *BotHandler) OnPlayedCard(_ *api.PlayedCard) {
 	// pass
 }
 
-func (h *BotHandler) OnMatchEnd(_ *api.EndOfGame) {
-	// pass
-}
-
 func (h *BotHandler) OnTableStateReceived(_ *api.TableState) {
 	// pass
 }

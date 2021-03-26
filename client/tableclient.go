@@ -14,7 +14,6 @@ type ClientHandler interface {
 	OnMatchStart(s *api.MatchState)
 	OnDeclaration(d *api.Declaration)
 	OnPlayedCard(card *api.PlayedCard)
-	OnMatchEnd(end *api.EndOfGame)
 }
 type TableClient struct {
 	Service ClientService
@@ -56,8 +55,6 @@ func (c *TableClient) Start() {
 			c.handleDeclare(ev.Declared)
 		case *api.Event_PlayedCard:
 			c.handlePlayedCard(ev.PlayedCard)
-		case *api.Event_Ended:
-			c.handleMatchEnded(ev.Ended)
 		default:
 			log.Fatalf("unimplemented event occured: %v", msg)
 		}
@@ -92,9 +89,6 @@ func (c *TableClient) handlePlayedCard(card *api.PlayedCard) {
 	c.checkMyTurn()
 }
 
-func (c *TableClient) handleMatchEnded(end *api.EndOfGame) {
-	c.handler.OnMatchEnd(end)
-}
 func (c *TableClient) checkMyTurn() {
 	if c.View.Match != nil && c.View.Match.MyTurn && len(c.View.Match.Cards) > 0 {
 		c.handler.OnMyTurn()
