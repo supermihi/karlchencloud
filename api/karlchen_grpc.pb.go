@@ -26,6 +26,7 @@ type DokoClient interface {
 	PlayCard(ctx context.Context, in *PlayCardRequest, opts ...grpc.CallOption) (*PlayedCard, error)
 	PlaceBid(ctx context.Context, in *PlaceBidRequest, opts ...grpc.CallOption) (*Bid, error)
 	Declare(ctx context.Context, in *DeclareRequest, opts ...grpc.CallOption) (*Declaration, error)
+	StartNextMatch(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*MatchState, error)
 	StartSession(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Doko_StartSessionClient, error)
 }
 
@@ -109,6 +110,15 @@ func (c *dokoClient) Declare(ctx context.Context, in *DeclareRequest, opts ...gr
 	return out, nil
 }
 
+func (c *dokoClient) StartNextMatch(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*MatchState, error) {
+	out := new(MatchState)
+	err := c.cc.Invoke(ctx, "/api.Doko/StartNextMatch", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dokoClient) StartSession(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Doko_StartSessionClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Doko_ServiceDesc.Streams[0], "/api.Doko/StartSession", opts...)
 	if err != nil {
@@ -153,6 +163,7 @@ type DokoServer interface {
 	PlayCard(context.Context, *PlayCardRequest) (*PlayedCard, error)
 	PlaceBid(context.Context, *PlaceBidRequest) (*Bid, error)
 	Declare(context.Context, *DeclareRequest) (*Declaration, error)
+	StartNextMatch(context.Context, *TableId) (*MatchState, error)
 	StartSession(*Empty, Doko_StartSessionServer) error
 	mustEmbedUnimplementedDokoServer()
 }
@@ -184,6 +195,9 @@ func (UnimplementedDokoServer) PlaceBid(context.Context, *PlaceBidRequest) (*Bid
 }
 func (UnimplementedDokoServer) Declare(context.Context, *DeclareRequest) (*Declaration, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Declare not implemented")
+}
+func (UnimplementedDokoServer) StartNextMatch(context.Context, *TableId) (*MatchState, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartNextMatch not implemented")
 }
 func (UnimplementedDokoServer) StartSession(*Empty, Doko_StartSessionServer) error {
 	return status.Errorf(codes.Unimplemented, "method StartSession not implemented")
@@ -345,6 +359,24 @@ func _Doko_Declare_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Doko_StartNextMatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TableId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DokoServer).StartNextMatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Doko/StartNextMatch",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DokoServer).StartNextMatch(ctx, req.(*TableId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Doko_StartSession_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(Empty)
 	if err := stream.RecvMsg(m); err != nil {
@@ -404,6 +436,10 @@ var Doko_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Declare",
 			Handler:    _Doko_Declare_Handler,
+		},
+		{
+			MethodName: "StartNextMatch",
+			Handler:    _Doko_StartNextMatch_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
