@@ -21,6 +21,10 @@ func (s Suit) String() string {
 	return [...]string{"♦", "♥", "♠", "♣"}[s]
 }
 
+func (s Suit) ColorCode() int {
+	return [...]int{33, 31, 32, 97}[s]
+}
+
 type Rank int
 
 const (
@@ -50,8 +54,8 @@ func Alte() Card {
 }
 
 func (c Card) String() string {
-	return fmt.Sprintf("%s"+
-		"%s", c.Suit, c.Rank)
+	// ANSI escape sequence for color, Suit, Rank, ANSI escape sequence reset
+	return fmt.Sprintf("\033[%dm" + "%s"+ "%s" + "\033[m", c.Suit.ColorCode(), c.Suit, c.Rank)
 }
 
 func (c Card) Score() int {

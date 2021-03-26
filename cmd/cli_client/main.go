@@ -52,7 +52,6 @@ func (h *CliHandler) Start(service client.ClientService) {
 	service.Logf("table %s created with invite code %s", table.TableId, table.InviteCode)
 	h.TableClient = client.NewTableClient(service, table.TableId, h)
 	go h.TableClient.Start()
-	go client.StartBots(address, 3, table.TableId, table.InviteCode)
 }
 
 func (h *CliHandler) OnTableStateReceived(_ *api.TableState) {
@@ -69,10 +68,11 @@ func (h *CliHandler) OnMemberEvent(ev *api.MemberEvent) {
 		h.Logf("user %s joined table", ev.Name)
 
 		if len(h.View.MemberNamesById) >= 4 {
-			_, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
+			matchState, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
 			if err != nil {
 				log.Fatalf("error starting table: %v", err)
 			}
+			h.HandleStart(matchState)
 		}
 	case api.MemberEventType_GO_ONLINE:
 		h.Logf("user %s is now online", h.View.MemberNamesById[ev.UserId])
@@ -157,6 +157,7 @@ func (h *CliHandler) playCard() {
 			log.Printf("invalid card index %d", i)
 			continue
 		}
+		log.Printf("Playing card: %v", h.Match().Cards[i])
 		err = h.PlayCard(h.Match().Cards[i])
 		if err != nil {
 			log.Printf("could not play card: %v. Try again", err)

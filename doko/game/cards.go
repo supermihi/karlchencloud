@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 )
@@ -20,9 +21,9 @@ func (h Hand) CardIndex(card Card) int {
 func (h Hand) String() string {
 	cardStrings := make([]string, len(h))
 	for i, card := range h {
-		cardStrings[i] = card.String()
+		cardStrings[i] = fmt.Sprintf("%d:%s", i, card.String())
 	}
-	return strings.Join(cardStrings, "; ")
+	return strings.Join(cardStrings, " ")
 }
 
 func (h *Hand) RemoveCard(c Card) {

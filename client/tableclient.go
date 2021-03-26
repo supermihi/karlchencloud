@@ -51,7 +51,7 @@ func (c *TableClient) Start() {
 			}
 			c.handler.OnMemberEvent(ev.Member)
 		case *api.Event_Start:
-			c.handleStart(ev.Start)
+			c.HandleStart(ev.Start)
 		case *api.Event_Declared:
 			c.handleDeclare(ev.Declared)
 		case *api.Event_PlayedCard:
@@ -74,7 +74,7 @@ func (c *TableClient) handleWelcome(us *api.UserState) {
 	c.checkMyTurn()
 }
 
-func (c *TableClient) handleStart(s *api.MatchState) {
+func (c *TableClient) HandleStart(s *api.MatchState) {
 	c.View.Match = NewMatchView(s)
 	c.handler.OnMatchStart(s)
 	c.checkMyTurn()
@@ -96,7 +96,7 @@ func (c *TableClient) handleMatchEnded(end *api.EndOfGame) {
 	c.handler.OnMatchEnd(end)
 }
 func (c *TableClient) checkMyTurn() {
-	if c.View.Match != nil && c.View.Match.MyTurn {
+	if c.View.Match != nil && c.View.Match.MyTurn && len(c.View.Match.Cards) > 0 {
 		c.handler.OnMyTurn()
 	}
 }
@@ -105,7 +105,7 @@ func (c *TableClient) PlayCard(card game.Card) error {
 		c.Service.Context,
 		&api.PlayCardRequest{Table: c.TableId, Card: server.ToApiCard(card)})
 	if err == nil {
-		c.View.Match.UpdateTrick(result)
+		c.handlePlayedCard(result)
 	}
 	return err
 }
