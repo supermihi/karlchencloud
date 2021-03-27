@@ -13,6 +13,18 @@ jobs:
           command: go build ./...
       - go/test:
           failfast: true
+  Build-Frontend:
+    executor:
+      name: node/default
+      app-dir: ~/project/frontend
+      tag: '15'
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: yarn run build
+          name: yarn build
 
 workflows:
   version: 2
@@ -21,11 +33,8 @@ workflows:
       - Build-and-Test-Backend
   Frontend-Workflow:
     jobs:
-      - node/test:
-          app-dir: ~/project/frontend
-          pkg-manager: yarn
-          version: 10.23.0
+      - Build-Frontend
 
 orbs:
   go: circleci/go@1.3.0
-  node: circleci/node@4.1.0
+  node: circleci/node@4.2.0
