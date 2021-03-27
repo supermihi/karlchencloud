@@ -16,14 +16,15 @@ jobs:
   Build-Frontend:
     executor:
       name: node/default
-      app-dir: ~/project/frontend
       tag: '15'
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: yarn
+          app-dir: ~/project/frontend
       - run:
           command: yarn run build
+          working-directory: ~/project/frontend
           name: yarn build
 
 workflows:
