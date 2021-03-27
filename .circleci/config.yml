@@ -16,7 +16,7 @@ jobs:
   Build-Frontend:
     executor:
       name: node/default
-      tag: '13'
+      tag: 'current'
     steps:
       - checkout
       - node/install-packages:
