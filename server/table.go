@@ -29,14 +29,16 @@ func (t *Table) String() string {
 }
 
 func NewTable(owner string, fixedTableId *string, fixedInviteCode *string) *Table {
-	table := Table{
+	return &Table{
 		getStringWithDefault(fixedTableId, randomTableId),
 		time.Now(),
 		getStringWithDefault(fixedInviteCode, randomInviteCode),
 		api.TablePhase_NOT_STARTED,
 		[]string{owner},
-		nil, nil, nil}
-	return &table
+		nil,
+		nil,
+		nil,
+	}
 }
 
 func randomTableId() string {
