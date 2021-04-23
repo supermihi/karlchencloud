@@ -9,7 +9,7 @@ type AceSolo struct {
 }
 
 func AceSoloSuite(card game.Card) game.GameSuit {
-	return card.Suit.AsFehl()
+	return card.Suit.AsNonTrump()
 }
 func (f AceSolo) GameSuit(card game.Card) game.GameSuit {
 	return AceSoloSuite(card)

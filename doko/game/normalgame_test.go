@@ -14,18 +14,18 @@ func TestGameSuitTrump(t *testing.T) {
 
 func TestSpielFarbeKaro(t *testing.T) {
 	for _, card := range CreateDeck() {
-		assert.NotEqual(t, NormalGameSuit(card), KaroFehl)
+		assert.NotEqual(t, NormalGameSuit(card), KaroNonTrump)
 	}
 }
 
 func TestSpielFarbeHerz(t *testing.T) {
 	keinHerz := []Card{Herz10, HerzB, KreuzA}
 	for _, card := range keinHerz {
-		assert.NotEqual(t, NormalGameSuit(card), HerzFehl)
+		assert.NotEqual(t, NormalGameSuit(card), HerzNonTrump)
 	}
 	herz := []Card{Herz9, HerzK, HerzA}
 	for _, card := range herz {
-		assert.Equal(t, NormalGameSuit(card), HerzFehl)
+		assert.Equal(t, NormalGameSuit(card), HerzNonTrump)
 	}
 }
 

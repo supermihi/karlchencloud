@@ -128,5 +128,5 @@ func TakesTrickFrom(new Card, old Card, m Mode) bool {
 		return new.TrumpTrickValue() > old.TrumpTrickValue()
 	}
 	// none trump
-	return newSuit == oldSuit && new.FehlTrickValue() > old.FehlTrickValue()
+	return newSuit == oldSuit && new.NonTrumpTrickValue() > old.NonTrumpTrickValue()
 }

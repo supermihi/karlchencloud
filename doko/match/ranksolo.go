@@ -17,7 +17,7 @@ func RankSoloSuit(trump game.Rank, card game.Card) game.GameSuit {
 	if card.Rank == trump {
 		return game.Trump
 	}
-	return card.Suit.AsFehl()
+	return card.Suit.AsNonTrump()
 }
 
 func (r RankSolo) GameSuit(card game.Card) game.GameSuit {

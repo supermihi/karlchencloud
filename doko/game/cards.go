@@ -110,7 +110,7 @@ func (cards BySuitAndRank) Swap(i, j int) {
 	cards[i], cards[j] = cards[j], cards[i]
 }
 
-func (c Card) FehlTrickValue() int {
+func (c Card) NonTrumpTrickValue() int {
 	return c.Rank.Score()
 }
 

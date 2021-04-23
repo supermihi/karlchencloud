@@ -90,22 +90,22 @@ type GameSuit int
 
 const (
 	Trump GameSuit = iota
-	KaroFehl
-	HerzFehl
-	PikFehl
-	KreuzFehl
+	KaroNonTrump
+	HerzNonTrump
+	PikNonTrump
+	KreuzNonTrump
 )
 
-func (s Suit) AsFehl() GameSuit {
+func (s Suit) AsNonTrump() GameSuit {
 	switch s {
 	case Karo:
-		return KaroFehl
+		return KaroNonTrump
 	case Herz:
-		return HerzFehl
+		return HerzNonTrump
 	case Pik:
-		return PikFehl
+		return PikNonTrump
 	case Kreuz:
-		return KreuzFehl
+		return KreuzNonTrump
 	default:
 		panic("unexpected suit")
 	}

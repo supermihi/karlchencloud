@@ -8,7 +8,7 @@ func NormalGameSuit(c Card) GameSuit {
 	if IsNormalTrump(c) {
 		return Trump
 	}
-	return c.Suit.AsFehl()
+	return c.Suit.AsNonTrump()
 }
 
 type NormalGameMode struct {
