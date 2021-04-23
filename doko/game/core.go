@@ -37,7 +37,8 @@ const (
 )
 
 func (s Rank) String() string {
-	return [...]string{"9", "B", "D", "K", "10", "A"}[s]
+	// right padded to two runes
+	return [...]string{"9 ", "B ", "D ", "K ", "10", "A "}[s]
 }
 
 type Card struct {
