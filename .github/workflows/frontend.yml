@@ -15,3 +15,6 @@ jobs:
       - name: Install deps
         run: yarn
         working-directory: ./frontend
+      - name: Run prettier
+        run: prettier --check
+        working-directory: ./frontend

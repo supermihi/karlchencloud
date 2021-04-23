@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { selectLocation, Location } from 'routing';
 import Login from 'session/view/Login';
 import Register from 'session/view/Register';
-import Lobby from "lobby/Lobby";
+import Lobby from 'lobby/Lobby';
 
 export default function App(): React.ReactElement {
   const location = useSelector(selectLocation);

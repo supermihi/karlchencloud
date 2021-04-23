@@ -1,12 +1,12 @@
-import * as React from "react";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import ForwardIcon from "@material-ui/icons/Forward";
-import { formatError } from "api/client";
-import MainPaper from "shared/MainPaper";
-import SpinBackdrop from "shared/SpinBackdrop";
-import ErrorAlert from "shared/ErrorAlert";
+import * as React from 'react';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import ForwardIcon from '@material-ui/icons/Forward';
+import { formatError } from 'api/client';
+import MainPaper from 'shared/MainPaper';
+import SpinBackdrop from 'shared/SpinBackdrop';
+import ErrorAlert from 'shared/ErrorAlert';
 
 interface Props {
   name: string;
@@ -17,14 +17,7 @@ interface Props {
   resetError?: () => void;
 }
 
-const LoginView: React.FC<Props> = ({
-  login,
-  forgetLogin,
-  loading,
-  error,
-  name,
-  resetError,
-}) => (
+const LoginView: React.FC<Props> = ({ login, forgetLogin, loading, error, name, resetError }) => (
   <>
     <MainPaper>
       <Typography component="h1" variant="h6" gutterBottom>
@@ -50,12 +43,7 @@ const LoginView: React.FC<Props> = ({
       </Grid>
       <SpinBackdrop open={loading} />
     </MainPaper>
-    {error && (
-      <ErrorAlert
-        message={`Error logging in: ${formatError(error)}`}
-        reset={resetError}
-      />
-    )}
+    {error && <ErrorAlert message={`Error logging in: ${formatError(error)}`} reset={resetError} />}
   </>
 );
 export default LoginView;

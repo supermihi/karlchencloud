@@ -25,12 +25,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function PlayerView({
-                                     user: { name, online },
-                                     soloGame,
-                                     declaration,
-                                     bids,
-                                     turn,
-                                   }: Props): React.ReactElement {
+  user: { name, online },
+  soloGame,
+  declaration,
+  bids,
+  turn,
+}: Props): React.ReactElement {
   const classes = useStyles();
   return (
     <Paper variant="outlined" className={classes.root}>

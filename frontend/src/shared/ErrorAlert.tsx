@@ -1,5 +1,5 @@
-import React from "react";
-import Alert from "@material-ui/lab/Alert";
+import React from 'react';
+import Alert from '@material-ui/lab/Alert';
 
 interface Props {
   message: React.ReactNode;

@@ -30,9 +30,8 @@ const match: Match = {
   auction: emptyAuction(),
   turn: Pos.bottom,
 };
-export default <div style={{ width: '75vw', height: '95vh' }}>
-      <GameView
-        match={match}
-        players={toPlayerMap(match.players, mockPlayers.userMap)}
-      />
-    </div>;
+export default (
+  <div style={{ width: '75vw', height: '95vh' }}>
+    <GameView match={match} players={toPlayerMap(match.players, mockPlayers.userMap)} />
+  </div>
+);

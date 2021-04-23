@@ -11,17 +11,18 @@ interface Props {
   match: Match | null;
   players: PlayingUsers;
 }
-export default function GameView({match, players}: Props): React.ReactElement {
-
+export default function GameView({ match, players }: Props): React.ReactElement {
   const dRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState([0, 0]);
   useEffect(() => {
     if (dRef.current) {
       const div = dRef.current;
-      const updateSize = ()  => {
-        if (!dRef?.current) {return;}
+      const updateSize = () => {
+        if (!dRef?.current) {
+          return;
+        }
         setSize([div.clientWidth, div.clientHeight]);
-      }
+      };
       updateSize();
       window.addEventListener('resize', updateSize);
       return () => window.removeEventListener('resize', updateSize);
@@ -47,28 +48,32 @@ export default function GameView({match, players}: Props): React.ReactElement {
       }}
       ref={dRef}
     >
-        {/*<DeclarationDialogContainer />*/}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            height: '100%',
-            overflow: 'hidden',
-          }}
-        >
-          {inGame && (
-            <TrickView trick={match.game.currentTrick} cardWidth={size[0]/6} center={['50%', '50%']} />
-          )}
-          <OwnCardsView
-            cards={match.cards}
-            cardWidth={size[0] / 5}
-            onClick={() => undefined /*todo*/}
+      {/*<DeclarationDialogContainer />*/}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        {inGame && (
+          <TrickView
+            trick={match.game.currentTrick}
+            cardWidth={size[0] / 6}
+            center={['50%', '50%']}
           />
-          {[Pos.left, Pos.right, Pos.top, Pos.bottom].map((p) => (
-            <PositionedPlayerView key={p} user={players[p]} pos={p} match={match} />
-          ))}
-        </div>
+        )}
+        <OwnCardsView
+          cards={match.cards}
+          cardWidth={size[0] / 5}
+          onClick={() => undefined /*todo*/}
+        />
+        {[Pos.left, Pos.right, Pos.top, Pos.bottom].map((p) => (
+          <PositionedPlayerView key={p} user={players[p]} pos={p} match={match} />
+        ))}
       </div>
+    </div>
   );
 }
