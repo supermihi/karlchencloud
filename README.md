@@ -7,7 +7,8 @@ KarlchenCloud is an open source client/server implementation of the German card 
 We provide a web application that can be used without any installation.
 Using the open and simple [API](api/README.md), however, other clients an be developed as well.
 ## Usage
-Sorry - no working version available yet.
+### Docker
+Run `docker-compose build`, then `docker-compose up` to start the server.
 
 ### Command line game with bots
 You can debug the game with bots (that just play random cards).
