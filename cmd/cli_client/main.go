@@ -38,6 +38,7 @@ func main() {
 
 type CliHandler struct {
 	client.TableClient
+	IsCreator bool
 }
 
 func NewCliHandler() CliHandler {
@@ -49,6 +50,7 @@ func (h *CliHandler) Start(service client.ClientService) {
 	action := UserInputRune()
 	table := ""
 	if action == 'c' {
+		h.IsCreator = true
 		tableData, err := service.Api.CreateTable(service.Context, &api.Empty{})
 		if err != nil {
 			log.Fatalf("%s could not create table: %v", service.Name, err)
@@ -56,6 +58,7 @@ func (h *CliHandler) Start(service client.ClientService) {
 		table = tableData.TableId
 		service.Logf("table %s created with invite code %s", table, tableData.InviteCode)
 	} else if action == 'j' {
+		h.IsCreator = false
 		log.Printf("Input invite code:")
 		invite := UserInputString()
 		tableData, err := service.Api.JoinTable(service.Context, &api.JoinTableRequest{InviteCode: invite})
@@ -86,7 +89,7 @@ func (h *CliHandler) OnMemberEvent(ev *api.MemberEvent) {
 		}
 		h.Logf("user %s joined table", ev.Name)
 
-		if len(h.View.MemberNamesById) >= 4 {
+		if len(h.View.MemberNamesById) >= 4 && h.IsCreator {
 			matchState, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
 			if err != nil {
 				log.Fatalf("error starting table: %v", err)
