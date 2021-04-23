@@ -18,7 +18,8 @@ following order:
 1. Server terminal:
    `CONSTANT_INVITE_CODE=1234 CONSTANT_TABLE_ID=5678 go run cmd/server/main.go`
 1. Client terminal:
-   `INVITE_CODE=1234 TABLE_ID=5678 go run cmd/cli_client/main.go`
+   `go run cmd/cli_client/main.go`
+1. Input `c` to create a table.
 1. Bot terminal:
    `INVITE_CODE=1234 TABLE_ID=5678 go run cmd/bot_client/main.go`
 1. Play the game in the client terminal.

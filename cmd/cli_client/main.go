@@ -45,12 +45,31 @@ func NewCliHandler() CliHandler {
 }
 
 func (h *CliHandler) Start(service client.ClientService) {
-	table, err := service.Api.CreateTable(service.Context, &api.Empty{})
-	if err != nil {
-		log.Fatalf("%s could not create table: %v", service.Name, err)
+	log.Printf("Choose: [_c_reate, _j_oin] table")
+	action := UserInputRune()
+	table := ""
+	if action == 'c' {
+		tableData, err := service.Api.CreateTable(service.Context, &api.Empty{})
+		if err != nil {
+			log.Fatalf("%s could not create table: %v", service.Name, err)
+		}
+		table = tableData.TableId
+		service.Logf("table %s created with invite code %s", table, tableData.InviteCode)
+	} else if action == 'j' {
+		log.Printf("Input invite code:")
+		invite := UserInputString()
+		tableData, err := service.Api.JoinTable(service.Context, &api.JoinTableRequest{InviteCode: invite})
+		if err != nil {
+			service.Logf("could not join table: %v", err)
+			return
+		}
+		table = tableData.Data.TableId
+		service.Logf("table %s joined", table)
+	} else {
+		service.Logf("Invalid action %c", action)
+		return
 	}
-	service.Logf("table %s created with invite code %s", table.TableId, table.InviteCode)
-	h.TableClient = client.NewTableClient(service, table.TableId, h)
+	h.TableClient = client.NewTableClient(service, table, h)
 	go h.TableClient.Start()
 }
 
