@@ -12,3 +12,10 @@ to allow for grpc-web (browser) connections.
 
 ## Web App
 See [frontend/README.md](frontend/README.md)
+
+## Development Parameters
+The following debug parameters can be specified as environment variables:
+
+| Variable    | Example             | Explanation                                        |
+|-------------|---------------------|----------------------------------------------------|
+| KC_DBG_SEED | 1475759920238344204 | Overwrite for randomized events (e.g. dealt cards) |
