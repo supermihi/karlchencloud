@@ -11,7 +11,7 @@ func AssertCardIsHigher(t *testing.T, lower game.Card, higher game.Card, mode ga
 }
 
 func TestWinnerOfTrickKreuzSolo(t *testing.T) {
-	var kreuzSolo = NewFarbsolo(game.Kreuz, game.Player1)
+	var kreuzSolo = NewSuitSolo(game.Kreuz, game.Player1)
 
 	// Turnier-Spielregeln (TSR) des Deutschen Doppelkopf-Verbandes e. V., Stand 1. April 2019
 	// https://www.doko-verband.de/Regeln__Ordnungen.html?file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/&file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/Turnier-Spielregeln%20Stand%2001.04.2019.pdf
@@ -48,7 +48,7 @@ func TestWinnerOfTrickKreuzSolo(t *testing.T) {
 }
 
 func TestWinnerOfTrickPikSolo(t *testing.T) {
-	var pikSolo = NewFarbsolo(game.Pik, game.Player2)
+	var pikSolo = NewSuitSolo(game.Pik, game.Player2)
 
 	// Turnier-Spielregeln (TSR) des Deutschen Doppelkopf-Verbandes e. V., Stand 1. April 2019
 	// https://www.doko-verband.de/Regeln__Ordnungen.html?file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/&file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/Turnier-Spielregeln%20Stand%2001.04.2019.pdf
@@ -85,7 +85,7 @@ func TestWinnerOfTrickPikSolo(t *testing.T) {
 }
 
 func TestWinnerOfTrickHerzSolo(t *testing.T) {
-	var herzSolo = NewFarbsolo(game.Herz, game.Player3)
+	var herzSolo = NewSuitSolo(game.Herz, game.Player3)
 
 	// Turnier-Spielregeln (TSR) des Deutschen Doppelkopf-Verbandes e. V., Stand 1. April 2019
 	// https://www.doko-verband.de/Regeln__Ordnungen.html?file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/&file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/Turnier-Spielregeln%20Stand%2001.04.2019.pdf
@@ -122,7 +122,7 @@ func TestWinnerOfTrickHerzSolo(t *testing.T) {
 }
 
 func TestWinnerOfTrickKaroSolo(t *testing.T) {
-	var karoSolo = NewFarbsolo(game.Karo, game.Player4)
+	var karoSolo = NewSuitSolo(game.Karo, game.Player4)
 
 	// Turnier-Spielregeln (TSR) des Deutschen Doppelkopf-Verbandes e. V., Stand 1. April 2019
 	// https://www.doko-verband.de/Regeln__Ordnungen.html?file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/&file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/Turnier-Spielregeln%20Stand%2001.04.2019.pdf
