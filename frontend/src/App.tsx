@@ -5,6 +5,7 @@ import { selectLocation, Location } from 'routing';
 import Login from 'session/view/Login';
 import Register from 'session/view/Register';
 import Lobby from 'lobby/Lobby';
+import Play from 'play/view/Play';
 
 export default function App(): React.ReactElement {
   const location = useSelector(selectLocation);
@@ -26,7 +27,7 @@ function Content({ location }: { location: Location }) {
     case Location.lobby:
       return <Lobby />;
     case Location.table:
-      return <h1>table not implemented</h1>;
+      return <Play />;
   }
 }
 

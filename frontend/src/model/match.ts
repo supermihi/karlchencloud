@@ -1,4 +1,4 @@
-import { BidType, GameType, MatchPhase } from '../api/karlchen_pb';
+import { BidType, GameType, MatchPhase } from 'api/karlchen_pb';
 import { Auction } from './auction';
 import { Card } from './core';
 import { Pos, PlayerIds, newPlayerMap } from './players';

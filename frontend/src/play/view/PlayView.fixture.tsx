@@ -1,11 +1,13 @@
 import React from 'react';
-import GameView from './GameView';
-import { Match, Game } from 'model/match';
-import { MatchPhase, GameType, BidType } from 'api/karlchen_pb';
-import { Pos, toPlayerMap } from 'model/players';
+import PlayView from 'play/view/PlayView';
+import { Game, Match } from 'model/match';
+import { BidType, GameType, MatchPhase, TablePhase } from 'api/karlchen_pb';
+import { Pos } from 'model/players';
 import { emptyAuction } from 'model/auction';
 import * as mockCards from 'mocks/cards';
 import * as mockPlayers from 'mocks/players';
+import { Table } from 'model/table';
+
 const mode = {
   type: GameType.NORMAL_GAME,
   forehand: Pos.bottom,
@@ -30,8 +32,16 @@ const match: Match = {
   auction: emptyAuction(),
   turn: Pos.bottom,
 };
+
+const table: Table = {
+  id: '123',
+  members: mockPlayers.users,
+  owner: mockPlayers.me.id,
+  created: '1',
+  phase: TablePhase.PLAYING,
+};
 export default (
   <div style={{ width: '75vw', height: '95vh' }}>
-    <GameView match={match} players={toPlayerMap(match.players, mockPlayers.userMap)} />
+    <PlayView match={match} table={table} />
   </div>
 );
