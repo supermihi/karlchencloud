@@ -137,9 +137,9 @@ func (c Card) TrumpfTrickValue() int {
 	}
 	switch c.Rank {
 	case Dame:
-		return 20 + int(c.Suit)
+		return 30 + int(c.Suit)
 	case Bube:
-		return 10 + int(c.Suit)
+		return 20 + int(c.Suit)
 	default:
 		return c.Rank.Score()
 	}
