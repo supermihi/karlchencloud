@@ -117,17 +117,13 @@ func (h *CliHandler) OnMyTurn() {
 }
 func (h *CliHandler) declare() {
 	log.Printf("Choose: [_g_esund, _h_ochzeit]")
-	reader := bufio.NewReader(os.Stdin)
-	char, _, err := reader.ReadRune()
-	if err != nil {
-		log.Fatalf("error reading rune: %v", err)
-	}
+	char := UserInputRune()
 	declaration := game.NormalGameType
 	if char == 'h' {
 		declaration = game.MarriageType
 	}
 	if h.Declare(declaration) != nil {
-		log.Fatalf("error declaring game: %v", err)
+		log.Fatalf("error declaring game: %v", declaration)
 	}
 	h.Logf("successfully declared %s", declaration)
 }
@@ -162,4 +158,13 @@ func (h *CliHandler) playCard() {
 		break
 	}
 
+}
+
+func UserInputRune() rune {
+	reader := bufio.NewReader(os.Stdin)
+	char, _, err := reader.ReadRune()
+	if err != nil {
+		log.Fatalf("error reading rune: %v", err)
+	}
+	return char
 }
