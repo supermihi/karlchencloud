@@ -44,13 +44,13 @@ func (f SuitSolo) Type() game.AnnouncedGameType {
 
 func gameTypeForTrump(trump game.Suit) game.AnnouncedGameType {
 	switch trump {
-	case game.Karo:
+	case game.Diamonds:
 		return game.DiamondSoloType
-	case game.Herz:
+	case game.Hearts:
 		return game.HeartSoloType
-	case game.Pik:
+	case game.Spades:
 		return game.SpadeSoloType
-	case game.Kreuz:
+	case game.Clubs:
 		return game.ClubSoloType
 	}
 	panic("unexpected solo suit")

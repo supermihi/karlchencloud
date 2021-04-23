@@ -1,7 +1,7 @@
 package game
 
 func IsNormalTrump(k Card) bool {
-	return k.Suit == Karo || k.Rank == Bube || k.Rank == Dame || k == TenOfHearts()
+	return k.Suit == Diamonds || k.Rank == Bube || k.Rank == Dame || k == TenOfHearts()
 }
 
 func NormalGameSuit(c Card) GameSuit {

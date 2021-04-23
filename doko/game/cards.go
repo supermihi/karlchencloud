@@ -74,7 +74,7 @@ func (h Hand) NumQueensOfClubs() int {
 func CreateDeck() []Card {
 	ans := make([]Card, DeckSize)
 	pos := 0
-	for suit := Karo; suit <= Kreuz; suit++ {
+	for suit := Diamonds; suit <= Clubs; suit++ {
 		for rank := Neun; rank <= Ass; rank++ {
 			ans[pos] = Card{suit, rank}
 			ans[pos+1] = Card{suit, rank}
@@ -128,30 +128,30 @@ func (c Card) TrumpTrickValue() int {
 	}
 }
 
-var Karo9 = Card{Karo, Neun}
-var KaroB = Card{Karo, Bube}
-var KaroD = Card{Karo, Dame}
-var KaroK = Card{Karo, Koenig}
-var Karo10 = Card{Karo, Zehn}
-var KaroA = Card{Karo, Ass}
+var Diamonds9 = Card{Diamonds, Neun}
+var DiamondsB = Card{Diamonds, Bube}
+var DiamondsD = Card{Diamonds, Dame}
+var DiamondsK = Card{Diamonds, Koenig}
+var Diamonds10 = Card{Diamonds, Zehn}
+var DiamondsA = Card{Diamonds, Ass}
 
-var Herz9 = Card{Herz, Neun}
-var HerzB = Card{Herz, Bube}
-var HerzD = Card{Herz, Dame}
-var HerzK = Card{Herz, Koenig}
-var Herz10 = Card{Herz, Zehn}
-var HerzA = Card{Herz, Ass}
+var Hearts9 = Card{Hearts, Neun}
+var HeartsB = Card{Hearts, Bube}
+var HeartsD = Card{Hearts, Dame}
+var HeartsK = Card{Hearts, Koenig}
+var Hearts10 = Card{Hearts, Zehn}
+var HeartsA = Card{Hearts, Ass}
 
-var Pik9 = Card{Pik, Neun}
-var PikB = Card{Pik, Bube}
-var PikD = Card{Pik, Dame}
-var PikK = Card{Pik, Koenig}
-var Pik10 = Card{Pik, Zehn}
-var PikA = Card{Pik, Ass}
+var Spades9 = Card{Spades, Neun}
+var SpadesB = Card{Spades, Bube}
+var SpadesD = Card{Spades, Dame}
+var SpadesK = Card{Spades, Koenig}
+var Spades10 = Card{Spades, Zehn}
+var SpadesA = Card{Spades, Ass}
 
-var Kreuz9 = Card{Kreuz, Neun}
-var KreuzB = Card{Kreuz, Bube}
-var KreuzD = Card{Kreuz, Dame}
-var KreuzK = Card{Kreuz, Koenig}
-var Kreuz10 = Card{Kreuz, Zehn}
-var KreuzA = Card{Kreuz, Ass}
+var Clubs9 = Card{Clubs, Neun}
+var ClubsB = Card{Clubs, Bube}
+var ClubsD = Card{Clubs, Dame}
+var ClubsK = Card{Clubs, Koenig}
+var Clubs10 = Card{Clubs, Zehn}
+var ClubsA = Card{Clubs, Ass}

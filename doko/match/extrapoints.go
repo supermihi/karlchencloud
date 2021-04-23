@@ -39,7 +39,7 @@ func fuechse(g *game.Game) []ExtraPoint {
 	var ans []ExtraPoint
 	for i, trick := range g.CompleteTricks {
 		for _, player := range game.Players() {
-			if trick.CardsOf[player] == game.KaroA && g.Mode.PartyOf(player) != g.Mode.PartyOf(trick.Winner) {
+			if trick.CardsOf[player] == game.DiamondsA && g.Mode.PartyOf(player) != g.Mode.PartyOf(trick.Winner) {
 				ans = append(ans, ExtraPoint{FuchsGefangen, trick.Winner, i})
 			}
 		}
@@ -49,7 +49,7 @@ func fuechse(g *game.Game) []ExtraPoint {
 
 func karlchen(g *game.Game) []ExtraPoint {
 	lastTrick := g.CompleteTricks[game.NumTricks-1]
-	if lastTrick.CardsOf[lastTrick.Winner] == game.KreuzB {
+	if lastTrick.CardsOf[lastTrick.Winner] == game.ClubsB {
 		ans := [1]ExtraPoint{{Karlchen, lastTrick.Winner, game.NumTricks - 1}}
 		return ans[:]
 	}

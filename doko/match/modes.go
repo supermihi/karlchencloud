@@ -22,13 +22,13 @@ func GetReservation(t game.AnnouncedGameType) Reservation {
 	case game.AceSoloType:
 		return ReservationAceSolo{}
 	case game.DiamondSoloType:
-		return ReservationSuitSolo{game.Karo}
+		return ReservationSuitSolo{game.Diamonds}
 	case game.HeartSoloType:
-		return ReservationSuitSolo{game.Herz}
+		return ReservationSuitSolo{game.Hearts}
 	case game.SpadeSoloType:
-		return ReservationSuitSolo{game.Pik}
+		return ReservationSuitSolo{game.Spades}
 	case game.ClubSoloType:
-		return ReservationSuitSolo{game.Kreuz}
+		return ReservationSuitSolo{game.Clubs}
 	case game.JackSoloType:
 		return ReservationRankSolo{game.Bube}
 	case game.QueenSoloType:
@@ -46,13 +46,13 @@ func GameSuitOf(card game.Card, t game.AnnouncedGameType) game.GameSuit {
 	case game.AceSoloType:
 		return AceSoloSuite(card)
 	case game.DiamondSoloType:
-		return SuitSoloSuit(game.Karo, card)
+		return SuitSoloSuit(game.Diamonds, card)
 	case game.HeartSoloType:
-		return SuitSoloSuit(game.Herz, card)
+		return SuitSoloSuit(game.Hearts, card)
 	case game.SpadeSoloType:
-		return SuitSoloSuit(game.Pik, card)
+		return SuitSoloSuit(game.Spades, card)
 	case game.ClubSoloType:
-		return SuitSoloSuit(game.Kreuz, card)
+		return SuitSoloSuit(game.Clubs, card)
 	case game.JackSoloType:
 		return RankSoloSuit(game.Bube, card)
 	case game.QueenSoloType:

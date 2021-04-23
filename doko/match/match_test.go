@@ -10,16 +10,16 @@ import (
 func sampleCards() Cards {
 	return [NumPlayers]Hand{
 		[]Card{
-			HerzK, HerzA, PikK, Pik10, PikA, KreuzK, KaroK, KaroA, HerzB, KreuzB, KreuzD, Herz10,
+			HeartsK, HeartsA, SpadesK, Spades10, SpadesA, ClubsK, DiamondsK, DiamondsA, HeartsB, ClubsB, ClubsD, Hearts10,
 		},
 		[]Card{
-			PikK, Pik10, Kreuz10, Kreuz10, Karo10, KaroB, KaroB, HerzD, HerzD, PikD, PikD, KreuzD,
+			SpadesK, Spades10, Clubs10, Clubs10, Diamonds10, DiamondsB, DiamondsB, HeartsD, HeartsD, SpadesD, SpadesD, ClubsD,
 		},
 		[]Card{
-			Herz9, Herz9, HerzK, Kreuz9, Kreuz9, Karo9, KaroK, KaroA, PikB, KaroD, KaroD, Herz10,
+			Hearts9, Hearts9, HeartsK, Clubs9, Clubs9, Diamonds9, DiamondsK, DiamondsA, SpadesB, DiamondsD, DiamondsD, Hearts10,
 		},
 		[]Card{
-			HerzA, Pik9, Pik9, PikA, KreuzK, KreuzA, KreuzA, Karo9, Karo10, HerzB, PikB, KreuzB,
+			HeartsA, Spades9, Spades9, SpadesA, ClubsK, ClubsA, ClubsA, Diamonds9, Diamonds10, HeartsB, SpadesB, ClubsB,
 		},
 	}
 }
@@ -55,78 +55,78 @@ func TestSampleMatch(t *testing.T) {
 	assert.Equal(t, ContraParty, mode.PartyOf(Player3))
 	assert.Equal(t, ContraParty, mode.PartyOf(Player4))
 	// trick 0
-	play(Player3, PikB)
-	play(Player4, Karo9)
-	play(Player1, KreuzD)
-	play(Player2, Karo10)
+	play(Player3, SpadesB)
+	play(Player4, Diamonds9)
+	play(Player1, ClubsD)
+	play(Player2, Diamonds10)
 	expectTrickWinner(Player1)
 	match.PlaceBid(Player1, Re)
 	assert.False(t, match.PlaceBid(Player4, Re))
 	// trick 1
-	play(Player1, PikA)
-	play(Player2, Pik10)
-	play(Player3, KaroA)
-	play(Player4, PikA) // doppelkopf
+	play(Player1, SpadesA)
+	play(Player2, Spades10)
+	play(Player3, DiamondsA)
+	play(Player4, SpadesA) // doppelkopf
 	expectTrickWinner(Player3)
 	// trick 2
-	play(Player3, Kreuz9)
-	play(Player4, KreuzA)
-	play(Player1, KreuzK)
-	play(Player2, Kreuz10)
+	play(Player3, Clubs9)
+	play(Player4, ClubsA)
+	play(Player1, ClubsK)
+	play(Player2, Clubs10)
 	expectTrickWinner(Player4)
 	// trick 3
-	play(Player4, HerzA)
-	play(Player1, HerzK)
-	play(Player2, KaroB)
-	play(Player3, Herz9)
+	play(Player4, HeartsA)
+	play(Player1, HeartsK)
+	play(Player2, DiamondsB)
+	play(Player3, Hearts9)
 	expectTrickWinner(Player2)
 	// trick 4
-	play(Player2, PikD)
-	play(Player3, Herz10)
-	play(Player4, Karo10)
-	play(Player1, KaroK)
+	play(Player2, SpadesD)
+	play(Player3, Hearts10)
+	play(Player4, Diamonds10)
+	play(Player1, DiamondsK)
 	expectTrickWinner(Player3)
 	// trick 5
-	play(Player3, Karo9)
-	play(Player4, PikB)
-	play(Player1, KaroA)
-	play(Player2, HerzD)
+	play(Player3, Diamonds9)
+	play(Player4, SpadesB)
+	play(Player1, DiamondsA)
+	play(Player2, HeartsD)
 	expectTrickWinner(Player2)
 	// trick 6
-	play(Player2, PikD)
-	play(Player3, KaroK)
-	play(Player4, HerzB)
-	play(Player1, HerzB)
+	play(Player2, SpadesD)
+	play(Player3, DiamondsK)
+	play(Player4, HeartsB)
+	play(Player1, HeartsB)
 	expectTrickWinner(Player2)
 	// trick 7
-	play(Player2, PikK)
-	play(Player3, KaroD)
-	play(Player4, Pik9)
-	play(Player1, PikK)
+	play(Player2, SpadesK)
+	play(Player3, DiamondsD)
+	play(Player4, Spades9)
+	play(Player1, SpadesK)
 	expectTrickWinner(Player3)
 	// trick 8
-	play(Player3, Herz9)
-	play(Player4, Pik9)
-	play(Player1, HerzA)
-	play(Player2, Kreuz10)
+	play(Player3, Hearts9)
+	play(Player4, Spades9)
+	play(Player1, HeartsA)
+	play(Player2, Clubs10)
 	expectTrickWinner(Player1)
 	// trick 9
-	play(Player1, Pik10)
-	play(Player2, KreuzD)
-	play(Player3, Kreuz9)
-	play(Player4, KreuzK)
+	play(Player1, Spades10)
+	play(Player2, ClubsD)
+	play(Player3, Clubs9)
+	play(Player4, ClubsK)
 	expectTrickWinner(Player2)
 	// trick 10
-	play(Player2, HerzD)
-	play(Player3, KaroD)
-	play(Player4, KreuzB)
-	play(Player1, Herz10)
+	play(Player2, HeartsD)
+	play(Player3, DiamondsD)
+	play(Player4, ClubsB)
+	play(Player1, Hearts10)
 	expectTrickWinner(Player1)
 	// trick 11
-	play(Player1, KreuzB)
-	play(Player2, KaroB)
-	play(Player3, HerzK)
-	play(Player4, KreuzA) // karlchen
+	play(Player1, ClubsB)
+	play(Player2, DiamondsB)
+	play(Player3, HeartsK)
+	play(Player4, ClubsA) // karlchen
 	expectTrickWinner(Player1)
 	assert.Equal(t, MatchFinished, match.Phase())
 	result := match.Evaluate()

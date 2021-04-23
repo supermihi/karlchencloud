@@ -6,26 +6,26 @@ import (
 )
 
 func TestGameSuitTrump(t *testing.T) {
-	cards := []Card{Herz10, KreuzD, KaroA, HerzB}
+	cards := []Card{Hearts10, ClubsD, DiamondsA, HeartsB}
 	for _, card := range cards {
 		assert.Equal(t, NormalGameSuit(card), Trump)
 	}
 }
 
-func TestSpielFarbeKaro(t *testing.T) {
+func TestGameSuitDiamonds(t *testing.T) {
 	for _, card := range CreateDeck() {
-		assert.NotEqual(t, NormalGameSuit(card), KaroNonTrump)
+		assert.NotEqual(t, NormalGameSuit(card), DiamondsNonTrump)
 	}
 }
 
-func TestSpielFarbeHerz(t *testing.T) {
-	keinHerz := []Card{Herz10, HerzB, KreuzA}
-	for _, card := range keinHerz {
-		assert.NotEqual(t, NormalGameSuit(card), HerzNonTrump)
+func TestGameSuitHearts(t *testing.T) {
+	noHearts := []Card{Hearts10, HeartsB, ClubsA}
+	for _, card := range noHearts {
+		assert.NotEqual(t, NormalGameSuit(card), HeartsNonTrump)
 	}
-	herz := []Card{Herz9, HerzK, HerzA}
-	for _, card := range herz {
-		assert.Equal(t, NormalGameSuit(card), HerzNonTrump)
+	hearts := []Card{Hearts9, HeartsK, HeartsA}
+	for _, card := range hearts {
+		assert.Equal(t, NormalGameSuit(card), HeartsNonTrump)
 	}
 }
 
@@ -34,10 +34,10 @@ func TestTakesTrickFrom(t *testing.T) {
 		neu Card
 		alt Card
 	}{
-		{Herz10, KreuzD},
-		{HerzA, HerzK},
-		{Karo9, PikA},
-		{Kreuz10, KreuzK},
+		{Hearts10, ClubsD},
+		{HeartsA, HeartsK},
+		{Diamonds9, SpadesA},
+		{Clubs10, ClubsK},
 	}
 	for _, neuAlt := range sticht {
 		assert.True(t, TakesTrickFrom(neuAlt.neu, neuAlt.alt, someNormalspiel))
@@ -46,10 +46,10 @@ func TestTakesTrickFrom(t *testing.T) {
 		neu Card
 		alt Card
 	}{
-		{Herz10, Herz10},
-		{HerzA, HerzA},
-		{Kreuz10, Karo9},
-		{HerzA, Herz10},
+		{Hearts10, Hearts10},
+		{HeartsA, HeartsA},
+		{Clubs10, Diamonds9},
+		{HeartsA, Hearts10},
 	}
 	for _, neuAlt := range stichtNicht {
 		assert.False(t, TakesTrickFrom(neuAlt.neu, neuAlt.alt, someNormalspiel))

@@ -30,8 +30,8 @@ func TestRoom_GetMatchData(t *testing.T) {
 		match.AnnounceGameType(player, game.NormalGameType)
 	}
 	curTrick := game.NewIncompleteTrick(game.Player1)
-	curTrick.Play(game.Player1, game.Herz9)
-	curTrick.Play(game.Player2, game.Herz10)
+	curTrick.Play(game.Player1, game.Hearts9)
+	curTrick.Play(game.Player2, game.Hearts10)
 	match.Game = game.NewGame(cards, game.Player1, game.NewNormalGame(cards))
 	match.Game.CurrentTrick = curTrick
 	players := [game.NumPlayers]string {"1", "2", "3", "4"}

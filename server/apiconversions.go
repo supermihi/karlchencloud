@@ -126,13 +126,13 @@ func ToApiMode(mode game.Mode, forehand game.Player, users PlayerUserMap) *api.M
 
 func ToApiSuit(s game.Suit) api.Suit {
 	switch s {
-	case game.Karo:
+	case game.Diamonds:
 		return api.Suit_DIAMONDS
-	case game.Herz:
+	case game.Hearts:
 		return api.Suit_HEARTS
-	case game.Pik:
+	case game.Spades:
 		return api.Suit_SPADES
-	case game.Kreuz:
+	case game.Clubs:
 		return api.Suit_CLUBS
 	}
 	panic(fmt.Sprintf("unexpected suit %v", s))
@@ -141,13 +141,13 @@ func ToApiSuit(s game.Suit) api.Suit {
 func ToSuit(s api.Suit) game.Suit {
 	switch s {
 	case api.Suit_DIAMONDS:
-		return game.Karo
+		return game.Diamonds
 	case api.Suit_HEARTS:
-		return game.Herz
+		return game.Hearts
 	case api.Suit_SPADES:
-		return game.Pik
+		return game.Spades
 	case api.Suit_CLUBS:
-		return game.Kreuz
+		return game.Clubs
 	}
 	panic(fmt.Sprintf("unexpected apisuit %v in ToSuit()", s))
 }

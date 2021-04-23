@@ -15,30 +15,30 @@ func TestWinnerOfTrickAceSolo(t *testing.T) {
 	// Rule 2.3.1
 	assert.Equal(t,
 		game.Player1,
-		game.WinnerOfTrick([4]game.Card{game.KaroA, game.HerzA, game.PikA, game.KreuzA}, game.Player1, solo))
+		game.WinnerOfTrick([4]game.Card{game.DiamondsA, game.HeartsA, game.SpadesA, game.ClubsA}, game.Player1, solo))
 
 	// Rule 2.3.7
-	AssertCardIsHigher(t, game.Kreuz10, game.KreuzA, solo)
-	AssertCardIsHigher(t, game.KreuzK, game.Kreuz10, solo)
-	AssertCardIsHigher(t, game.KreuzD, game.KreuzK, solo)
-	AssertCardIsHigher(t, game.KreuzB, game.KreuzD, solo)
-	AssertCardIsHigher(t, game.Kreuz9, game.KreuzB, solo)
+	AssertCardIsHigher(t, game.Clubs10, game.ClubsA, solo)
+	AssertCardIsHigher(t, game.ClubsK, game.Clubs10, solo)
+	AssertCardIsHigher(t, game.ClubsD, game.ClubsK, solo)
+	AssertCardIsHigher(t, game.ClubsB, game.ClubsD, solo)
+	AssertCardIsHigher(t, game.Clubs9, game.ClubsB, solo)
 
-	AssertCardIsHigher(t, game.Pik10, game.PikA, solo)
-	AssertCardIsHigher(t, game.PikK, game.Pik10, solo)
-	AssertCardIsHigher(t, game.PikD, game.PikK, solo)
-	AssertCardIsHigher(t, game.PikB, game.PikD, solo)
-	AssertCardIsHigher(t, game.Pik9, game.PikB, solo)
+	AssertCardIsHigher(t, game.Spades10, game.SpadesA, solo)
+	AssertCardIsHigher(t, game.SpadesK, game.Spades10, solo)
+	AssertCardIsHigher(t, game.SpadesD, game.SpadesK, solo)
+	AssertCardIsHigher(t, game.SpadesB, game.SpadesD, solo)
+	AssertCardIsHigher(t, game.Spades9, game.SpadesB, solo)
 
-	AssertCardIsHigher(t, game.Herz10, game.HerzA, solo)
-	AssertCardIsHigher(t, game.HerzK, game.Herz10, solo)
-	AssertCardIsHigher(t, game.HerzD, game.HerzK, solo)
-	AssertCardIsHigher(t, game.HerzB, game.HerzD, solo)
-	AssertCardIsHigher(t, game.Herz9, game.HerzB, solo)
+	AssertCardIsHigher(t, game.Hearts10, game.HeartsA, solo)
+	AssertCardIsHigher(t, game.HeartsK, game.Hearts10, solo)
+	AssertCardIsHigher(t, game.HeartsD, game.HeartsK, solo)
+	AssertCardIsHigher(t, game.HeartsB, game.HeartsD, solo)
+	AssertCardIsHigher(t, game.Hearts9, game.HeartsB, solo)
 
-	AssertCardIsHigher(t, game.Karo10, game.KaroA, solo)
-	AssertCardIsHigher(t, game.KaroK, game.Karo10, solo)
-	AssertCardIsHigher(t, game.KaroD, game.KaroK, solo)
-	AssertCardIsHigher(t, game.KaroB, game.KaroD, solo)
-	AssertCardIsHigher(t, game.Karo9, game.KaroB, solo)
+	AssertCardIsHigher(t, game.Diamonds10, game.DiamondsA, solo)
+	AssertCardIsHigher(t, game.DiamondsK, game.Diamonds10, solo)
+	AssertCardIsHigher(t, game.DiamondsD, game.DiamondsK, solo)
+	AssertCardIsHigher(t, game.DiamondsB, game.DiamondsD, solo)
+	AssertCardIsHigher(t, game.Diamonds9, game.DiamondsB, solo)
 }
