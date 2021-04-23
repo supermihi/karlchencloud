@@ -15,7 +15,7 @@ func (f AceSolo) GameSuit(card game.Card) game.GameSuit {
 	return AceSoloSuite(card)
 }
 
-func (AceSolo) Klaerungsstich() int {
+func (AceSolo) ClarificationTrick() int {
 	return -1
 }
 

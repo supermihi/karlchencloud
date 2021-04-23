@@ -31,7 +31,7 @@ func (r RankSolo) PartyOf(p game.Player) game.Party {
 	return game.ContraParty
 }
 
-func (RankSolo) Klaerungsstich() int {
+func (RankSolo) ClarificationTrick() int {
 	return -1
 }
 

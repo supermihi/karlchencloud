@@ -25,7 +25,7 @@ func (bid Bid) Party() game.Party {
 	return game.ContraParty
 }
 
-func (bid Bid) MaxPlayedCardsAfterKlaerung() int {
+func (bid Bid) MaxPlayedCardsAfterClarification() int {
 	switch bid {
 	case Re, Contra:
 		return 1
@@ -80,9 +80,9 @@ func (bids *Bids) MaxPartyBid(p game.Party) Bid {
 	return max
 }
 
-func playedCardsSinceKlaerung(player game.Player, game *game.Game) int {
+func playedCardsSinceClarification(player game.Player, game *game.Game) int {
 	playedCards := game.HandCards[player].NumPlayedCards()
-	klearungsstich := game.Mode.Klaerungsstich()
+	klearungsstich := game.Mode.ClarificationTrick()
 	return playedCards - klearungsstich - 1
 }
 func CanPlaceBid(player game.Player, bid Bid, bids *Bids, g *game.Game) bool {
@@ -95,7 +95,7 @@ func CanPlaceBid(player game.Player, bid Bid, bids *Bids, g *game.Game) bool {
 	if bid != bids.MaxPartyBid(g.Mode.PartyOf(player))+1 {
 		return false
 	}
-	if playedCardsSinceKlaerung(player, g) > bid.MaxPlayedCardsAfterKlaerung() {
+	if playedCardsSinceClarification(player, g) > bid.MaxPlayedCardsAfterClarification() {
 		return false
 	}
 	return true

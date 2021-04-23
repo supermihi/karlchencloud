@@ -40,7 +40,7 @@ func (n NormalGameMode) IsSilentSolo() bool {
 func (NormalGameMode) OnCompletedTrick(Trick, int) {
 }
 
-func (NormalGameMode) Klaerungsstich() int {
+func (NormalGameMode) ClarificationTrick() int {
 	return -1
 }
 

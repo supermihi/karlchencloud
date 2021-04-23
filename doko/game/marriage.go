@@ -10,10 +10,10 @@ const (
 const MaxTricksWaitingForPartner = 3
 
 type Marriage struct {
-	announcer      Player
-	partner        Player
-	state          MarriageState
-	klaerungsstich int
+	announcer          Player
+	partner            Player
+	state              MarriageState
+	clarificationTrick int
 }
 
 func NewMarriage(announcer Player) Marriage {
@@ -27,10 +27,10 @@ func (h Marriage) OnCompletedTrick(t Trick, numTrick int) {
 	winner := WinnerOfTrick(t.CardsOf, t.Forehand, h)
 	if winner != h.announcer {
 		h.partner = winner
-		h.klaerungsstich = numTrick
+		h.clarificationTrick = numTrick
 	} else if numTrick >= MaxTricksWaitingForPartner-1 {
 		h.state = Solo
-		h.klaerungsstich = numTrick
+		h.clarificationTrick = numTrick
 	}
 }
 
@@ -60,8 +60,8 @@ func (h Marriage) GameSuit(card Card) GameSuit {
 	return NormalGameSuit(card)
 }
 
-func (h Marriage) Klaerungsstich() int {
-	return h.klaerungsstich
+func (h Marriage) ClarificationTrick() int {
+	return h.clarificationTrick
 }
 
 func (h Marriage) Type() AnnouncedGameType {

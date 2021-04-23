@@ -5,7 +5,7 @@ import "fmt"
 type Mode interface {
 	GameSuit(Card) GameSuit
 	PartyOf(Player) Party
-	Klaerungsstich() int
+	ClarificationTrick() int
 	Type() AnnouncedGameType
 	OnCompletedTrick(t Trick, numTrick int)
 }
