@@ -24,7 +24,8 @@ func (h Hand) CardIndex(card Card) int {
 func (h Hand) String() string {
 	cardStrings := make([]string, len(h))
 	for i, card := range h {
-		cardStrings[i] = fmt.Sprintf("%d:%s", i, card.String())
+		// two runes for index (left padded)
+		cardStrings[i] = fmt.Sprintf("%2d:%s", i, card.String())
 	}
 	return strings.Join(cardStrings, " ")
 }
