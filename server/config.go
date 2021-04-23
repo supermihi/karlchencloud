@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"math/rand"
 )
 
 type RoomConfig struct {
@@ -18,4 +19,11 @@ type ServerConfig struct {
 func ReadConfig() (cfg ServerConfig, err error) {
 	err = cleanenv.ReadEnv(&cfg)
 	return
+}
+
+func (cfg *RoomConfig) Seed() int64 {
+	if cfg.InputSeed == 0 {
+		return rand.Int63()
+	}
+	return cfg.InputSeed
 }
