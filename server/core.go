@@ -68,8 +68,14 @@ func GetData(t *Table) *TableData {
 	if t.playersInOrder == nil {
 		players = t.players
 	}
-	return &TableData{Id: t.Id, Owner: t.Owner(), InviteCode: t.InviteCode, Players: players,
-		Phase: t.Phase, Created: t.Created}
+	return &TableData{
+		Id: t.Id,
+		Owner: t.Owner(),
+		InviteCode: t.InviteCode,
+		Players: players,
+		Phase: t.Phase,
+		Created: t.Created,
+	}
 }
 
 func (d *TableData) ContainsPlayer(id string) bool {
