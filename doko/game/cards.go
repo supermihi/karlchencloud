@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
+	"strconv"
 	"strings"
 )
 
@@ -89,7 +91,15 @@ func DealCards(seed int64) Cards {
 		seed = rand.Int63()
 	}
 
+	override, isOverwritten := os.LookupEnv("KC_DBG_SEED")
+	if isOverwritten {
+		override, importError := strconv.ParseInt(override, 10, 64)
+		if importError == nil {
+			seed = override
+		}
+	}
 	log.Printf("Dealing cards (seed: %d)", seed)
+
 	deck := CreateDeck()
 	random := rand.New(rand.NewSource(seed))
 	random.Shuffle(len(deck), func(i int, j int) { deck[i], deck[j] = deck[j], deck[i] })
