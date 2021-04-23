@@ -94,7 +94,7 @@ func (r *Room) StartTable(tableId string, userId string) (*TableData, error) {
 }
 
 type Declaration struct {
-	Gesund      bool
+	Healthy     bool
 	Reservation game.AnnouncedGameType
 }
 type MatchData struct {
@@ -117,7 +117,7 @@ func GetMatchData(tm *TableMatch) *MatchData {
 	declarations := make(map[game.Player]Declaration, len(decls))
 	for k, v := range decls {
 
-		if v.Gesund {
+		if v.Healthy {
 			declarations[k] = Declaration{true, game.NormalGameType}
 		} else {
 			declarations[k] = Declaration{false, v.Reservation.Type()}

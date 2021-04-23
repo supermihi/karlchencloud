@@ -34,9 +34,9 @@ func TestSampleMatch(t *testing.T) {
 		ans := match.PlayCard(player, card)
 		require.Truef(t, ans, "error playing %v as %v", card, player)
 	}
-	sayGesund := func(player Player) {
+	sayHealthy := func(player Player) {
 		ans := match.AnnounceGameType(player, NormalGameType)
-		assert.Truef(t, ans, "error announcing gesund as %v", player)
+		assert.Truef(t, ans, "error announcing healthy as %v", player)
 	}
 	expectTrickWinner := func(player Player) {
 		tricks := match.Game.CompleteTricks
@@ -44,10 +44,10 @@ func TestSampleMatch(t *testing.T) {
 		require.Equalf(t, player, winner, "expecting %v to win 1st trick instead of %v", player, winner)
 		assert.True(t, match.Game.IsFinished() || match.Game.WhoseTurn() == player)
 	}
-	sayGesund(Player3)
-	sayGesund(Player4)
-	sayGesund(Player1)
-	sayGesund(Player2)
+	sayHealthy(Player3)
+	sayHealthy(Player4)
+	sayHealthy(Player1)
+	sayHealthy(Player2)
 	assert.Equal(t, InGame, match.Phase())
 	mode := match.Game.Mode
 	assert.Equal(t, ReParty, mode.PartyOf(Player1))

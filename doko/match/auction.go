@@ -5,11 +5,11 @@ import (
 )
 
 type Declaration struct {
-	Gesund      bool
+	Healthy     bool
 	Reservation Reservation
 }
 
-func DeclarationGesund() Declaration {
+func DeclarationHealthy() Declaration {
 	return Declaration{true, nil}
 }
 
@@ -50,8 +50,8 @@ func (a *Auction) Declare(player game.Player, t game.AnnouncedGameType) bool {
 	}
 	v := GetReservation(t)
 	if v == nil {
-		// gesund
-		a.Declarations[player] = DeclarationGesund()
+		// healthy
+		a.Declarations[player] = DeclarationHealthy()
 	} else {
 		if !v.CanAnnounceWith(a.cards[player]) {
 			return false
@@ -74,7 +74,7 @@ func (a Auction) GetResult() Result {
 	maxPrio := -1
 	for _, player := range game.PlayersFrom(a.forehand) {
 		d := a.Declarations[player]
-		if !d.Gesund && d.Reservation.Priority() > maxPrio {
+		if !d.Healthy && d.Reservation.Priority() > maxPrio {
 			winner = player
 			maxPrio = d.Reservation.Priority()
 		}

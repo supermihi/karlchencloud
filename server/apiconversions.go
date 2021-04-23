@@ -223,7 +223,7 @@ func toAuctionState(data *MatchData) *api.AuctionState {
 	declarations := make([]*api.Declaration, len(data.Declarations))
 	i := 0
 	for player, decl := range data.Declarations {
-		declarations[i] = &api.Declaration{UserId: data.Players[player], Vorbehalt: !decl.Gesund}
+		declarations[i] = &api.Declaration{UserId: data.Players[player], Vorbehalt: !decl.Healthy}
 		i++
 	}
 	return &api.AuctionState{Declarations: declarations}
