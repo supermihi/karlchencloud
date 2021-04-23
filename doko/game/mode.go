@@ -44,6 +44,8 @@ const (
 	HerzSoloType
 	PikSoloType
 	KreuzSoloType
+	JacksSoloType
+	QueensSoloType
 )
 
 func (t AnnouncedGameType) String() string {
@@ -62,6 +64,10 @@ func (t AnnouncedGameType) String() string {
 		return "Spades Solo"
 	case KreuzSoloType:
 		return "Clubs Solo"
+	case JacksSoloType:
+		return "Jacks Solo"
+	case QueensSoloType:
+		return "Queens Solo"
 	}
 	panic(fmt.Sprintf("unexpected game type: %d", int(t)))
 }

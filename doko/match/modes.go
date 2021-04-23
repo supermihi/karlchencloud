@@ -29,6 +29,10 @@ func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
 		return VorbehaltFarbsolo{game.Pik}
 	case game.KreuzSoloType:
 		return VorbehaltFarbsolo{game.Kreuz}
+	case game.JacksSoloType:
+		return VorbehaltRankSolo{game.Bube}
+	case game.QueensSoloType:
+		return VorbehaltRankSolo{game.Dame}
 	}
 	panic(fmt.Sprintf("unexpected game type %v in GetVorbehalt", t))
 }
@@ -49,7 +53,10 @@ func GameSuitOf(card game.Card, t game.AnnouncedGameType) game.GameSuit {
 		return FarbsoloSuit(game.Pik, card)
 	case game.KreuzSoloType:
 		return FarbsoloSuit(game.Kreuz, card)
-
+	case game.JacksSoloType:
+		return RankSoloSuit(game.Bube, card)
+	case game.QueensSoloType:
+		return RankSoloSuit(game.Dame, card)
 	}
 	panic(fmt.Sprintf("unsupported game type: %v", t))
 }
