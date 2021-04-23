@@ -30,7 +30,7 @@ func (f FleischlosMode) PartyOf(p game.Player) game.Party {
 }
 
 func (FleischlosMode) Type() game.AnnouncedGameType {
-	return game.FleischlosType
+	return game.AceSoloType
 }
 
 type VorbehaltFleischlos struct{}
@@ -39,7 +39,7 @@ func (VorbehaltFleischlos) CanAnnounceWith(_ game.Hand) bool {
 	return true
 }
 func (VorbehaltFleischlos) Type() game.AnnouncedGameType {
-	return game.FleischlosType
+	return game.AceSoloType
 }
 func (VorbehaltFleischlos) Priority() int {
 	return VorbehaltPriorityHochzeit + 1

@@ -6,7 +6,7 @@ type VorbehaltHochzeit struct {
 }
 
 func (v VorbehaltHochzeit) Type() game.AnnouncedGameType {
-	return game.HochzeitType
+	return game.MarriageType
 }
 
 func (v VorbehaltHochzeit) CanAnnounceWith(handCards game.Hand) bool {

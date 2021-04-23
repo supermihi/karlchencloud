@@ -65,5 +65,5 @@ func (h Hochzeit) Klaerungsstich() int {
 }
 
 func (h Hochzeit) Type() AnnouncedGameType {
-	return HochzeitType
+	return MarriageType
 }

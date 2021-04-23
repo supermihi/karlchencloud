@@ -11,7 +11,7 @@ type ExtraPoint struct {
 }
 
 func extraPointsApply(t game.AnnouncedGameType) bool {
-	return t == game.NormalspielType || t == game.HochzeitType
+	return t == game.NormalGameType || t == game.MarriageType
 }
 
 func findExtraPoints(g *game.Game) (ans []ExtraPoint) {

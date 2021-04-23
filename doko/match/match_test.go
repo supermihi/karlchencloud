@@ -35,7 +35,7 @@ func TestSampleMatch(t *testing.T) {
 		require.Truef(t, ans, "error playing %v as %v", card, player)
 	}
 	sayGesund := func(player Player) {
-		ans := match.AnnounceGameType(player, NormalspielType)
+		ans := match.AnnounceGameType(player, NormalGameType)
 		assert.Truef(t, ans, "error announcing gesund as %v", player)
 	}
 	expectTrickWinner := func(player Player) {

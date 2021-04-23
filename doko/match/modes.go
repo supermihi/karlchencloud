@@ -15,23 +15,23 @@ type Vorbehalt interface {
 
 func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
 	switch t {
-	case game.NormalspielType:
+	case game.NormalGameType:
 		return nil
-	case game.HochzeitType:
+	case game.MarriageType:
 		return VorbehaltHochzeit{}
-	case game.FleischlosType:
+	case game.AceSoloType:
 		return VorbehaltFleischlos{}
-	case game.KaroSoloType:
+	case game.DiamondSoloType:
 		return VorbehaltFarbsolo{game.Karo}
-	case game.HerzSoloType:
+	case game.HeartSoloType:
 		return VorbehaltFarbsolo{game.Herz}
-	case game.PikSoloType:
+	case game.SpadeSoloType:
 		return VorbehaltFarbsolo{game.Pik}
-	case game.KreuzSoloType:
+	case game.ClubSoloType:
 		return VorbehaltFarbsolo{game.Kreuz}
-	case game.JacksSoloType:
+	case game.JackSoloType:
 		return VorbehaltRankSolo{game.Bube}
-	case game.QueensSoloType:
+	case game.QueenSoloType:
 		return VorbehaltRankSolo{game.Dame}
 	}
 	panic(fmt.Sprintf("unexpected game type %v in GetVorbehalt", t))
@@ -39,23 +39,23 @@ func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
 
 func GameSuitOf(card game.Card, t game.AnnouncedGameType) game.GameSuit {
 	switch t {
-	case game.NormalspielType:
+	case game.NormalGameType:
 		fallthrough
-	case game.HochzeitType:
+	case game.MarriageType:
 		return game.NormalGameSuit(card)
-	case game.FleischlosType:
+	case game.AceSoloType:
 		return FleischlosSuite(card)
-	case game.KaroSoloType:
+	case game.DiamondSoloType:
 		return FarbsoloSuit(game.Karo, card)
-	case game.HerzSoloType:
+	case game.HeartSoloType:
 		return FarbsoloSuit(game.Herz, card)
-	case game.PikSoloType:
+	case game.SpadeSoloType:
 		return FarbsoloSuit(game.Pik, card)
-	case game.KreuzSoloType:
+	case game.ClubSoloType:
 		return FarbsoloSuit(game.Kreuz, card)
-	case game.JacksSoloType:
+	case game.JackSoloType:
 		return RankSoloSuit(game.Bube, card)
-	case game.QueensSoloType:
+	case game.QueenSoloType:
 		return RankSoloSuit(game.Dame, card)
 	}
 	panic(fmt.Sprintf("unsupported game type: %v", t))

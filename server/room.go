@@ -118,7 +118,7 @@ func GetMatchData(tm *TableMatch) *MatchData {
 	for k, v := range decls {
 
 		if v.Gesund {
-			declarations[k] = Declaration{true, game.NormalspielType}
+			declarations[k] = Declaration{true, game.NormalGameType}
 		} else {
 			declarations[k] = Declaration{false, v.Vorbehalt.Type()}
 		}

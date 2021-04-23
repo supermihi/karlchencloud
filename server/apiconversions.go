@@ -75,19 +75,19 @@ func ToBid(b api.BidType) match.Bid {
 
 func ToApiGameType(t game.AnnouncedGameType) api.GameType {
 	switch t {
-	case game.NormalspielType:
+	case game.NormalGameType:
 		return api.GameType_NORMAL_GAME
-	case game.HochzeitType:
+	case game.MarriageType:
 		return api.GameType_MARRIAGE
-	case game.KaroSoloType:
+	case game.DiamondSoloType:
 		return api.GameType_DIAMONDS_SOLO
-	case game.HerzSoloType:
+	case game.HeartSoloType:
 		return api.GameType_HEARTS_SOLO
-	case game.PikSoloType:
+	case game.SpadeSoloType:
 		return api.GameType_SPADES_SOLO
-	case game.KreuzSoloType:
+	case game.ClubSoloType:
 		return api.GameType_CLUBS_SOLO
-	case game.FleischlosType:
+	case game.AceSoloType:
 		return api.GameType_MEATLESS_SOLO
 	}
 	panic(fmt.Sprintf("not a solo type: %v", t))
@@ -96,19 +96,19 @@ func ToApiGameType(t game.AnnouncedGameType) api.GameType {
 func ToGameType(t api.GameType) game.AnnouncedGameType {
 	switch t {
 	case api.GameType_NORMAL_GAME:
-		return game.NormalspielType
+		return game.NormalGameType
 	case api.GameType_MARRIAGE:
-		return game.HochzeitType
+		return game.MarriageType
 	case api.GameType_DIAMONDS_SOLO:
-		return game.KaroSoloType
+		return game.DiamondSoloType
 	case api.GameType_HEARTS_SOLO:
-		return game.HerzSoloType
+		return game.HeartSoloType
 	case api.GameType_SPADES_SOLO:
-		return game.PikSoloType
+		return game.SpadeSoloType
 	case api.GameType_CLUBS_SOLO:
-		return game.KreuzSoloType
+		return game.ClubSoloType
 	case api.GameType_MEATLESS_SOLO:
-		return game.FleischlosType
+		return game.AceSoloType
 	}
 	panic(fmt.Sprintf("not an api game type: %s", t))
 }

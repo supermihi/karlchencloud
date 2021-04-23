@@ -27,7 +27,7 @@ func TestRoom_GetMatchData(t *testing.T) {
 	cards := game.DealCards(rng)
 	match := match.NewMatch(game.Player1, cards)
 	for _, player := range game.PlayersFrom(game.Player1) {
-		match.AnnounceGameType(player, game.NormalspielType)
+		match.AnnounceGameType(player, game.NormalGameType)
 	}
 	curTrick := game.NewIncompleteTrick(game.Player1)
 	curTrick.Play(game.Player1, game.Herz9)

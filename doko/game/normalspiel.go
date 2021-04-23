@@ -53,5 +53,5 @@ func (n NormalspielMode) PartyOf(p Player) Party {
 }
 
 func (n NormalspielMode) Type() AnnouncedGameType {
-	return NormalspielType
+	return NormalGameType
 }
