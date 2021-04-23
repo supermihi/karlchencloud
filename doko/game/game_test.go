@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var someNormalspiel = NormalspielMode{[...]Party{ReParty, ReParty, ContraParty, ContraParty}, false}
+var someNormalspiel = NormalGameMode{[...]Party{ReParty, ReParty, ContraParty, ContraParty}, false}
 
 func AssertCardIsHigher(t *testing.T, lower Card, higher Card) {
 	assert.Equal(t, Player4, WinnerOfTrick([4]Card{lower, lower, lower, higher}, Player1, someNormalspiel))

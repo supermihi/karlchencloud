@@ -80,7 +80,7 @@ func (a Auction) GetResult() Result {
 		}
 	}
 	if winner == game.NoPlayer {
-		return Result{game.NewNormalspiel(a.cards), a.forehand}
+		return Result{game.NewNormalGame(a.cards), a.forehand}
 	}
 	vorbehalt := a.Declarations[winner].Vorbehalt
 	forehand := a.forehand

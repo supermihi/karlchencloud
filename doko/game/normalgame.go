@@ -11,12 +11,12 @@ func NormalGameSuit(c Card) GameSuit {
 	return c.Suit.AsFehl()
 }
 
-type NormalspielMode struct {
+type NormalGameMode struct {
 	parties    [NumPlayers]Party
 	silentSolo bool
 }
 
-func NewNormalspiel(dealtCards Cards) NormalspielMode {
+func NewNormalGame(dealtCards Cards) NormalGameMode {
 	var parties [NumPlayers]Party
 	silentSolo := false
 	for _, p := range Players() {
@@ -30,28 +30,28 @@ func NewNormalspiel(dealtCards Cards) NormalspielMode {
 			parties[p] = ContraParty
 		}
 	}
-	return NormalspielMode{parties, silentSolo}
+	return NormalGameMode{parties, silentSolo}
 }
 
-func (n NormalspielMode) IsSilentSolo() bool {
+func (n NormalGameMode) IsSilentSolo() bool {
 	return n.silentSolo
 }
 
-func (NormalspielMode) OnCompletedTrick(Trick, int) {
+func (NormalGameMode) OnCompletedTrick(Trick, int) {
 }
 
-func (NormalspielMode) Klaerungsstich() int {
+func (NormalGameMode) Klaerungsstich() int {
 	return -1
 }
 
-func (n NormalspielMode) GameSuit(k Card) GameSuit {
+func (n NormalGameMode) GameSuit(k Card) GameSuit {
 	return NormalGameSuit(k)
 }
 
-func (n NormalspielMode) PartyOf(p Player) Party {
+func (n NormalGameMode) PartyOf(p Player) Party {
 	return n.parties[p]
 }
 
-func (n NormalspielMode) Type() AnnouncedGameType {
+func (n NormalGameMode) Type() AnnouncedGameType {
 	return NormalGameType
 }
