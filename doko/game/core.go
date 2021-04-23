@@ -46,11 +46,11 @@ type Card struct {
 	Rank Rank
 }
 
-func Dulle() Card {
+func TenOfHearts() Card {
 	return Card{Herz, Zehn}
 }
 
-func Alte() Card {
+func QueenOfClubs() Card {
 	return Card{Kreuz, Dame}
 }
 

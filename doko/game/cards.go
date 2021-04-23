@@ -67,8 +67,8 @@ func (h Hand) NumPlayedCards() int {
 	return NumHandCards - len(h)
 }
 
-func (h Hand) NumAlte() int {
-	return h.NumberOfCards(Alte())
+func (h Hand) NumQueensOfClubs() int {
+	return h.NumberOfCards(QueenOfClubs())
 }
 
 func CreateDeck() []Card {
@@ -115,7 +115,7 @@ func (c Card) NonTrumpTrickValue() int {
 }
 
 func (c Card) TrumpTrickValue() int {
-	if c == Dulle() {
+	if c == TenOfHearts() {
 		return 100
 	}
 	switch c.Rank {

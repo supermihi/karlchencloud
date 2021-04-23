@@ -14,7 +14,7 @@ func NewSuitSolo(trump game.Suit, soloist game.Player) SuitSolo {
 }
 
 func SuitSoloSuit(trump game.Suit, card game.Card) game.GameSuit {
-	if card.Suit == trump || card.Rank == game.Bube || card.Rank == game.Dame || card == game.Dulle() {
+	if card.Suit == trump || card.Rank == game.Bube || card.Rank == game.Dame || card == game.TenOfHearts() {
 		return game.Trump
 	}
 	return card.Suit.AsNonTrump()

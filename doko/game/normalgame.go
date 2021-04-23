@@ -1,7 +1,7 @@
 package game
 
 func IsNormalTrump(k Card) bool {
-	return k.Suit == Karo || k.Rank == Bube || k.Rank == Dame || k == Dulle()
+	return k.Suit == Karo || k.Rank == Bube || k.Rank == Dame || k == TenOfHearts()
 }
 
 func NormalGameSuit(c Card) GameSuit {
@@ -20,10 +20,10 @@ func NewNormalGame(dealtCards Cards) NormalGameMode {
 	var parties [NumPlayers]Party
 	silentSolo := false
 	for _, p := range Players() {
-		alte := dealtCards[p].NumAlte()
-		if alte >= 1 {
+		queensOfClubs := dealtCards[p].NumQueensOfClubs()
+		if queensOfClubs >= 1 {
 			parties[p] = ReParty
-			if alte == 2 {
+			if queensOfClubs == 2 {
 				silentSolo = true
 			}
 		} else {

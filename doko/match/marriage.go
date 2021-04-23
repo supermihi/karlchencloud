@@ -10,7 +10,7 @@ func (v ReservationMarriage) Type() game.AnnouncedGameType {
 }
 
 func (v ReservationMarriage) CanAnnounceWith(handCards game.Hand) bool {
-	return handCards.NumAlte() == 2
+	return handCards.NumQueensOfClubs() == 2
 }
 
 const ReservationPriorityMarriage = 1
