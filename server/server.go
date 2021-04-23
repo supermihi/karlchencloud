@@ -49,7 +49,13 @@ func (s *dokoserver) CreateTable(ctx context.Context, _ *api.Empty) (*api.TableD
 	user, _ := GetAuthenticatedUser(ctx)
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
-	table, err := s.room.CreateTable(user.Id, &s.config.Room.ConstantTableId, &s.config.Room.ConstantInviteCode)
+
+	table, err := s.room.CreateTable(
+		user.Id,
+		&s.config.Room.ConstantTableId,
+		&s.config.Room.ConstantInviteCode,
+		s.config.Room.Seed(),
+	)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}

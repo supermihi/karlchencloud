@@ -4,13 +4,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"math/rand"
 	"testing"
 )
 
 func TestRoom_JoinTable(t *testing.T) {
 	r := NewRoom(NewMemoryUserDb())
 	assert.True(t, r.users.Add("owner", "owner", "secret"))
-	table, err := r.CreateTable("owner", nil, nil)
+	table, err := r.CreateTable("owner", nil, nil, 0)
 	assert.Nil(t, err)
 	_, err = r.JoinTable("player 2", "not the invite code")
 	assert.NotNil(t, err)
@@ -22,7 +23,8 @@ func TestRoom_JoinTable(t *testing.T) {
 
 
 func TestRoom_GetMatchData(t *testing.T) {
-	cards := game.DealCards(123)
+	rng := rand.New(rand.NewSource(123))
+	cards := game.DealCards(rng)
 	match := match.NewMatch(game.Player1, cards)
 	for _, player := range game.PlayersFrom(game.Player1) {
 		match.AnnounceGameType(player, game.NormalspielType)

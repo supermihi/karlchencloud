@@ -5,6 +5,7 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -18,6 +19,7 @@ type Table struct {
 	playersInOrder []string
 	round          *match.Round
 	CurrentMatch   *TableMatch
+	Rng            *rand.Rand
 }
 
 func (t *Table) Owner() string {
@@ -28,15 +30,19 @@ func (t *Table) String() string {
 	return fmt.Sprintf("Table %v", t.Id)
 }
 
-func NewTable(owner string, fixedTableId *string, fixedInviteCode *string) *Table {
-	table := Table{
+func NewTable(owner string, fixedTableId *string, fixedInviteCode *string, seed int64) *Table {
+	log.Printf("Creating table (seed: %d)", seed)
+	return &Table{
 		getStringWithDefault(fixedTableId, randomTableId),
 		time.Now(),
 		getStringWithDefault(fixedInviteCode, randomInviteCode),
 		api.TablePhase_NOT_STARTED,
 		[]string{owner},
-		nil, nil, nil}
-	return &table
+		nil,
+		nil,
+		nil,
+		rand.New(rand.NewSource(seed)),
+	}
 }
 
 func randomTableId() string {
@@ -56,10 +62,10 @@ func (t *Table) Start() error {
 	}
 	t.playersInOrder = make([]string, len(t.players))
 	copy(t.playersInOrder, t.players)
-	rand.Shuffle(len(t.players), func(i int, j int) {
+	t.Rng.Shuffle(len(t.players), func(i int, j int) {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
 	})
-	t.round = match.NewRound(len(t.players), rand.Int63())
+	t.round = match.NewRound(len(t.players), t.Rng)
 	t.Phase = api.TablePhase_BETWEEN_GAMES
 	return t.StartMatch()
 }

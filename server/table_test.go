@@ -7,7 +7,7 @@ import (
 )
 
 func TestTable_Start(t *testing.T) {
-	table := NewTable("user1", nil, nil)
+	table := NewTable("user1", nil, nil, 0)
 	_ = table.Join("user2")
 	_ = table.Join("user3")
 	_ = table.Join("user4")
