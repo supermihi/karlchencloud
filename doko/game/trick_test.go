@@ -6,8 +6,8 @@ import (
 )
 
 func TestIncompleteTrick_AsCompleteTrick(t *testing.T) {
-	it := IncompleteTrick{Player3, map[Player]Card{Player1: PikB, Player2: Karo9, Player3: KreuzD, Player4: Karo10}}
+	it := IncompleteTrick{Player3, map[Player]Card{Player1: SpadesJ, Player2: Diamonds9, Player3: ClubsQ, Player4: Diamonds10}}
 	ct := it.AsCompleteTrick(Player3)
 	assert.Equal(t, ct.Forehand, it.Forehand)
-	assert.ElementsMatch(t, ct.CardsOf, [NumPlayers]Card{KreuzD, Karo10, PikB, Karo9})
+	assert.ElementsMatch(t, ct.CardsOf, [NumPlayers]Card{ClubsQ, Diamonds10, SpadesJ, Diamonds9})
 }

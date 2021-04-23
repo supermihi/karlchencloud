@@ -5,16 +5,16 @@ import "fmt"
 type Mode interface {
 	GameSuit(Card) GameSuit
 	PartyOf(Player) Party
-	Klaerungsstich() int
+	ClarificationTrick() int
 	Type() AnnouncedGameType
 	OnCompletedTrick(t Trick, numTrick int)
 }
 
 func IsNormalspiel(t AnnouncedGameType) bool {
 	switch t {
-	case NormalspielType:
+	case NormalGameType:
 		return true
-	case HochzeitType:
+	case MarriageType:
 		return true
 	default:
 		return false
@@ -37,37 +37,37 @@ func Soloist(m Mode) Player {
 type AnnouncedGameType int
 
 const (
-	NormalspielType AnnouncedGameType = iota
-	HochzeitType
-	FleischlosType
-	KaroSoloType
-	HerzSoloType
-	PikSoloType
-	KreuzSoloType
-	JacksSoloType
-	QueensSoloType
+	NormalGameType AnnouncedGameType = iota
+	MarriageType
+	AceSoloType
+	DiamondSoloType
+	HeartSoloType
+	SpadeSoloType
+	ClubSoloType
+	JackSoloType
+	QueenSoloType
 )
 
 func (t AnnouncedGameType) String() string {
 	switch t {
-	case NormalspielType:
+	case NormalGameType:
 		return "Normal Game"
-	case HochzeitType:
+	case MarriageType:
 		return "Marriage"
-	case FleischlosType:
-		return "Meatless Solo"
-	case KaroSoloType:
-		return "Diamonds Solo"
-	case HerzSoloType:
-		return "Hearts Solo"
-	case PikSoloType:
-		return "Spades Solo"
-	case KreuzSoloType:
-		return "Clubs Solo"
-	case JacksSoloType:
-		return "Jacks Solo"
-	case QueensSoloType:
-		return "Queens Solo"
+	case AceSoloType:
+		return "Ace Solo"
+	case DiamondSoloType:
+		return "Diamond Solo"
+	case HeartSoloType:
+		return "Heart Solo"
+	case SpadeSoloType:
+		return "Spade Solo"
+	case ClubSoloType:
+		return "Club Solo"
+	case JackSoloType:
+		return "Jack Solo"
+	case QueenSoloType:
+		return "Queen Solo"
 	}
 	panic(fmt.Sprintf("unexpected game type: %d", int(t)))
 }

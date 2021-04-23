@@ -92,9 +92,9 @@ func countReScoreAndTricks(g *game.Game) (int, int) {
 
 func IsCountedSolo(m game.Mode) bool {
 	switch u := m.(type) {
-	case game.NormalspielMode:
-		return u.IsStilleHochzeit()
-	case game.Hochzeit:
+	case game.NormalGameMode:
+		return u.IsSilentSolo()
+	case game.Marriage:
 		return false
 	default:
 		return true

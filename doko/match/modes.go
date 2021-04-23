@@ -5,7 +5,7 @@ import (
 	"github.com/supermihi/karlchencloud/doko/game"
 )
 
-type Vorbehalt interface {
+type Reservation interface {
 	CanAnnounceWith(handCards game.Hand) bool
 	Type() game.AnnouncedGameType
 	Priority() int
@@ -13,50 +13,50 @@ type Vorbehalt interface {
 	AnnouncerTakesForehand() bool
 }
 
-func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
+func GetReservation(t game.AnnouncedGameType) Reservation {
 	switch t {
-	case game.NormalspielType:
+	case game.NormalGameType:
 		return nil
-	case game.HochzeitType:
-		return VorbehaltHochzeit{}
-	case game.FleischlosType:
-		return VorbehaltFleischlos{}
-	case game.KaroSoloType:
-		return VorbehaltFarbsolo{game.Karo}
-	case game.HerzSoloType:
-		return VorbehaltFarbsolo{game.Herz}
-	case game.PikSoloType:
-		return VorbehaltFarbsolo{game.Pik}
-	case game.KreuzSoloType:
-		return VorbehaltFarbsolo{game.Kreuz}
-	case game.JacksSoloType:
-		return VorbehaltRankSolo{game.Bube}
-	case game.QueensSoloType:
-		return VorbehaltRankSolo{game.Dame}
+	case game.MarriageType:
+		return ReservationMarriage{}
+	case game.AceSoloType:
+		return ReservationAceSolo{}
+	case game.DiamondSoloType:
+		return ReservationSuitSolo{game.Diamonds}
+	case game.HeartSoloType:
+		return ReservationSuitSolo{game.Hearts}
+	case game.SpadeSoloType:
+		return ReservationSuitSolo{game.Spades}
+	case game.ClubSoloType:
+		return ReservationSuitSolo{game.Clubs}
+	case game.JackSoloType:
+		return ReservationRankSolo{game.Jack}
+	case game.QueenSoloType:
+		return ReservationRankSolo{game.Queen}
 	}
-	panic(fmt.Sprintf("unexpected game type %v in GetVorbehalt", t))
+	panic(fmt.Sprintf("unexpected game type %v in GetReservation", t))
 }
 
 func GameSuitOf(card game.Card, t game.AnnouncedGameType) game.GameSuit {
 	switch t {
-	case game.NormalspielType:
+	case game.NormalGameType:
 		fallthrough
-	case game.HochzeitType:
+	case game.MarriageType:
 		return game.NormalGameSuit(card)
-	case game.FleischlosType:
-		return FleischlosSuite(card)
-	case game.KaroSoloType:
-		return FarbsoloSuit(game.Karo, card)
-	case game.HerzSoloType:
-		return FarbsoloSuit(game.Herz, card)
-	case game.PikSoloType:
-		return FarbsoloSuit(game.Pik, card)
-	case game.KreuzSoloType:
-		return FarbsoloSuit(game.Kreuz, card)
-	case game.JacksSoloType:
-		return RankSoloSuit(game.Bube, card)
-	case game.QueensSoloType:
-		return RankSoloSuit(game.Dame, card)
+	case game.AceSoloType:
+		return AceSoloSuite(card)
+	case game.DiamondSoloType:
+		return SuitSoloSuit(game.Diamonds, card)
+	case game.HeartSoloType:
+		return SuitSoloSuit(game.Hearts, card)
+	case game.SpadeSoloType:
+		return SuitSoloSuit(game.Spades, card)
+	case game.ClubSoloType:
+		return SuitSoloSuit(game.Clubs, card)
+	case game.JackSoloType:
+		return RankSoloSuit(game.Jack, card)
+	case game.QueenSoloType:
+		return RankSoloSuit(game.Queen, card)
 	}
 	panic(fmt.Sprintf("unsupported game type: %v", t))
 }

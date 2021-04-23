@@ -122,9 +122,9 @@ func (h *CliHandler) declare() {
 	if err != nil {
 		log.Fatalf("error reading rune: %v", err)
 	}
-	declaration := game.NormalspielType
+	declaration := game.NormalGameType
 	if char == 'h' {
-		declaration = game.HochzeitType
+		declaration = game.MarriageType
 	}
 	if h.Declare(declaration) != nil {
 		log.Fatalf("error declaring game: %v", err)

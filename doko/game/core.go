@@ -11,10 +11,10 @@ const TotalScore = 240
 type Suit int
 
 const (
-	Karo Suit = iota
-	Herz
-	Pik
-	Kreuz
+	Diamonds Suit = iota
+	Hearts
+	Spades
+	Clubs
 )
 
 func (s Suit) String() string {
@@ -28,12 +28,12 @@ func (s Suit) ColorCode() int {
 type Rank int
 
 const (
-	Neun Rank = iota
-	Bube
-	Dame
-	Koenig
-	Zehn
-	Ass
+	Nine Rank = iota
+	Jack
+	Queen
+	King
+	Ten
+	Ace
 )
 
 func (s Rank) String() string {
@@ -46,12 +46,12 @@ type Card struct {
 	Rank Rank
 }
 
-func Dulle() Card {
-	return Card{Herz, Zehn}
+func TenOfHearts() Card {
+	return Card{Hearts, Ten}
 }
 
-func Alte() Card {
-	return Card{Kreuz, Dame}
+func QueenOfClubs() Card {
+	return Card{Clubs, Queen}
 }
 
 func (c Card) String() string {
@@ -89,23 +89,23 @@ func (p Party) Other() Party {
 type GameSuit int
 
 const (
-	Trumpf GameSuit = iota
-	KaroFehl
-	HerzFehl
-	PikFehl
-	KreuzFehl
+	Trump GameSuit = iota
+	DiamondsNonTrump
+	HeartsNonTrump
+	SpadesNonTrump
+	ClubsNonTrump
 )
 
-func (s Suit) AsFehl() GameSuit {
+func (s Suit) AsNonTrump() GameSuit {
 	switch s {
-	case Karo:
-		return KaroFehl
-	case Herz:
-		return HerzFehl
-	case Pik:
-		return PikFehl
-	case Kreuz:
-		return KreuzFehl
+	case Diamonds:
+		return DiamondsNonTrump
+	case Hearts:
+		return HeartsNonTrump
+	case Spades:
+		return SpadesNonTrump
+	case Clubs:
+		return ClubsNonTrump
 	default:
 		panic("unexpected suit")
 	}

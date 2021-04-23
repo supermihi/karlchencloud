@@ -5,7 +5,7 @@ import (
 )
 
 type RankSolo struct {
-	Trumpf  game.Rank
+	Trump   game.Rank
 	Soloist game.Player
 }
 
@@ -15,13 +15,13 @@ func NewRankSolo(trump game.Rank, soloist game.Player) RankSolo {
 
 func RankSoloSuit(trump game.Rank, card game.Card) game.GameSuit {
 	if card.Rank == trump {
-		return game.Trumpf
+		return game.Trump
 	}
-	return card.Suit.AsFehl()
+	return card.Suit.AsNonTrump()
 }
 
 func (r RankSolo) GameSuit(card game.Card) game.GameSuit {
-	return RankSoloSuit(r.Trumpf, card)
+	return RankSoloSuit(r.Trump, card)
 }
 
 func (r RankSolo) PartyOf(p game.Player) game.Party {
@@ -31,7 +31,7 @@ func (r RankSolo) PartyOf(p game.Player) game.Party {
 	return game.ContraParty
 }
 
-func (RankSolo) Klaerungsstich() int {
+func (RankSolo) ClarificationTrick() int {
 	return -1
 }
 
@@ -39,38 +39,38 @@ func (RankSolo) OnCompletedTrick(game.Trick, int) {
 }
 
 func (r RankSolo) Type() game.AnnouncedGameType {
-	return gameTypeForRank(r.Trumpf)
+	return gameTypeForRank(r.Trump)
 }
 
 func gameTypeForRank(rank game.Rank) game.AnnouncedGameType {
 	switch rank {
-	case game.Bube:
-		return game.JacksSoloType
-	case game.Dame:
-		return game.QueensSoloType
+	case game.Jack:
+		return game.JackSoloType
+	case game.Queen:
+		return game.QueenSoloType
 	}
 	panic("unexpected solo rank")
 }
 
-type VorbehaltRankSolo struct {
+type ReservationRankSolo struct {
 	rank game.Rank
 }
 
-func (v VorbehaltRankSolo) CanAnnounceWith(_ game.Hand) bool {
+func (v ReservationRankSolo) CanAnnounceWith(_ game.Hand) bool {
 	return true
 }
-func (v VorbehaltRankSolo) Type() game.AnnouncedGameType {
+func (v ReservationRankSolo) Type() game.AnnouncedGameType {
 	return gameTypeForRank(v.rank)
 }
 
-func (v VorbehaltRankSolo) Priority() int {
-	return VorbehaltPriorityHochzeit + 1
+func (v ReservationRankSolo) Priority() int {
+	return ReservationPriorityMarriage + 1
 }
 
-func (v VorbehaltRankSolo) CreateMode(announcer game.Player) game.Mode {
+func (v ReservationRankSolo) CreateMode(announcer game.Player) game.Mode {
 	return NewRankSolo(v.rank, announcer)
 }
 
-func (v VorbehaltRankSolo) AnnouncerTakesForehand() bool {
+func (v ReservationRankSolo) AnnouncerTakesForehand() bool {
 	return false
 }

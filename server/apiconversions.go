@@ -75,19 +75,19 @@ func ToBid(b api.BidType) match.Bid {
 
 func ToApiGameType(t game.AnnouncedGameType) api.GameType {
 	switch t {
-	case game.NormalspielType:
+	case game.NormalGameType:
 		return api.GameType_NORMAL_GAME
-	case game.HochzeitType:
+	case game.MarriageType:
 		return api.GameType_MARRIAGE
-	case game.KaroSoloType:
+	case game.DiamondSoloType:
 		return api.GameType_DIAMONDS_SOLO
-	case game.HerzSoloType:
+	case game.HeartSoloType:
 		return api.GameType_HEARTS_SOLO
-	case game.PikSoloType:
+	case game.SpadeSoloType:
 		return api.GameType_SPADES_SOLO
-	case game.KreuzSoloType:
+	case game.ClubSoloType:
 		return api.GameType_CLUBS_SOLO
-	case game.FleischlosType:
+	case game.AceSoloType:
 		return api.GameType_MEATLESS_SOLO
 	}
 	panic(fmt.Sprintf("not a solo type: %v", t))
@@ -96,19 +96,19 @@ func ToApiGameType(t game.AnnouncedGameType) api.GameType {
 func ToGameType(t api.GameType) game.AnnouncedGameType {
 	switch t {
 	case api.GameType_NORMAL_GAME:
-		return game.NormalspielType
+		return game.NormalGameType
 	case api.GameType_MARRIAGE:
-		return game.HochzeitType
+		return game.MarriageType
 	case api.GameType_DIAMONDS_SOLO:
-		return game.KaroSoloType
+		return game.DiamondSoloType
 	case api.GameType_HEARTS_SOLO:
-		return game.HerzSoloType
+		return game.HeartSoloType
 	case api.GameType_SPADES_SOLO:
-		return game.PikSoloType
+		return game.SpadeSoloType
 	case api.GameType_CLUBS_SOLO:
-		return game.KreuzSoloType
+		return game.ClubSoloType
 	case api.GameType_MEATLESS_SOLO:
-		return game.FleischlosType
+		return game.AceSoloType
 	}
 	panic(fmt.Sprintf("not an api game type: %s", t))
 }
@@ -117,7 +117,7 @@ func ToApiMode(mode game.Mode, forehand game.Player, users PlayerUserMap) *api.M
 	soloist := ToPlayerValue(game.Soloist(mode), users)
 	var spouse *api.PlayerValue
 	switch h := mode.(type) {
-	case game.Hochzeit:
+	case game.Marriage:
 		spouse = ToPlayerValue(h.Partner(), users)
 	}
 	return &api.Mode{Type: ToApiGameType(mode.Type()), Soloist: soloist, Spouse: spouse,
@@ -126,13 +126,13 @@ func ToApiMode(mode game.Mode, forehand game.Player, users PlayerUserMap) *api.M
 
 func ToApiSuit(s game.Suit) api.Suit {
 	switch s {
-	case game.Karo:
+	case game.Diamonds:
 		return api.Suit_DIAMONDS
-	case game.Herz:
+	case game.Hearts:
 		return api.Suit_HEARTS
-	case game.Pik:
+	case game.Spades:
 		return api.Suit_SPADES
-	case game.Kreuz:
+	case game.Clubs:
 		return api.Suit_CLUBS
 	}
 	panic(fmt.Sprintf("unexpected suit %v", s))
@@ -141,30 +141,30 @@ func ToApiSuit(s game.Suit) api.Suit {
 func ToSuit(s api.Suit) game.Suit {
 	switch s {
 	case api.Suit_DIAMONDS:
-		return game.Karo
+		return game.Diamonds
 	case api.Suit_HEARTS:
-		return game.Herz
+		return game.Hearts
 	case api.Suit_SPADES:
-		return game.Pik
+		return game.Spades
 	case api.Suit_CLUBS:
-		return game.Kreuz
+		return game.Clubs
 	}
 	panic(fmt.Sprintf("unexpected apisuit %v in ToSuit()", s))
 }
 
 func ToApiRank(r game.Rank) api.Rank {
 	switch r {
-	case game.Neun:
+	case game.Nine:
 		return api.Rank_NINE
-	case game.Bube:
+	case game.Jack:
 		return api.Rank_JACK
-	case game.Dame:
+	case game.Queen:
 		return api.Rank_QUEEN
-	case game.Koenig:
+	case game.King:
 		return api.Rank_KING
-	case game.Zehn:
+	case game.Ten:
 		return api.Rank_TEN
-	case game.Ass:
+	case game.Ace:
 		return api.Rank_ACE
 	}
 	panic(fmt.Sprintf("unexpected rank %v", r))
@@ -173,17 +173,17 @@ func ToApiRank(r game.Rank) api.Rank {
 func ToRank(r api.Rank) game.Rank {
 	switch r {
 	case api.Rank_NINE:
-		return game.Neun
+		return game.Nine
 	case api.Rank_JACK:
-		return game.Bube
+		return game.Jack
 	case api.Rank_QUEEN:
-		return game.Dame
+		return game.Queen
 	case api.Rank_KING:
-		return game.Koenig
+		return game.King
 	case api.Rank_TEN:
-		return game.Zehn
+		return game.Ten
 	case api.Rank_ACE:
-		return game.Ass
+		return game.Ace
 	}
 	panic(fmt.Sprintf("unexpected apirank %v in ToRank()", r))
 }
@@ -223,7 +223,7 @@ func toAuctionState(data *MatchData) *api.AuctionState {
 	declarations := make([]*api.Declaration, len(data.Declarations))
 	i := 0
 	for player, decl := range data.Declarations {
-		declarations[i] = &api.Declaration{UserId: data.Players[player], Vorbehalt: !decl.Gesund}
+		declarations[i] = &api.Declaration{UserId: data.Players[player], Vorbehalt: !decl.Healthy}
 		i++
 	}
 	return &api.AuctionState{Declarations: declarations}

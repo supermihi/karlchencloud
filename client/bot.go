@@ -97,9 +97,9 @@ func (h *BotHandler) OnMyTurn() {
 
 func (h *BotHandler) makeTurnAuction() {
 
-	declaration := game.NormalspielType
-	if h.Match().Cards.NumAlte() == 2 {
-		declaration = game.HochzeitType
+	declaration := game.NormalGameType
+	if h.Match().Cards.NumQueensOfClubs() == 2 {
+		declaration = game.MarriageType
 	}
 	h.Logf("declaring '%s'...", declaration)
 	err := h.Declare(declaration)

@@ -67,15 +67,15 @@ func (h Hand) NumPlayedCards() int {
 	return NumHandCards - len(h)
 }
 
-func (h Hand) NumAlte() int {
-	return h.NumberOfCards(Alte())
+func (h Hand) NumQueensOfClubs() int {
+	return h.NumberOfCards(QueenOfClubs())
 }
 
 func CreateDeck() []Card {
 	ans := make([]Card, DeckSize)
 	pos := 0
-	for suit := Karo; suit <= Kreuz; suit++ {
-		for rank := Neun; rank <= Ass; rank++ {
+	for suit := Diamonds; suit <= Clubs; suit++ {
+		for rank := Nine; rank <= Ace; rank++ {
 			ans[pos] = Card{suit, rank}
 			ans[pos+1] = Card{suit, rank}
 			pos += 2
@@ -110,48 +110,48 @@ func (cards BySuitAndRank) Swap(i, j int) {
 	cards[i], cards[j] = cards[j], cards[i]
 }
 
-func (c Card) FehlTrickValue() int {
+func (c Card) NonTrumpTrickValue() int {
 	return c.Rank.Score()
 }
 
-func (c Card) TrumpfTrickValue() int {
-	if c == Dulle() {
+func (c Card) TrumpTrickValue() int {
+	if c == TenOfHearts() {
 		return 100
 	}
 	switch c.Rank {
-	case Dame:
+	case Queen:
 		return 30 + int(c.Suit)
-	case Bube:
+	case Jack:
 		return 20 + int(c.Suit)
 	default:
 		return c.Rank.Score()
 	}
 }
 
-var Karo9 = Card{Karo, Neun}
-var KaroB = Card{Karo, Bube}
-var KaroD = Card{Karo, Dame}
-var KaroK = Card{Karo, Koenig}
-var Karo10 = Card{Karo, Zehn}
-var KaroA = Card{Karo, Ass}
+var Diamonds9 = Card{Diamonds, Nine}
+var DiamondsJ = Card{Diamonds, Jack}
+var DiamondsQ = Card{Diamonds, Queen}
+var DiamondsK = Card{Diamonds, King}
+var Diamonds10 = Card{Diamonds, Ten}
+var DiamondsA = Card{Diamonds, Ace}
 
-var Herz9 = Card{Herz, Neun}
-var HerzB = Card{Herz, Bube}
-var HerzD = Card{Herz, Dame}
-var HerzK = Card{Herz, Koenig}
-var Herz10 = Card{Herz, Zehn}
-var HerzA = Card{Herz, Ass}
+var Hearts9 = Card{Hearts, Nine}
+var HeartsJ = Card{Hearts, Jack}
+var HeartsQ = Card{Hearts, Queen}
+var HeartsK = Card{Hearts, King}
+var Hearts10 = Card{Hearts, Ten}
+var HeartsA = Card{Hearts, Ace}
 
-var Pik9 = Card{Pik, Neun}
-var PikB = Card{Pik, Bube}
-var PikD = Card{Pik, Dame}
-var PikK = Card{Pik, Koenig}
-var Pik10 = Card{Pik, Zehn}
-var PikA = Card{Pik, Ass}
+var Spades9 = Card{Spades, Nine}
+var SpadesJ = Card{Spades, Jack}
+var SpadesQ = Card{Spades, Queen}
+var SpadesK = Card{Spades, King}
+var Spades10 = Card{Spades, Ten}
+var SpadesA = Card{Spades, Ace}
 
-var Kreuz9 = Card{Kreuz, Neun}
-var KreuzB = Card{Kreuz, Bube}
-var KreuzD = Card{Kreuz, Dame}
-var KreuzK = Card{Kreuz, Koenig}
-var Kreuz10 = Card{Kreuz, Zehn}
-var KreuzA = Card{Kreuz, Ass}
+var Clubs9 = Card{Clubs, Nine}
+var ClubsJ = Card{Clubs, Jack}
+var ClubsQ = Card{Clubs, Queen}
+var ClubsK = Card{Clubs, King}
+var Clubs10 = Card{Clubs, Ten}
+var ClubsA = Card{Clubs, Ace}

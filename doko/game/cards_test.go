@@ -8,16 +8,16 @@ import (
 )
 
 func TestHand_CardIndex(t *testing.T) {
-	var hand Hand = []Card{Karo9, Herz10, PikA, KreuzB}
-	assert.Equal(t, -1, hand.CardIndex(Karo10))
-	assert.Equal(t, 1, hand.CardIndex(Herz10))
+	var hand Hand = []Card{Diamonds9, Hearts10, SpadesA, ClubsJ}
+	assert.Equal(t, -1, hand.CardIndex(Diamonds10))
+	assert.Equal(t, 1, hand.CardIndex(Hearts10))
 }
 
 func TestHand_RemoveCard(t *testing.T) {
-	var hand Hand = []Card{Herz10, KaroK, PikD, Herz10}
+	var hand Hand = []Card{Hearts10, DiamondsK, SpadesQ, Hearts10}
 	newHand := hand[:]
-	newHand.RemoveCard(Herz10)
-	var expected Hand = []Card{KaroK, PikD, Herz10}
+	newHand.RemoveCard(Hearts10)
+	var expected Hand = []Card{DiamondsK, SpadesQ, Hearts10}
 	assert.ElementsMatch(t, newHand, expected)
 }
 
