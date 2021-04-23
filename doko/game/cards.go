@@ -75,7 +75,7 @@ func CreateDeck() []Card {
 	ans := make([]Card, DeckSize)
 	pos := 0
 	for suit := Diamonds; suit <= Clubs; suit++ {
-		for rank := Neun; rank <= Ass; rank++ {
+		for rank := Nine; rank <= Ace; rank++ {
 			ans[pos] = Card{suit, rank}
 			ans[pos+1] = Card{suit, rank}
 			pos += 2
@@ -119,39 +119,39 @@ func (c Card) TrumpTrickValue() int {
 		return 100
 	}
 	switch c.Rank {
-	case Dame:
+	case Queen:
 		return 30 + int(c.Suit)
-	case Bube:
+	case Jack:
 		return 20 + int(c.Suit)
 	default:
 		return c.Rank.Score()
 	}
 }
 
-var Diamonds9 = Card{Diamonds, Neun}
-var DiamondsB = Card{Diamonds, Bube}
-var DiamondsD = Card{Diamonds, Dame}
-var DiamondsK = Card{Diamonds, Koenig}
-var Diamonds10 = Card{Diamonds, Zehn}
-var DiamondsA = Card{Diamonds, Ass}
+var Diamonds9 = Card{Diamonds, Nine}
+var DiamondsJ = Card{Diamonds, Jack}
+var DiamondsQ = Card{Diamonds, Queen}
+var DiamondsK = Card{Diamonds, King}
+var Diamonds10 = Card{Diamonds, Ten}
+var DiamondsA = Card{Diamonds, Ace}
 
-var Hearts9 = Card{Hearts, Neun}
-var HeartsB = Card{Hearts, Bube}
-var HeartsD = Card{Hearts, Dame}
-var HeartsK = Card{Hearts, Koenig}
-var Hearts10 = Card{Hearts, Zehn}
-var HeartsA = Card{Hearts, Ass}
+var Hearts9 = Card{Hearts, Nine}
+var HeartsJ = Card{Hearts, Jack}
+var HeartsQ = Card{Hearts, Queen}
+var HeartsK = Card{Hearts, King}
+var Hearts10 = Card{Hearts, Ten}
+var HeartsA = Card{Hearts, Ace}
 
-var Spades9 = Card{Spades, Neun}
-var SpadesB = Card{Spades, Bube}
-var SpadesD = Card{Spades, Dame}
-var SpadesK = Card{Spades, Koenig}
-var Spades10 = Card{Spades, Zehn}
-var SpadesA = Card{Spades, Ass}
+var Spades9 = Card{Spades, Nine}
+var SpadesJ = Card{Spades, Jack}
+var SpadesQ = Card{Spades, Queen}
+var SpadesK = Card{Spades, King}
+var Spades10 = Card{Spades, Ten}
+var SpadesA = Card{Spades, Ace}
 
-var Clubs9 = Card{Clubs, Neun}
-var ClubsB = Card{Clubs, Bube}
-var ClubsD = Card{Clubs, Dame}
-var ClubsK = Card{Clubs, Koenig}
-var Clubs10 = Card{Clubs, Zehn}
-var ClubsA = Card{Clubs, Ass}
+var Clubs9 = Card{Clubs, Nine}
+var ClubsJ = Card{Clubs, Jack}
+var ClubsQ = Card{Clubs, Queen}
+var ClubsK = Card{Clubs, King}
+var Clubs10 = Card{Clubs, Ten}
+var ClubsA = Card{Clubs, Ace}

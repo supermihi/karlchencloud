@@ -44,9 +44,9 @@ func (r RankSolo) Type() game.AnnouncedGameType {
 
 func gameTypeForRank(rank game.Rank) game.AnnouncedGameType {
 	switch rank {
-	case game.Bube:
+	case game.Jack:
 		return game.JackSoloType
-	case game.Dame:
+	case game.Queen:
 		return game.QueenSoloType
 	}
 	panic("unexpected solo rank")

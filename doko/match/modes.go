@@ -30,9 +30,9 @@ func GetReservation(t game.AnnouncedGameType) Reservation {
 	case game.ClubSoloType:
 		return ReservationSuitSolo{game.Clubs}
 	case game.JackSoloType:
-		return ReservationRankSolo{game.Bube}
+		return ReservationRankSolo{game.Jack}
 	case game.QueenSoloType:
-		return ReservationRankSolo{game.Dame}
+		return ReservationRankSolo{game.Queen}
 	}
 	panic(fmt.Sprintf("unexpected game type %v in GetReservation", t))
 }
@@ -54,9 +54,9 @@ func GameSuitOf(card game.Card, t game.AnnouncedGameType) game.GameSuit {
 	case game.ClubSoloType:
 		return SuitSoloSuit(game.Clubs, card)
 	case game.JackSoloType:
-		return RankSoloSuit(game.Bube, card)
+		return RankSoloSuit(game.Jack, card)
 	case game.QueenSoloType:
-		return RankSoloSuit(game.Dame, card)
+		return RankSoloSuit(game.Queen, card)
 	}
 	panic(fmt.Sprintf("unsupported game type: %v", t))
 }

@@ -10,16 +10,16 @@ import (
 func sampleCards() Cards {
 	return [NumPlayers]Hand{
 		[]Card{
-			HeartsK, HeartsA, SpadesK, Spades10, SpadesA, ClubsK, DiamondsK, DiamondsA, HeartsB, ClubsB, ClubsD, Hearts10,
+			HeartsK, HeartsA, SpadesK, Spades10, SpadesA, ClubsK, DiamondsK, DiamondsA, HeartsJ, ClubsJ, ClubsQ, Hearts10,
 		},
 		[]Card{
-			SpadesK, Spades10, Clubs10, Clubs10, Diamonds10, DiamondsB, DiamondsB, HeartsD, HeartsD, SpadesD, SpadesD, ClubsD,
+			SpadesK, Spades10, Clubs10, Clubs10, Diamonds10, DiamondsJ, DiamondsJ, HeartsQ, HeartsQ, SpadesQ, SpadesQ, ClubsQ,
 		},
 		[]Card{
-			Hearts9, Hearts9, HeartsK, Clubs9, Clubs9, Diamonds9, DiamondsK, DiamondsA, SpadesB, DiamondsD, DiamondsD, Hearts10,
+			Hearts9, Hearts9, HeartsK, Clubs9, Clubs9, Diamonds9, DiamondsK, DiamondsA, SpadesJ, DiamondsQ, DiamondsQ, Hearts10,
 		},
 		[]Card{
-			HeartsA, Spades9, Spades9, SpadesA, ClubsK, ClubsA, ClubsA, Diamonds9, Diamonds10, HeartsB, SpadesB, ClubsB,
+			HeartsA, Spades9, Spades9, SpadesA, ClubsK, ClubsA, ClubsA, Diamonds9, Diamonds10, HeartsJ, SpadesJ, ClubsJ,
 		},
 	}
 }
@@ -55,9 +55,9 @@ func TestSampleMatch(t *testing.T) {
 	assert.Equal(t, ContraParty, mode.PartyOf(Player3))
 	assert.Equal(t, ContraParty, mode.PartyOf(Player4))
 	// trick 0
-	play(Player3, SpadesB)
+	play(Player3, SpadesJ)
 	play(Player4, Diamonds9)
-	play(Player1, ClubsD)
+	play(Player1, ClubsQ)
 	play(Player2, Diamonds10)
 	expectTrickWinner(Player1)
 	match.PlaceBid(Player1, Re)
@@ -77,30 +77,30 @@ func TestSampleMatch(t *testing.T) {
 	// trick 3
 	play(Player4, HeartsA)
 	play(Player1, HeartsK)
-	play(Player2, DiamondsB)
+	play(Player2, DiamondsJ)
 	play(Player3, Hearts9)
 	expectTrickWinner(Player2)
 	// trick 4
-	play(Player2, SpadesD)
+	play(Player2, SpadesQ)
 	play(Player3, Hearts10)
 	play(Player4, Diamonds10)
 	play(Player1, DiamondsK)
 	expectTrickWinner(Player3)
 	// trick 5
 	play(Player3, Diamonds9)
-	play(Player4, SpadesB)
+	play(Player4, SpadesJ)
 	play(Player1, DiamondsA)
-	play(Player2, HeartsD)
+	play(Player2, HeartsQ)
 	expectTrickWinner(Player2)
 	// trick 6
-	play(Player2, SpadesD)
+	play(Player2, SpadesQ)
 	play(Player3, DiamondsK)
-	play(Player4, HeartsB)
-	play(Player1, HeartsB)
+	play(Player4, HeartsJ)
+	play(Player1, HeartsJ)
 	expectTrickWinner(Player2)
 	// trick 7
 	play(Player2, SpadesK)
-	play(Player3, DiamondsD)
+	play(Player3, DiamondsQ)
 	play(Player4, Spades9)
 	play(Player1, SpadesK)
 	expectTrickWinner(Player3)
@@ -112,19 +112,19 @@ func TestSampleMatch(t *testing.T) {
 	expectTrickWinner(Player1)
 	// trick 9
 	play(Player1, Spades10)
-	play(Player2, ClubsD)
+	play(Player2, ClubsQ)
 	play(Player3, Clubs9)
 	play(Player4, ClubsK)
 	expectTrickWinner(Player2)
 	// trick 10
-	play(Player2, HeartsD)
-	play(Player3, DiamondsD)
-	play(Player4, ClubsB)
+	play(Player2, HeartsQ)
+	play(Player3, DiamondsQ)
+	play(Player4, ClubsJ)
 	play(Player1, Hearts10)
 	expectTrickWinner(Player1)
 	// trick 11
-	play(Player1, ClubsB)
-	play(Player2, DiamondsB)
+	play(Player1, ClubsJ)
+	play(Player2, DiamondsJ)
 	play(Player3, HeartsK)
 	play(Player4, ClubsA) // karlchen
 	expectTrickWinner(Player1)

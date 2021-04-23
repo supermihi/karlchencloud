@@ -154,17 +154,17 @@ func ToSuit(s api.Suit) game.Suit {
 
 func ToApiRank(r game.Rank) api.Rank {
 	switch r {
-	case game.Neun:
+	case game.Nine:
 		return api.Rank_NINE
-	case game.Bube:
+	case game.Jack:
 		return api.Rank_JACK
-	case game.Dame:
+	case game.Queen:
 		return api.Rank_QUEEN
-	case game.Koenig:
+	case game.King:
 		return api.Rank_KING
-	case game.Zehn:
+	case game.Ten:
 		return api.Rank_TEN
-	case game.Ass:
+	case game.Ace:
 		return api.Rank_ACE
 	}
 	panic(fmt.Sprintf("unexpected rank %v", r))
@@ -173,17 +173,17 @@ func ToApiRank(r game.Rank) api.Rank {
 func ToRank(r api.Rank) game.Rank {
 	switch r {
 	case api.Rank_NINE:
-		return game.Neun
+		return game.Nine
 	case api.Rank_JACK:
-		return game.Bube
+		return game.Jack
 	case api.Rank_QUEEN:
-		return game.Dame
+		return game.Queen
 	case api.Rank_KING:
-		return game.Koenig
+		return game.King
 	case api.Rank_TEN:
-		return game.Zehn
+		return game.Ten
 	case api.Rank_ACE:
-		return game.Ass
+		return game.Ace
 	}
 	panic(fmt.Sprintf("unexpected apirank %v in ToRank()", r))
 }

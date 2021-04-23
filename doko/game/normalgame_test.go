@@ -6,7 +6,7 @@ import (
 )
 
 func TestGameSuitTrump(t *testing.T) {
-	cards := []Card{Hearts10, ClubsD, DiamondsA, HeartsB}
+	cards := []Card{Hearts10, ClubsQ, DiamondsA, HeartsJ}
 	for _, card := range cards {
 		assert.Equal(t, NormalGameSuit(card), Trump)
 	}
@@ -19,7 +19,7 @@ func TestGameSuitDiamonds(t *testing.T) {
 }
 
 func TestGameSuitHearts(t *testing.T) {
-	noHearts := []Card{Hearts10, HeartsB, ClubsA}
+	noHearts := []Card{Hearts10, HeartsJ, ClubsA}
 	for _, card := range noHearts {
 		assert.NotEqual(t, NormalGameSuit(card), HeartsNonTrump)
 	}
@@ -34,7 +34,7 @@ func TestTakesTrickFrom(t *testing.T) {
 		neu Card
 		alt Card
 	}{
-		{Hearts10, ClubsD},
+		{Hearts10, ClubsQ},
 		{HeartsA, HeartsK},
 		{Diamonds9, SpadesA},
 		{Clubs10, ClubsK},

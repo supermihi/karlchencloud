@@ -49,7 +49,7 @@ func fuechse(g *game.Game) []ExtraPoint {
 
 func karlchen(g *game.Game) []ExtraPoint {
 	lastTrick := g.CompleteTricks[game.NumTricks-1]
-	if lastTrick.CardsOf[lastTrick.Winner] == game.ClubsB {
+	if lastTrick.CardsOf[lastTrick.Winner] == game.ClubsJ {
 		ans := [1]ExtraPoint{{Karlchen, lastTrick.Winner, game.NumTricks - 1}}
 		return ans[:]
 	}

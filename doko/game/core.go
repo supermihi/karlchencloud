@@ -28,12 +28,12 @@ func (s Suit) ColorCode() int {
 type Rank int
 
 const (
-	Neun Rank = iota
-	Bube
-	Dame
-	Koenig
-	Zehn
-	Ass
+	Nine Rank = iota
+	Jack
+	Queen
+	King
+	Ten
+	Ace
 )
 
 func (s Rank) String() string {
@@ -47,11 +47,11 @@ type Card struct {
 }
 
 func TenOfHearts() Card {
-	return Card{Hearts, Zehn}
+	return Card{Hearts, Ten}
 }
 
 func QueenOfClubs() Card {
-	return Card{Clubs, Dame}
+	return Card{Clubs, Queen}
 }
 
 func (c Card) String() string {
