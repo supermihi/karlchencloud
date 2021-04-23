@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/stretchr/testify/assert"
+	"math/rand"
 	"sort"
 	"testing"
 )
@@ -22,7 +23,8 @@ func TestHand_RemoveCard(t *testing.T) {
 
 //noinspection GoNilness
 func TestDealCards(t *testing.T) {
-	hands := DealCards(126795)
+	rng := rand.New(rand.NewSource(126795))
+	hands := DealCards(rng)
 	var dealtDeck []Card
 	for _, p := range Players() {
 		dealtDeck = append(dealtDeck, hands[p]...)

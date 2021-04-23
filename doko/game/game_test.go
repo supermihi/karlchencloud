@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/stretchr/testify/assert"
+	"math/rand"
 	"testing"
 )
 
@@ -13,7 +14,8 @@ func TestWinnerOfTrick(t *testing.T) {
 }
 
 func TestGame_IsValidMove(t *testing.T) {
-	cards := DealCards(1487)
+	rng := rand.New(rand.NewSource(1487))
+	cards := DealCards(rng)
 	game := NewGame(cards, Player3, someNormalspiel)
 	for _, card := range game.HandCards[Player3] {
 		assert.Equal(t, game.CanPlayCard(Player3, card), CardPlayed)

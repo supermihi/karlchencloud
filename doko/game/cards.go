@@ -2,10 +2,7 @@ package game
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
-	"os"
-	"strconv"
 	"strings"
 )
 
@@ -87,23 +84,9 @@ func CreateDeck() []Card {
 	return ans
 }
 
-func DealCards(seed int64) Cards {
-	if seed == 0 {
-		seed = rand.Int63()
-	}
-
-	override, isOverwritten := os.LookupEnv("KC_DBG_SEED")
-	if isOverwritten {
-		override, importError := strconv.ParseInt(override, 10, 64)
-		if importError == nil {
-			seed = override
-		}
-	}
-	log.Printf("Dealing cards (seed: %d)", seed)
-
+func DealCards(rng *rand.Rand) Cards {
 	deck := CreateDeck()
-	random := rand.New(rand.NewSource(seed))
-	random.Shuffle(len(deck), func(i int, j int) { deck[i], deck[j] = deck[j], deck[i] })
+	rng.Shuffle(len(deck), func(i int, j int) { deck[i], deck[j] = deck[j], deck[i] })
 	var ans [NumPlayers]Hand
 	for i := 0; i < NumPlayers; i++ {
 		ans[i] = deck[i*NumHandCards : (i+1)*NumHandCards]
