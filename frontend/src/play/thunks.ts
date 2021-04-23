@@ -1,6 +1,6 @@
 import { toDeclareResult, toMatch, toTable, toTableState } from 'model/apiconv';
 import * as api from 'api/karlchen_pb';
-import { ActionKind, createGameThunk } from './gameActions';
+import { ActionKind, createPlayThunk } from './playActions';
 import { Table } from 'model/table';
 import { Match, PlayedCard } from 'model/match';
 import { tableId } from 'api/helpers';
@@ -11,7 +11,7 @@ import { getPosition, Pos } from 'model/players';
 import { selectAuthenticatedClientOrThrow } from 'session/selectors';
 import { DeclareResult } from 'model/auction';
 
-export const createTable = createGameThunk<void, Table>(
+export const createTable = createPlayThunk<void, Table>(
   ActionKind.createTable,
   async (_, { client, meta }) => {
     const result = await client.createTable(new api.Empty(), meta);
@@ -19,7 +19,7 @@ export const createTable = createGameThunk<void, Table>(
   }
 );
 
-export const joinTable = createGameThunk(
+export const joinTable = createPlayThunk(
   ActionKind.joinTable,
   async (inviteCode: string, { client, meta }) => {
     const req = new api.JoinTableRequest();
@@ -29,7 +29,7 @@ export const joinTable = createGameThunk(
   }
 );
 
-export const startTable = createGameThunk<void, Match>(
+export const startTable = createPlayThunk<void, Match>(
   ActionKind.startTable,
   async (_, { client, meta, getState }) => {
     const id = selectCurrentTableOrThrow(getState()).id;
@@ -38,7 +38,7 @@ export const startTable = createGameThunk<void, Match>(
   }
 );
 
-export const playCard = createGameThunk<Card, PlayedCard>(
+export const playCard = createPlayThunk<Card, PlayedCard>(
   ActionKind.playCard,
   async (card, { client, meta, getState }) => {
     const tableId = selectCurrentTableOrThrow(getState()).id;
@@ -54,7 +54,7 @@ export const playCard = createGameThunk<Card, PlayedCard>(
   }
 );
 
-export const declare = createGameThunk<api.GameType, DeclareResult & { gametype: api.GameType }>(
+export const declare = createPlayThunk<api.GameType, DeclareResult & { gametype: api.GameType }>(
   ActionKind.declare,
   async (gametype: api.GameType, thunkAPI) => {
     const state = thunkAPI.getState();

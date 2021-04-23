@@ -5,18 +5,18 @@ import {
   ThunkAction,
   ThunkDispatch,
 } from '@reduxjs/toolkit';
-import { GameState, reducer as gameReducer } from 'game/state';
+import { PlayState, reducer as playReducer } from 'play/state';
 import { SessionState } from 'session/state';
 import { reducer as sessionReducer } from 'session/slice';
 
 export type RootState = {
   session: SessionState;
-  game: GameState;
+  play: PlayState;
 };
 
 export const reducer = combineReducers({
   session: sessionReducer,
-  game: gameReducer,
+  play: playReducer,
 });
 export const store = configureStore<RootState>({
   reducer,

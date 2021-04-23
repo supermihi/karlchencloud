@@ -1,5 +1,5 @@
 import * as api from 'api/karlchen_pb';
-import { selectPlayers } from 'game/selectors';
+import { selectPlayers } from 'play/selectors';
 import { Dispatchable } from 'state';
 import { getCurrentTableState, toCard, toMatch, toMode } from 'model/apiconv';
 import { Declaration, DeclareResult } from 'model/auction';

@@ -1,7 +1,7 @@
 import { RootState } from './state';
 import { TablePhase } from 'api/karlchen_pb';
 import { selectSession } from 'session/selectors';
-import { selectGame } from 'game/selectors';
+import { selectPlay } from 'play/selectors';
 
 export enum Location {
   register,
@@ -12,7 +12,7 @@ export enum Location {
 export function selectLocation(state: RootState): Location {
   const session = selectSession(state);
   if (session.session) {
-    if (selectGame(state).table?.phase === TablePhase.PLAYING) {
+    if (selectPlay(state).table?.phase === TablePhase.PLAYING) {
       return Location.table;
     }
     return Location.lobby;

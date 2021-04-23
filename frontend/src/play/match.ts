@@ -27,7 +27,7 @@ const reduceDeclaration: CaseReducer<MatchState, PayloadAction<DeclareResult>> =
 };
 
 const matchSlice = createSlice({
-  name: 'game/match',
+  name: 'play/match',
   initialState: initialState as MatchState,
   reducers: {},
   extraReducers: (builder) => {

@@ -25,7 +25,7 @@ export interface ActionError {
   error: unknown;
 }
 
-interface GameThunkConfig extends AuthenticatedClient {
+interface PlayThunkConfig extends AuthenticatedClient {
   getState: () => RootState;
 }
 export const actionStarted = createAction<ActionKind>('ACTION_STARTED');
@@ -49,16 +49,16 @@ export const reducer = createReducer<ActionState>(
     }),
   }
 );
-export type GameThunk<Returned, ThunkArg> = ((
+export type PlayThunk<Returned, ThunkArg> = ((
   arg: ThunkArg
 ) => ThunkAction<any, RootState, unknown, Action<string>>) & {
   fulfilled: PayloadActionCreator<Returned, string, PrepareAction<Returned>>;
 };
-export function createGameThunk<TArg, Returned = void>(
+export function createPlayThunk<TArg, Returned = void>(
   actionKind: ActionKind,
-  creator: (thunkArg: TArg, api: GameThunkConfig) => Promise<Returned>
-): GameThunk<Returned, TArg> {
-  const action = createAction('game/' + actionKind, (result: Returned) => ({
+  creator: (thunkArg: TArg, api: PlayThunkConfig) => Promise<Returned>
+): PlayThunk<Returned, TArg> {
+  const action = createAction('play/' + actionKind, (result: Returned) => ({
     payload: result,
   }));
   const thunk: (arg: TArg) => AppThunk = (arg) => async (dispatch, getState) => {
