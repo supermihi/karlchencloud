@@ -29,9 +29,10 @@ export const joinTable = createGameThunk(
   }
 );
 
-export const startTable = createGameThunk<string, Match>(
+export const startTable = createGameThunk<void, Match>(
   ActionKind.startTable,
-  async (id, { client, meta }) => {
+  async (_, { client, meta, getState }) => {
+    const id = selectCurrentTableOrThrow(getState()).id;
     const match = await client.startTable(tableId(id), meta);
     return toMatch(match);
   }

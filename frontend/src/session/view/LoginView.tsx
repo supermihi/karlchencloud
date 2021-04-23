@@ -37,7 +37,7 @@ const LoginView: React.FC<Props> = ({
             fullWidth
             variant="contained"
             color="primary"
-            onClick={() => login()}
+            onClick={login}
           >
             Weiter
           </Button>

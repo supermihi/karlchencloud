@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { selectLocation, Location } from 'routing';
 import Login from 'session/view/Login';
 import Register from 'session/view/Register';
+import Lobby from "lobby/Lobby";
 
 export default function App(): React.ReactElement {
   const location = useSelector(selectLocation);
@@ -18,12 +19,12 @@ export default function App(): React.ReactElement {
 }
 function Content({ location }: { location: Location }) {
   switch (location) {
-    case Location.login:
-      return <Login />;
     case Location.register:
       return <Register />;
+    case Location.login:
+      return <Login />;
     case Location.lobby:
-      return <h1>lobby not implemented</h1>;
+      return <Lobby />;
     case Location.table:
       return <h1>table not implemented</h1>;
   }
