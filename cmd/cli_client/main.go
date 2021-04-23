@@ -23,6 +23,16 @@ func main() {
 		ExistingSecret: nil,
 		Address:        address,
 	}
+	log.Printf("Input your display name (empty for default \"client\"):")
+	displayName := UserInputString()
+	if len(displayName) > 0 {
+		conn.DisplayName = displayName
+	}
+	log.Printf("Input the connection endpoint (empty for default \"localhost:50501\"):")
+	connectionEndpoint := UserInputString()
+	if len(connectionEndpoint) > 0 {
+		conn.Address = connectionEndpoint
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	service, err := client.GetClientService(conn, ctx)
@@ -38,6 +48,7 @@ func main() {
 
 type CliHandler struct {
 	client.TableClient
+	IsCreator bool
 }
 
 func NewCliHandler() CliHandler {
@@ -45,12 +56,33 @@ func NewCliHandler() CliHandler {
 }
 
 func (h *CliHandler) Start(service client.ClientService) {
-	table, err := service.Api.CreateTable(service.Context, &api.Empty{})
-	if err != nil {
-		log.Fatalf("%s could not create table: %v", service.Name, err)
+	log.Printf("Choose: [_c_reate, _j_oin] table")
+	action := UserInputRune()
+	table := ""
+	if action == 'c' {
+		h.IsCreator = true
+		tableData, err := service.Api.CreateTable(service.Context, &api.Empty{})
+		if err != nil {
+			log.Fatalf("%s could not create table: %v", service.Name, err)
+		}
+		table = tableData.TableId
+		service.Logf("table %s created with invite code %s", table, tableData.InviteCode)
+	} else if action == 'j' {
+		h.IsCreator = false
+		log.Printf("Input invite code:")
+		invite := UserInputString()
+		tableData, err := service.Api.JoinTable(service.Context, &api.JoinTableRequest{InviteCode: invite})
+		if err != nil {
+			service.Logf("could not join table: %v", err)
+			return
+		}
+		table = tableData.Data.TableId
+		service.Logf("table %s joined", table)
+	} else {
+		service.Logf("Invalid action %c", action)
+		return
 	}
-	service.Logf("table %s created with invite code %s", table.TableId, table.InviteCode)
-	h.TableClient = client.NewTableClient(service, table.TableId, h)
+	h.TableClient = client.NewTableClient(service, table, h)
 	go h.TableClient.Start()
 }
 
@@ -67,7 +99,7 @@ func (h *CliHandler) OnMemberEvent(ev *api.MemberEvent) {
 		}
 		h.Logf("user %s joined table", ev.Name)
 
-		if len(h.View.MemberNamesById) >= 4 {
+		if len(h.View.MemberNamesById) >= 4 && h.IsCreator {
 			matchState, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
 			if err != nil {
 				log.Fatalf("error starting table: %v", err)
@@ -117,17 +149,14 @@ func (h *CliHandler) OnMyTurn() {
 }
 func (h *CliHandler) declare() {
 	log.Printf("Choose: [_g_esund, _h_ochzeit]")
-	reader := bufio.NewReader(os.Stdin)
-	char, _, err := reader.ReadRune()
-	if err != nil {
-		log.Fatalf("error reading rune: %v", err)
-	}
+	char := UserInputRune()
 	declaration := game.NormalGameType
 	if char == 'h' {
 		declaration = game.MarriageType
 	}
-	if h.Declare(declaration) != nil {
-		log.Fatalf("error declaring game: %v", err)
+	declareErr := h.Declare(declaration)
+	if declareErr != nil {
+		log.Fatalf("error declaring game: %v", declareErr)
 	}
 	h.Logf("successfully declared %s", declaration)
 }
@@ -136,14 +165,9 @@ func (h *CliHandler) playCard() {
 
 	log.Printf("your cards: %v", h.Match().Cards)
 	log.Printf("Choose index to play: ")
-	i := -1
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatalf("error reading ans: %v", err)
-		}
-		i, err = strconv.Atoi(line[:len(line)-1])
+		line := UserInputString()
+		i, err := strconv.Atoi(line)
 		if err != nil {
 			log.Printf("could not read answer: %v. Please try again", err)
 			continue
@@ -162,4 +186,22 @@ func (h *CliHandler) playCard() {
 		break
 	}
 
+}
+
+func UserInputRune() rune {
+	reader := bufio.NewReader(os.Stdin)
+	char, _, err := reader.ReadRune()
+	if err != nil {
+		log.Fatalf("error reading rune: %v", err)
+	}
+	return char
+}
+
+func UserInputString() string {
+	reader := bufio.NewReader(os.Stdin)
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatalf("error reading string: %v", err)
+	}
+	return line[:len(line)-1]
 }
