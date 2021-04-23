@@ -122,8 +122,9 @@ func (h *CliHandler) declare() {
 	if char == 'h' {
 		declaration = game.MarriageType
 	}
-	if h.Declare(declaration) != nil {
-		log.Fatalf("error declaring game: %v", declaration)
+	declareErr := h.Declare(declaration)
+	if declareErr != nil {
+		log.Fatalf("error declaring game: %v", declareErr)
 	}
 	h.Logf("successfully declared %s", declaration)
 }
@@ -132,14 +133,9 @@ func (h *CliHandler) playCard() {
 
 	log.Printf("your cards: %v", h.Match().Cards)
 	log.Printf("Choose index to play: ")
-	i := -1
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatalf("error reading ans: %v", err)
-		}
-		i, err = strconv.Atoi(line[:len(line)-1])
+		line := UserInputString()
+		i, err := strconv.Atoi(line)
 		if err != nil {
 			log.Printf("could not read answer: %v. Please try again", err)
 			continue
@@ -167,4 +163,13 @@ func UserInputRune() rune {
 		log.Fatalf("error reading rune: %v", err)
 	}
 	return char
+}
+
+func UserInputString() string {
+	reader := bufio.NewReader(os.Stdin)
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatalf("error reading string: %v", err)
+	}
+	return line[:len(line)-1]
 }
