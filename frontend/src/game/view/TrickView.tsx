@@ -14,7 +14,7 @@ export default function TrickView({
   trick: { cards, forehand },
   cardWidth,
   center: [x, y],
-}: Props) {
+}: Props): React.ReactElement {
   const excenter = cardWidth / 4;
   return (
     <>

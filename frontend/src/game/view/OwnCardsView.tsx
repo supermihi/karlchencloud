@@ -9,7 +9,7 @@ interface Props {
   onClick?: (card: Card, index: number) => void;
 }
 
-export default function OwnCardsView({ cards, cardWidth, onClick }: Props) {
+export default function OwnCardsView({ cards, cardWidth, onClick }: Props): React.ReactElement {
   const angle = 2.5;
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const allowClick = Boolean(onClick);
@@ -21,8 +21,8 @@ export default function OwnCardsView({ cards, cardWidth, onClick }: Props) {
           alt={cardString(card)}
           src={getCardUrl(card)}
           width={cardWidth}
-          onMouseEnter={(_) => setHoveredIndex(i)}
-          onMouseLeave={(_) => setHoveredIndex(-1)}
+          onMouseEnter={() => setHoveredIndex(i)}
+          onMouseLeave={() => setHoveredIndex(-1)}
           height={cardWidth / cardAspectRatio}
           style={{
             position: 'absolute',
@@ -35,7 +35,7 @@ export default function OwnCardsView({ cards, cardWidth, onClick }: Props) {
             transformOrigin: `${cardWidth / 2}px ${(cardWidth / cardAspectRatio) * 4}px`,
             cursor: allowClick ? 'pointer' : 'inherit',
           }}
-          onClick={onClick && ((_) => onClick(card, i))}
+          onClick={onClick && (() => onClick(card, i))}
         />
       ))}
     </>

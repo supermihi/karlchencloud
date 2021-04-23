@@ -30,7 +30,7 @@ import ClubA from './resources/cards/AC.svg';
 import { Rank, Suit } from 'api/karlchen_pb';
 import { Card } from 'model/core';
 
-export function getCardUrl(card: Card) {
+export function getCardUrl(card: Card): string {
   switch (card.rank) {
     case Rank.NINE:
       switch (card.suit) {

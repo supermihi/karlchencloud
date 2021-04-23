@@ -18,7 +18,7 @@ module.exports= {
         use: { loader: "babel-loader"}
       },
       {
-        test: /\.svg$/,
+        test: /\.(svg|jpg)$/,
         type: 'asset'
       }
     ],
