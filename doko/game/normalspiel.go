@@ -12,29 +12,29 @@ func NormalGameSuit(c Card) GameSuit {
 }
 
 type NormalspielMode struct {
-	parties        [NumPlayers]Party
-	stilleHochzeit bool
+	parties    [NumPlayers]Party
+	silentSolo bool
 }
 
 func NewNormalspiel(dealtCards Cards) NormalspielMode {
 	var parties [NumPlayers]Party
-	stilleHochzeit := false
+	silentSolo := false
 	for _, p := range Players() {
 		alte := dealtCards[p].NumAlte()
 		if alte >= 1 {
 			parties[p] = ReParty
 			if alte == 2 {
-				stilleHochzeit = true
+				silentSolo = true
 			}
 		} else {
 			parties[p] = ContraParty
 		}
 	}
-	return NormalspielMode{parties, stilleHochzeit}
+	return NormalspielMode{parties, silentSolo}
 }
 
-func (n NormalspielMode) IsStilleHochzeit() bool {
-	return n.stilleHochzeit
+func (n NormalspielMode) IsSilentSolo() bool {
+	return n.silentSolo
 }
 
 func (NormalspielMode) OnCompletedTrick(Trick, int) {

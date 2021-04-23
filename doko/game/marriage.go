@@ -1,26 +1,26 @@
 package game
 
-type HochzeitState int
+type MarriageState int
 
 const (
-	WaitingForPartner HochzeitState = iota
+	WaitingForPartner MarriageState = iota
 	PartnerFound
 	Solo
 )
 const MaxTricksWaitingForPartner = 3
 
-type Hochzeit struct {
+type Marriage struct {
 	announcer      Player
 	partner        Player
-	state          HochzeitState
+	state          MarriageState
 	klaerungsstich int
 }
 
-func NewHochzeit(announcer Player) Hochzeit {
-	return Hochzeit{announcer, NoPlayer, WaitingForPartner, 0}
+func NewMarriage(announcer Player) Marriage {
+	return Marriage{announcer, NoPlayer, WaitingForPartner, 0}
 }
 
-func (h Hochzeit) OnCompletedTrick(t Trick, numTrick int) {
+func (h Marriage) OnCompletedTrick(t Trick, numTrick int) {
 	if h.state != WaitingForPartner {
 		return
 	}
@@ -34,7 +34,7 @@ func (h Hochzeit) OnCompletedTrick(t Trick, numTrick int) {
 	}
 }
 
-func (h Hochzeit) PartyOf(p Player) Party {
+func (h Marriage) PartyOf(p Player) Party {
 	if p == h.announcer {
 		return ReParty
 	}
@@ -47,23 +47,23 @@ func (h Hochzeit) PartyOf(p Player) Party {
 	return ContraParty
 }
 
-func (h Hochzeit) PartnerFound() bool {
+func (h Marriage) PartnerFound() bool {
 	return h.partner != NoPlayer
 }
 
-func (h Hochzeit) Partner() Player {
+func (h Marriage) Partner() Player {
 	return h.partner
 }
 
 // trick-taking rules equal those of normal mode
-func (h Hochzeit) GameSuit(card Card) GameSuit {
+func (h Marriage) GameSuit(card Card) GameSuit {
 	return NormalGameSuit(card)
 }
 
-func (h Hochzeit) Klaerungsstich() int {
+func (h Marriage) Klaerungsstich() int {
 	return h.klaerungsstich
 }
 
-func (h Hochzeit) Type() AnnouncedGameType {
+func (h Marriage) Type() AnnouncedGameType {
 	return MarriageType
 }

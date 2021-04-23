@@ -68,7 +68,7 @@ func (v VorbehaltFarbsolo) Type() game.AnnouncedGameType {
 }
 
 func (v VorbehaltFarbsolo) Priority() int {
-	return VorbehaltPriorityHochzeit + 1
+	return VorbehaltPriorityMarriage + 1
 }
 
 func (v VorbehaltFarbsolo) CreateMode(announcer game.Player) game.Mode {

@@ -42,7 +42,7 @@ func (VorbehaltFleischlos) Type() game.AnnouncedGameType {
 	return game.AceSoloType
 }
 func (VorbehaltFleischlos) Priority() int {
-	return VorbehaltPriorityHochzeit + 1
+	return VorbehaltPriorityMarriage + 1
 }
 
 func (VorbehaltFleischlos) CreateMode(announcer game.Player) game.Mode {

@@ -117,7 +117,7 @@ func ToApiMode(mode game.Mode, forehand game.Player, users PlayerUserMap) *api.M
 	soloist := ToPlayerValue(game.Soloist(mode), users)
 	var spouse *api.PlayerValue
 	switch h := mode.(type) {
-	case game.Hochzeit:
+	case game.Marriage:
 		spouse = ToPlayerValue(h.Partner(), users)
 	}
 	return &api.Mode{Type: ToApiGameType(mode.Type()), Soloist: soloist, Spouse: spouse,

@@ -18,7 +18,7 @@ func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
 	case game.NormalGameType:
 		return nil
 	case game.MarriageType:
-		return VorbehaltHochzeit{}
+		return VorbehaltMarriage{}
 	case game.AceSoloType:
 		return VorbehaltFleischlos{}
 	case game.DiamondSoloType:
