@@ -20,7 +20,7 @@ func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
 	case game.MarriageType:
 		return VorbehaltMarriage{}
 	case game.AceSoloType:
-		return VorbehaltFleischlos{}
+		return VorbehaltAceSolo{}
 	case game.DiamondSoloType:
 		return VorbehaltSuitSolo{game.Karo}
 	case game.HeartSoloType:
@@ -44,7 +44,7 @@ func GameSuitOf(card game.Card, t game.AnnouncedGameType) game.GameSuit {
 	case game.MarriageType:
 		return game.NormalGameSuit(card)
 	case game.AceSoloType:
-		return FleischlosSuite(card)
+		return AceSoloSuite(card)
 	case game.DiamondSoloType:
 		return SuitSoloSuit(game.Karo, card)
 	case game.HeartSoloType:

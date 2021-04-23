@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestWinnerOfTrickFleischlos(t *testing.T) {
-	var solo = FleischlosMode{Soloist: game.Player1}
+func TestWinnerOfTrickAceSolo(t *testing.T) {
+	var solo = AceSolo{Soloist: game.Player1}
 
 	// Turnier-Spielregeln (TSR) des Deutschen Doppelkopf-Verbandes e. V., Stand 1. April 2019
 	// https://www.doko-verband.de/Regeln__Ordnungen.html?file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/&file=tl_files/DDV/Docs/Downloads/Regeln%20und%20Ordnungen/Turnier-Spielregeln%20Stand%2001.04.2019.pdf
