@@ -10,7 +10,4 @@ RUN go mod download
 COPY . .
 
 RUN go build -o kc_server cmd/server/main.go
-ENV CONSTANT_TABLE_ID=1234
-ENV CONSTANT_INVITE_CODE=1234
-
 CMD ["/go/src/app/kc_server"]
