@@ -33,22 +33,22 @@ func (AceSolo) Type() game.AnnouncedGameType {
 	return game.AceSoloType
 }
 
-type VorbehaltAceSolo struct{}
+type ReservationAceSolo struct{}
 
-func (VorbehaltAceSolo) CanAnnounceWith(_ game.Hand) bool {
+func (ReservationAceSolo) CanAnnounceWith(_ game.Hand) bool {
 	return true
 }
-func (VorbehaltAceSolo) Type() game.AnnouncedGameType {
+func (ReservationAceSolo) Type() game.AnnouncedGameType {
 	return game.AceSoloType
 }
-func (VorbehaltAceSolo) Priority() int {
-	return VorbehaltPriorityMarriage + 1
+func (ReservationAceSolo) Priority() int {
+	return ReservationPriorityMarriage + 1
 }
 
-func (VorbehaltAceSolo) CreateMode(announcer game.Player) game.Mode {
+func (ReservationAceSolo) CreateMode(announcer game.Player) game.Mode {
 	return AceSolo{announcer}
 }
 
-func (VorbehaltAceSolo) AnnouncerTakesForehand() bool {
+func (ReservationAceSolo) AnnouncerTakesForehand() bool {
 	return false
 }

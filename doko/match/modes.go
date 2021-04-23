@@ -5,7 +5,7 @@ import (
 	"github.com/supermihi/karlchencloud/doko/game"
 )
 
-type Vorbehalt interface {
+type Reservation interface {
 	CanAnnounceWith(handCards game.Hand) bool
 	Type() game.AnnouncedGameType
 	Priority() int
@@ -13,28 +13,28 @@ type Vorbehalt interface {
 	AnnouncerTakesForehand() bool
 }
 
-func GetVorbehalt(t game.AnnouncedGameType) Vorbehalt {
+func GetReservation(t game.AnnouncedGameType) Reservation {
 	switch t {
 	case game.NormalGameType:
 		return nil
 	case game.MarriageType:
-		return VorbehaltMarriage{}
+		return ReservationMarriage{}
 	case game.AceSoloType:
-		return VorbehaltAceSolo{}
+		return ReservationAceSolo{}
 	case game.DiamondSoloType:
-		return VorbehaltSuitSolo{game.Karo}
+		return ReservationSuitSolo{game.Karo}
 	case game.HeartSoloType:
-		return VorbehaltSuitSolo{game.Herz}
+		return ReservationSuitSolo{game.Herz}
 	case game.SpadeSoloType:
-		return VorbehaltSuitSolo{game.Pik}
+		return ReservationSuitSolo{game.Pik}
 	case game.ClubSoloType:
-		return VorbehaltSuitSolo{game.Kreuz}
+		return ReservationSuitSolo{game.Kreuz}
 	case game.JackSoloType:
-		return VorbehaltRankSolo{game.Bube}
+		return ReservationRankSolo{game.Bube}
 	case game.QueenSoloType:
-		return VorbehaltRankSolo{game.Dame}
+		return ReservationRankSolo{game.Dame}
 	}
-	panic(fmt.Sprintf("unexpected game type %v in GetVorbehalt", t))
+	panic(fmt.Sprintf("unexpected game type %v in GetReservation", t))
 }
 
 func GameSuitOf(card game.Card, t game.AnnouncedGameType) game.GameSuit {

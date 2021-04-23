@@ -2,27 +2,27 @@ package match
 
 import "github.com/supermihi/karlchencloud/doko/game"
 
-type VorbehaltMarriage struct {
+type ReservationMarriage struct {
 }
 
-func (v VorbehaltMarriage) Type() game.AnnouncedGameType {
+func (v ReservationMarriage) Type() game.AnnouncedGameType {
 	return game.MarriageType
 }
 
-func (v VorbehaltMarriage) CanAnnounceWith(handCards game.Hand) bool {
+func (v ReservationMarriage) CanAnnounceWith(handCards game.Hand) bool {
 	return handCards.NumAlte() == 2
 }
 
-const VorbehaltPriorityMarriage = 1
+const ReservationPriorityMarriage = 1
 
-func (v VorbehaltMarriage) Priority() int {
-	return VorbehaltPriorityMarriage
+func (v ReservationMarriage) Priority() int {
+	return ReservationPriorityMarriage
 }
 
-func (v VorbehaltMarriage) CreateMode(announcer game.Player) game.Mode {
+func (v ReservationMarriage) CreateMode(announcer game.Player) game.Mode {
 	return game.NewMarriage(announcer)
 }
 
-func (v VorbehaltMarriage) AnnouncerTakesForehand() bool {
+func (v ReservationMarriage) AnnouncerTakesForehand() bool {
 	return false
 }

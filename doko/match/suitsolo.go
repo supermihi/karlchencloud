@@ -56,25 +56,25 @@ func gameTypeForTrump(trump game.Suit) game.AnnouncedGameType {
 	panic("unexpected solo suit")
 }
 
-type VorbehaltSuitSolo struct {
+type ReservationSuitSolo struct {
 	suit game.Suit
 }
 
-func (v VorbehaltSuitSolo) CanAnnounceWith(_ game.Hand) bool {
+func (v ReservationSuitSolo) CanAnnounceWith(_ game.Hand) bool {
 	return true
 }
-func (v VorbehaltSuitSolo) Type() game.AnnouncedGameType {
+func (v ReservationSuitSolo) Type() game.AnnouncedGameType {
 	return gameTypeForTrump(v.suit)
 }
 
-func (v VorbehaltSuitSolo) Priority() int {
-	return VorbehaltPriorityMarriage + 1
+func (v ReservationSuitSolo) Priority() int {
+	return ReservationPriorityMarriage + 1
 }
 
-func (v VorbehaltSuitSolo) CreateMode(announcer game.Player) game.Mode {
+func (v ReservationSuitSolo) CreateMode(announcer game.Player) game.Mode {
 	return NewSuitSolo(v.suit, announcer)
 }
 
-func (v VorbehaltSuitSolo) AnnouncerTakesForehand() bool {
+func (v ReservationSuitSolo) AnnouncerTakesForehand() bool {
 	return false
 }

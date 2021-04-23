@@ -5,15 +5,15 @@ import (
 )
 
 type Declaration struct {
-	Gesund    bool
-	Vorbehalt Vorbehalt
+	Gesund      bool
+	Reservation Reservation
 }
 
 func DeclarationGesund() Declaration {
 	return Declaration{true, nil}
 }
 
-func DeclarationVorbehalt(v Vorbehalt) Declaration {
+func DeclarationReservation(v Reservation) Declaration {
 	return Declaration{false, v}
 }
 
@@ -48,7 +48,7 @@ func (a *Auction) Declare(player game.Player, t game.AnnouncedGameType) bool {
 	if player != a.WhoseTurn() {
 		panic("invalid call to declare")
 	}
-	v := GetVorbehalt(t)
+	v := GetReservation(t)
 	if v == nil {
 		// gesund
 		a.Declarations[player] = DeclarationGesund()
@@ -56,7 +56,7 @@ func (a *Auction) Declare(player game.Player, t game.AnnouncedGameType) bool {
 		if !v.CanAnnounceWith(a.cards[player]) {
 			return false
 		}
-		a.Declarations[player] = DeclarationVorbehalt(v)
+		a.Declarations[player] = DeclarationReservation(v)
 	}
 	return true
 }
@@ -74,18 +74,18 @@ func (a Auction) GetResult() Result {
 	maxPrio := -1
 	for _, player := range game.PlayersFrom(a.forehand) {
 		d := a.Declarations[player]
-		if !d.Gesund && d.Vorbehalt.Priority() > maxPrio {
+		if !d.Gesund && d.Reservation.Priority() > maxPrio {
 			winner = player
-			maxPrio = d.Vorbehalt.Priority()
+			maxPrio = d.Reservation.Priority()
 		}
 	}
 	if winner == game.NoPlayer {
 		return Result{game.NewNormalGame(a.cards), a.forehand}
 	}
-	vorbehalt := a.Declarations[winner].Vorbehalt
+	reservation := a.Declarations[winner].Reservation
 	forehand := a.forehand
-	if vorbehalt.AnnouncerTakesForehand() {
+	if reservation.AnnouncerTakesForehand() {
 		forehand = winner
 	}
-	return Result{vorbehalt.CreateMode(winner), forehand}
+	return Result{reservation.CreateMode(winner), forehand}
 }

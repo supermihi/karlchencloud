@@ -52,25 +52,25 @@ func gameTypeForRank(rank game.Rank) game.AnnouncedGameType {
 	panic("unexpected solo rank")
 }
 
-type VorbehaltRankSolo struct {
+type ReservationRankSolo struct {
 	rank game.Rank
 }
 
-func (v VorbehaltRankSolo) CanAnnounceWith(_ game.Hand) bool {
+func (v ReservationRankSolo) CanAnnounceWith(_ game.Hand) bool {
 	return true
 }
-func (v VorbehaltRankSolo) Type() game.AnnouncedGameType {
+func (v ReservationRankSolo) Type() game.AnnouncedGameType {
 	return gameTypeForRank(v.rank)
 }
 
-func (v VorbehaltRankSolo) Priority() int {
-	return VorbehaltPriorityMarriage + 1
+func (v ReservationRankSolo) Priority() int {
+	return ReservationPriorityMarriage + 1
 }
 
-func (v VorbehaltRankSolo) CreateMode(announcer game.Player) game.Mode {
+func (v ReservationRankSolo) CreateMode(announcer game.Player) game.Mode {
 	return NewRankSolo(v.rank, announcer)
 }
 
-func (v VorbehaltRankSolo) AnnouncerTakesForehand() bool {
+func (v ReservationRankSolo) AnnouncerTakesForehand() bool {
 	return false
 }

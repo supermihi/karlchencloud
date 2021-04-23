@@ -94,8 +94,8 @@ func (r *Room) StartTable(tableId string, userId string) (*TableData, error) {
 }
 
 type Declaration struct {
-	Gesund    bool
-	Vorbehalt game.AnnouncedGameType
+	Gesund      bool
+	Reservation game.AnnouncedGameType
 }
 type MatchData struct {
 	Phase           match.Phase
@@ -120,7 +120,7 @@ func GetMatchData(tm *TableMatch) *MatchData {
 		if v.Gesund {
 			declarations[k] = Declaration{true, game.NormalGameType}
 		} else {
-			declarations[k] = Declaration{false, v.Vorbehalt.Type()}
+			declarations[k] = Declaration{false, v.Reservation.Type()}
 		}
 	}
 	ans := &MatchData{Phase: tm.Match.Phase(), Turn: tm.Match.WhoseTurn(),
