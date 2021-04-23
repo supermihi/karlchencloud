@@ -87,7 +87,6 @@ func (h *BotHandler) OnMatchStart(_ *api.MatchState) {
 }
 
 func (h *BotHandler) OnMyTurn() {
-	time.Sleep(500 * time.Millisecond)
 	switch h.Match().Phase {
 	case match.InAuction:
 		h.makeTurnAuction()
