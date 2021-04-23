@@ -1,7 +1,7 @@
 import React from 'react';
-import { Declaration } from '../../model/auction';
-import { BidType, GameType } from '../../api/karlchen_pb';
-import { User } from '../../model/core';
+import { Declaration } from 'model/auction';
+import { BidType, GameType } from 'api/karlchen_pb';
+import { User } from 'model/core';
 import * as mockPlayers from 'mocks/players';
 import PlayerView from './PlayerView';
 
