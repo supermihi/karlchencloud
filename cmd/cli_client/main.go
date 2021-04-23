@@ -23,6 +23,16 @@ func main() {
 		ExistingSecret: nil,
 		Address:        address,
 	}
+	log.Printf("Input your display name (empty for default \"client\"):")
+	displayName := UserInputString()
+	if len(displayName) > 0 {
+		conn.DisplayName = displayName
+	}
+	log.Printf("Input the connection endpoint (empty for default \"localhost:50501\"):")
+	connectionEndpoint := UserInputString()
+	if len(connectionEndpoint) > 0 {
+		conn.Address = connectionEndpoint
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	service, err := client.GetClientService(conn, ctx)
