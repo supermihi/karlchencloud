@@ -131,7 +131,7 @@ func (h *BotHandler) makeTurnGame() {
 		cardIndex = 0 // no matchnig card -> can play anything
 	}
 	card := m.DrawCard(cardIndex)
-	h.Logf("playing card '%s'...", card)
+	h.Logf("playing card: %v", card)
 	err := h.PlayCard(card)
 	if err != nil {
 		log.Fatalf("could not play card: %v", err)
