@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 )
@@ -87,6 +88,8 @@ func DealCards(seed int64) Cards {
 	if seed == 0 {
 		seed = rand.Int63()
 	}
+
+	log.Printf("Dealing cards (seed: %d)", seed)
 	deck := CreateDeck()
 	random := rand.New(rand.NewSource(seed))
 	random.Shuffle(len(deck), func(i int, j int) { deck[i], deck[j] = deck[j], deck[i] })
