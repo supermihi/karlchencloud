@@ -6475,6 +6475,7 @@ fsevents@~2.3.1:
     js-base64: ^3.6.0
     lodash.frompairs: ^4.0.1
     lodash.mapvalues: ^4.6.0
+    prettier: 2.2.1
     react: ^17.0.2
     react-cosmos: ^5.6.2
     react-dom: ^17.0.2
@@ -7785,6 +7786,15 @@ fsevents@~2.3.1:
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
   checksum: bc1649f521e8928cde0e1b349b224de2e6f00b71361a4a44f2e4a615342b6e1ae30366c32d26412dabe74d999a40f79c0ae044ae6b17cf19af935e74d12ea4fa
+  languageName: node
+  linkType: hard
+
+"prettier@npm:2.2.1":
+  version: 2.2.1
+  resolution: "prettier@npm:2.2.1"
+  bin:
+    prettier: bin-prettier.js
+  checksum: 92c6c9f4b87eba1f28466edee57dd18c80d00b858edda77d46d1950d20e6e302b68ee255fc91133ba931e63c4577b5ae30da194d9626a8f3c0177778b91bf056
   languageName: node
   linkType: hard
 

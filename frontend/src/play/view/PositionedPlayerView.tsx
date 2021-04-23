@@ -22,10 +22,10 @@ function getPlayerProps(match: Match, pos: Pos, user: User): PlayerViewProps {
   const turn = match.turn === pos;
   const bids = match.game?.bids[pos] ?? [];
   const soloGame = !!match.game
-      ? match.game.mode.soloist === pos
+    ? match.game.mode.soloist === pos
       ? match.game.mode.type
       : undefined
-      : undefined;
+    : undefined;
   const declaration = match.auction?.declarations[pos];
   return {
     user,

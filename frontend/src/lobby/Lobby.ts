@@ -1,5 +1,5 @@
-import {connect} from "react-redux";
-import LobbyView from "./LobbyView";
+import { connect } from 'react-redux';
+import LobbyView from './LobbyView';
 import { createSelector } from '@reduxjs/toolkit';
 import { selectSession } from '../session/selectors';
 import { selectTable } from '../play/selectors';
@@ -12,6 +12,6 @@ const mapStateToProps = createSelector(selectTable, selectSession, (table, sessi
 }));
 const mapDispatchToProps = {
   createTable,
-  startTable
-}
+  startTable,
+};
 export default connect(mapStateToProps, mapDispatchToProps)(LobbyView);
