@@ -152,7 +152,7 @@ func (h *CliHandler) playCard() {
 			log.Printf("invalid card index %d", i)
 			continue
 		}
-		log.Printf("Playing card: %v", h.Match().Cards[i])
+		log.Printf("playing card: %v", h.Match().Cards[i])
 		err = h.PlayCard(h.Match().Cards[i])
 		if err != nil {
 			log.Printf("could not play card: %v. Try again", err)
