@@ -96,7 +96,6 @@ func (h *BotHandler) OnMyTurn() {
 }
 
 func (h *BotHandler) makeTurnAuction() {
-
 	declaration := game.NormalGameType
 	if h.Match().Cards.NumQueensOfClubs() == 2 {
 		declaration = game.MarriageType
@@ -167,8 +166,17 @@ func (h *BotHandler) OnDeclaration(_ *api.Declaration) {
 	// pass
 }
 
-func (h *BotHandler) OnPlayedCard(_ *api.PlayedCard) {
-	// pass
+func (h *BotHandler) OnPlayedCard(play *api.PlayedCard) {
+	if play.Winner != nil {
+		h.Match().Phase = match.MatchFinished
+	}
+	if h.Match().Phase == match.MatchFinished && h.isOwner {
+		state, err := h.Service.Api.StartNextMatch(h.Service.Context, &api.TableId{Value: h.TableId})
+		if err != nil {
+			h.Logf("Failed to start next match!")
+		}
+		h.HandleStart(state)
+	}
 }
 
 func (h *BotHandler) OnTableStateReceived(_ *api.TableState) {
