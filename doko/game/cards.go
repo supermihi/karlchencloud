@@ -114,7 +114,7 @@ func (c Card) FehlTrickValue() int {
 	return c.Rank.Score()
 }
 
-func (c Card) TrumpfTrickValue() int {
+func (c Card) TrumpTrickValue() int {
 	if c == Dulle() {
 		return 100
 	}

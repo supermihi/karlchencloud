@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-func TestSpielFarbeTrumpf(t *testing.T) {
+func TestGameSuitTrump(t *testing.T) {
 	cards := []Card{Herz10, KreuzD, KaroA, HerzB}
 	for _, card := range cards {
-		assert.Equal(t, NormalGameSuit(card), Trumpf)
+		assert.Equal(t, NormalGameSuit(card), Trump)
 	}
 }
 

@@ -89,7 +89,7 @@ func (p Party) Other() Party {
 type GameSuit int
 
 const (
-	Trumpf GameSuit = iota
+	Trump GameSuit = iota
 	KaroFehl
 	HerzFehl
 	PikFehl

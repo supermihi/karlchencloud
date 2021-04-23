@@ -117,16 +117,16 @@ func WinnerOfTrick(cardsOf [NumPlayers]Card, forehand Player, m Mode) Player {
 func TakesTrickFrom(new Card, old Card, m Mode) bool {
 	newSuit := m.GameSuit(new)
 	oldSuit := m.GameSuit(old)
-	if newSuit == Trumpf && oldSuit != Trumpf {
+	if newSuit == Trump && oldSuit != Trump {
 		return true
 	}
-	if oldSuit == Trumpf && newSuit != Trumpf {
+	if oldSuit == Trump && newSuit != Trump {
 		return false
 	}
-	if newSuit == Trumpf {
-		// both trumpf
-		return new.TrumpfTrickValue() > old.TrumpfTrickValue()
+	if newSuit == Trump {
+		// both trump
+		return new.TrumpTrickValue() > old.TrumpTrickValue()
 	}
-	// none trumpf
+	// none trump
 	return newSuit == oldSuit && new.FehlTrickValue() > old.FehlTrickValue()
 }

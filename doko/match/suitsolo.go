@@ -5,7 +5,7 @@ import (
 )
 
 type SuitSolo struct {
-	Trumpf  game.Suit
+	Trump   game.Suit
 	Soloist game.Player
 }
 
@@ -15,13 +15,13 @@ func NewSuitSolo(trump game.Suit, soloist game.Player) SuitSolo {
 
 func SuitSoloSuit(trump game.Suit, card game.Card) game.GameSuit {
 	if card.Suit == trump || card.Rank == game.Bube || card.Rank == game.Dame || card == game.Dulle() {
-		return game.Trumpf
+		return game.Trump
 	}
 	return card.Suit.AsFehl()
 }
 
 func (f SuitSolo) GameSuit(card game.Card) game.GameSuit {
-	return SuitSoloSuit(f.Trumpf, card)
+	return SuitSoloSuit(f.Trump, card)
 }
 
 func (f SuitSolo) PartyOf(p game.Player) game.Party {
@@ -39,7 +39,7 @@ func (SuitSolo) OnCompletedTrick(game.Trick, int) {
 }
 
 func (f SuitSolo) Type() game.AnnouncedGameType {
-	return gameTypeForTrump(f.Trumpf)
+	return gameTypeForTrump(f.Trump)
 }
 
 func gameTypeForTrump(trump game.Suit) game.AnnouncedGameType {

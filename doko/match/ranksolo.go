@@ -5,7 +5,7 @@ import (
 )
 
 type RankSolo struct {
-	Trumpf  game.Rank
+	Trump   game.Rank
 	Soloist game.Player
 }
 
@@ -15,13 +15,13 @@ func NewRankSolo(trump game.Rank, soloist game.Player) RankSolo {
 
 func RankSoloSuit(trump game.Rank, card game.Card) game.GameSuit {
 	if card.Rank == trump {
-		return game.Trumpf
+		return game.Trump
 	}
 	return card.Suit.AsFehl()
 }
 
 func (r RankSolo) GameSuit(card game.Card) game.GameSuit {
-	return RankSoloSuit(r.Trumpf, card)
+	return RankSoloSuit(r.Trump, card)
 }
 
 func (r RankSolo) PartyOf(p game.Player) game.Party {
@@ -39,7 +39,7 @@ func (RankSolo) OnCompletedTrick(game.Trick, int) {
 }
 
 func (r RankSolo) Type() game.AnnouncedGameType {
-	return gameTypeForRank(r.Trumpf)
+	return gameTypeForRank(r.Trump)
 }
 
 func gameTypeForRank(rank game.Rank) game.AnnouncedGameType {

@@ -6,7 +6,7 @@ func IsNormalTrump(k Card) bool {
 
 func NormalGameSuit(c Card) GameSuit {
 	if IsNormalTrump(c) {
-		return Trumpf
+		return Trump
 	}
 	return c.Suit.AsFehl()
 }
