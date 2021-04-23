@@ -1,0 +1,7 @@
+version: "3.6"
+services:
+  karlchencloud:
+    build: .
+    ports:
+      - "50501:50501"
+      - "8080:8080"
