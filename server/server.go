@@ -234,14 +234,16 @@ func (s *dokoserver) StartNextMatch(ctx context.Context, tableId *api.TableId) (
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	matchState := ToMatchState(matchData, user.Id)
-	event := &api.Event{Event: &api.Event_Start{Start: matchState}}
 	table, err := s.room.GetTable(tableId.Value)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	s.streams.send(getOtherPlayers(table, user.Id), event)
-	return matchState, nil
+	for _, u := range getOtherPlayers(table, user.Id) {
+		state := ToMatchState(matchData, u)
+		ev := &api.Event{Event: &api.Event_Start{Start: state}}
+		s.streams.sendSingle(u, ev)
+	}
+	return ToMatchState(matchData, user.Id), nil
 }
 
 func (s *dokoserver) getTableState(table *TableData, user string) (*api.TableState, error) {
