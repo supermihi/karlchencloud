@@ -52,8 +52,8 @@ func (d UserData) String() string {
 type Users interface {
 	Add(email string, password string, name string, isAdmin bool) (id UserId, err error)
 	ListIds() ([]UserId, error)
-	GetName(id UserId) (name string, ok bool)
-	ChangeName(id UserId, newName string) (ok bool)
+	GetName(id UserId) (name string, err error)
+	ChangeName(id UserId, newName string) error
 	Authenticate(id UserId, secret string) bool
 }
 

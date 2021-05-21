@@ -1,40 +1,41 @@
 package client
 
 import (
+	"context"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/server"
 	"log"
 )
 
-type ClientHandler interface {
-	OnMyTurn()
-	OnTableStateReceived(state *api.TableState)
-	OnMemberEvent(ev *api.MemberEvent)
-	OnMatchStart(s *api.MatchState)
-	OnDeclaration(d *api.Declaration)
-	OnPlayedCard(card *api.PlayedCard)
-}
-type TableClient struct {
-	Service ClientService
-	handler ClientHandler
-	TableId string
-	View    *TableView
+type KarlchenClient struct {
+	clientData LoginData
+	Service    *ClientService
+	handler    ClientHandler
+	TableId    string
+	View       *TableView
 }
 
-func NewTableClient(client ClientService, tableId string, handler ClientHandler) TableClient {
-	return TableClient{Service: client, handler: handler, TableId: tableId}
+func NewKarlchenClient(c LoginData, handler ClientHandler) KarlchenClient {
+	return KarlchenClient{clientData: c, handler: handler}
 }
 
-func (c *TableClient) Logf(format string, v ...interface{}) {
+func (c *KarlchenClient) Logf(format string, v ...interface{}) {
 	c.Service.Logf(format, v...)
 }
-func (c *TableClient) Start() {
-	stream, err := c.Service.Api.StartSession(c.Service.Context, &api.Empty{})
+func (c *KarlchenClient) Start(ctx context.Context) {
+	service, err := GetConnectedClientService(c.clientData, ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer service.CloseConnection()
+	c.Service = service
+	c.handler.OnConnect(c.Service)
+	stream, err := c.Service.Grpc.StartSession(c.Service.Context, &api.Empty{})
 	c.Service.Logf("Listening for match events ...")
 	if err != nil {
 		c.Service.Logf("error subscribing: %v", err)
-		return
+		log.Fatal(err)
 	}
 	for {
 		msg, err := stream.Recv()
@@ -61,41 +62,43 @@ func (c *TableClient) Start() {
 	}
 }
 
-func (c *TableClient) handleWelcome(us *api.UserState) {
+func (c *KarlchenClient) handleWelcome(us *api.UserState) {
+	c.handler.OnWelcome(c, us)
 	ts := us.CurrentTable
-	if ts == nil {
-		panic("table client expects active table")
+	if ts != nil {
+		c.TableId = ts.Data.TableId
+		c.Logf("sitting at table %s", c.TableId)
 	}
 	c.View = NewTableView(ts)
 	c.handler.OnTableStateReceived(ts)
 	c.checkMyTurn()
 }
 
-func (c *TableClient) HandleStart(s *api.MatchState) {
+func (c *KarlchenClient) HandleStart(s *api.MatchState) {
 	c.View.Match = NewMatchView(s)
 	c.handler.OnMatchStart(s)
 	c.checkMyTurn()
 }
 
-func (c *TableClient) handleDeclare(d *api.Declaration) {
+func (c *KarlchenClient) handleDeclare(d *api.Declaration) {
 	c.View.Match.UpdateOnDeclare(d)
 	c.handler.OnDeclaration(d)
 	c.checkMyTurn()
 }
 
-func (c *TableClient) handlePlayedCard(card *api.PlayedCard) {
+func (c *KarlchenClient) handlePlayedCard(card *api.PlayedCard) {
 	c.View.Match.UpdateTrick(card)
 	c.handler.OnPlayedCard(card)
 	c.checkMyTurn()
 }
 
-func (c *TableClient) checkMyTurn() {
+func (c *KarlchenClient) checkMyTurn() {
 	if c.View.Match != nil && c.View.Match.MyTurn && len(c.View.Match.Cards) > 0 {
 		c.handler.OnMyTurn()
 	}
 }
-func (c *TableClient) PlayCard(card game.Card) error {
-	result, err := c.Service.Api.PlayCard(
+func (c *KarlchenClient) PlayCard(card game.Card) error {
+	result, err := c.Service.Grpc.PlayCard(
 		c.Service.Context,
 		&api.PlayCardRequest{Table: c.TableId, Card: server.ToApiCard(card)})
 	if err == nil {
@@ -104,8 +107,8 @@ func (c *TableClient) PlayCard(card game.Card) error {
 	return err
 }
 
-func (c *TableClient) Declare(t game.AnnouncedGameType) error {
-	result, err := c.Service.Api.Declare(c.Service.Context, &api.DeclareRequest{
+func (c *KarlchenClient) Declare(t game.AnnouncedGameType) error {
+	result, err := c.Service.Grpc.Declare(c.Service.Context, &api.DeclareRequest{
 		Table:       c.TableId,
 		Declaration: server.ToApiGameType(t)})
 	if err == nil {
@@ -114,10 +117,10 @@ func (c *TableClient) Declare(t game.AnnouncedGameType) error {
 	return err
 }
 
-func (c *TableClient) Api() api.DokoClient {
-	return c.Service.Api
+func (c *KarlchenClient) Api() api.DokoClient {
+	return c.Service.Grpc
 }
 
-func (c *TableClient) Match() *MatchView {
+func (c *KarlchenClient) Match() *MatchView {
 	return c.View.Match
 }

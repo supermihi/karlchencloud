@@ -65,12 +65,18 @@ func (s *SqlUserDatabase) GetName(id UserId) (name string, err error) {
 	return
 }
 
-func (s *SqlUserDatabase) ChangeName(id UserId, newName string) (ok bool) {
+func (s *SqlUserDatabase) ChangeName(id UserId, newName string) error {
 	panic("implement me")
 }
 
 func (s *SqlUserDatabase) Authenticate(id UserId, secret string) bool {
-	panic("implement me")
+	row := s.db.QueryRow("SELECT secret FROM user WHERE id = ?", id)
+	var hash string
+	err := row.Scan(&hash)
+	if err != nil {
+		return false
+	}
+	return security.VerifyPassword(secret, hash)
 }
 
 func (s *SqlUserDatabase) Close() error {

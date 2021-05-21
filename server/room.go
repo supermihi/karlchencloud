@@ -28,8 +28,8 @@ func (r *Room) AddUser(email string, name string, password string) (id UserId, e
 }
 
 func (r *Room) GetUserData(userId UserId) (data UserData, err error) {
-	name, ok := r.users.GetName(userId)
-	if ok {
+	name, err := r.users.GetName(userId)
+	if err != nil {
 		return UserData{Id: userId, Name: name}, nil
 	}
 	return UserData{}, NewCloudError(UserDoesNotExist)

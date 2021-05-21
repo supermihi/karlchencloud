@@ -6,21 +6,12 @@ import (
 )
 
 type ClientCredentials struct {
-	userId string
-	secret string
+	userId   string
+	password string
 }
 
 func (c *ClientCredentials) UserId() string {
 	return c.userId
-}
-
-func EmptyClientCredentials() *ClientCredentials {
-	return &ClientCredentials{"", ""}
-}
-
-func (c *ClientCredentials) UpdateLogin(userId string, secret string) {
-	c.userId = userId
-	c.secret = secret
 }
 
 func (c *ClientCredentials) RequireTransportSecurity() bool {
@@ -28,11 +19,11 @@ func (c *ClientCredentials) RequireTransportSecurity() bool {
 }
 
 func (c *ClientCredentials) GetRequestMetadata(_ context.Context, _ ...string) (map[string]string, error) {
-	return getAuthMeta(c.userId, c.secret), nil
+	return getAuthMeta(c.userId, c.password), nil
 }
 
-func getAuthMeta(userId string, secret string) map[string]string {
-	auth := userId + ":" + secret
+func getAuthMeta(userId string, password string) map[string]string {
+	auth := userId + ":" + password
 	enc := base64.StdEncoding.EncodeToString([]byte(auth))
 	return map[string]string{
 		"authorization": "basic " + enc,

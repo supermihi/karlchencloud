@@ -1,11 +1,9 @@
-package main
+package client
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
-	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"github.com/supermihi/karlchencloud/server"
@@ -14,78 +12,52 @@ import (
 	"strconv"
 )
 
-const address = "localhost:50501"
-
-func main() {
-	conn := client.ConnectData{
-		DisplayName:    "client",
-		ExistingUserId: nil,
-		ExistingSecret: nil,
-		Address:        address,
-	}
-	log.Printf("Input your display name (empty for default \"client\"):")
-	displayName := UserInputString()
-	if len(displayName) > 0 {
-		conn.DisplayName = displayName
-	}
-	log.Printf("Input the connection endpoint (empty for default \"localhost:50501\"):")
-	connectionEndpoint := UserInputString()
-	if len(connectionEndpoint) > 0 {
-		conn.Address = connectionEndpoint
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	service, err := client.GetClientService(conn, ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer service.CloseConnection()
-
-	cliHandler := NewCliHandler()
-	cliHandler.Start(service)
-	<-ctx.Done()
-}
-
 type CliHandler struct {
-	client.TableClient
+	KarlchenClient
 	IsCreator bool
+	service   *ClientService
 }
 
 func NewCliHandler() CliHandler {
 	return CliHandler{}
 }
 
-func (h *CliHandler) Start(service client.ClientService) {
+func (h *CliHandler) OnConnect(service *ClientService) {
+	h.service = service
+}
+
+func (h *CliHandler) OnWelcome(_ *KarlchenClient, us *api.UserState) {
+	if us.CurrentTable != nil {
+		h.service.Logf("continuing table %s", us.CurrentTable.Data.TableId)
+		return
+	}
 	log.Printf("Choose: [_c_reate, _j_oin] table")
 	action := UserInputRune()
 	table := ""
 	if action == 'c' {
 		h.IsCreator = true
-		tableData, err := service.Api.CreateTable(service.Context, &api.Empty{})
+		tableData, err := h.service.Grpc.CreateTable(h.service.Context, &api.Empty{})
 		if err != nil {
-			log.Fatalf("%s could not create table: %v", service.Name, err)
+			log.Fatalf("%s could not create table: %v", h.service.Name, err)
 		}
 		table = tableData.TableId
-		service.Logf("table %s created with invite code %s", table, tableData.InviteCode)
+		h.service.Logf("table %s created with invite code %s", table, tableData.InviteCode)
 	} else if action == 'j' {
 		h.IsCreator = false
 		log.Printf("Input invite code:")
 		invite := UserInputString()
-		tableData, err := service.Api.JoinTable(service.Context, &api.JoinTableRequest{InviteCode: invite})
+		tableData, err := h.service.Grpc.JoinTable(h.service.Context, &api.JoinTableRequest{InviteCode: invite})
 		if err != nil {
-			service.Logf("could not join table: %v", err)
+			h.service.Logf("could not join table: %v", err)
 			return
 		}
 		table = tableData.Data.TableId
-		service.Logf("table %s joined", table)
+		h.service.Logf("table %s joined", table)
 	} else {
-		service.Logf("Invalid action %c", action)
+		h.service.Logf("Invalid action %c", action)
 		return
 	}
-	h.TableClient = client.NewTableClient(service, table, h)
-	go h.TableClient.Start()
 }
-
 func (h *CliHandler) OnTableStateReceived(_ *api.TableState) {
 	h.Logf("Table state received. Let the games begin!")
 }
@@ -100,7 +72,7 @@ func (h *CliHandler) OnMemberEvent(ev *api.MemberEvent) {
 		h.Logf("user %s joined table", ev.Name)
 
 		if len(h.View.MemberNamesById) >= 4 && h.IsCreator {
-			matchState, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
+			matchState, err := h.Api().StartTable(h.Service.Context, &api.StartTableRequest{TableId: h.TableId})
 			if err != nil {
 				log.Fatalf("error starting table: %v", err)
 			}

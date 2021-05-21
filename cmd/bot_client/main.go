@@ -14,10 +14,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading client config: %v", err)
 	}
-	botConfig, err := client.ReadBotConfig("bots.json")
+	/*botConfig, err := client.ReadBotConfig("bots.json")
 	var bots []client.BotLogin
 	if err == nil {
 		bots = botConfig.Bots
-	}
-	client.StartBots(address, config.NumberOfBots, config.TableId, config.InviteCode, config.InitTable, bots)
+	}*/
+	client.StartBots(address, config.NumberOfBots, config.InviteCode, config.InitTable, []client.LoginData{})
 }

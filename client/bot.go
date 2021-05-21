@@ -11,77 +11,73 @@ import (
 	"time"
 )
 
-func StartBots(address string, numBots int, table string, inviteCode string, initTable bool, logins []BotLogin) {
-	clients := make([]*BotHandler, numBots)
+func StartBots(address string, numBots int, inviteCode string, initTable bool, logins []LoginData) {
+	clients := make([]*KarlchenClient, numBots)
+	ctx := context.Background()
 	for i := 0; i < numBots; i++ {
-		var user, secret *string
+		var login LoginData
 		if len(logins) > i {
-			user = &logins[i].Id
-			secret = &logins[i].Secret
+			login = logins[i]
+		} else {
+			login.RegisterIfEmptyUserId = true
+			login.ServerAddress = address
+			login.Name = fmt.Sprintf("Bot %v", i+1)
+			login.Password = "123"
 		}
-		connect := ConnectData{
-			DisplayName:    fmt.Sprintf("Bot %v", i+1),
-			ExistingUserId: user,
-			ExistingSecret: secret,
-			Address:        address,
-		}
-		clients[i] = NewBotHandler(i == 0 && initTable)
+		handler := NewBotHandler(i == 0 && initTable, inviteCode)
 		log.Printf("starting bot %d", i)
 		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
-		go clients[i].Run(connect, table, inviteCode)
+		client := NewKarlchenClient(login, handler)
+		clients[i] = &client
+		go client.Start(ctx)
 	}
-	for i := 0; i < numBots; i++ {
-		<-clients[i].context.Done()
-	}
+	<-ctx.Done()
+	// TODO use nontrivial contexts
 	log.Printf("all bots finished")
 
 }
 
 type BotHandler struct {
-	TableClient
+	KarlchenClient
 	context context.Context
 	cancel  context.CancelFunc
+	service *ClientService
 	isOwner bool
+	invite  string
 }
 
-func NewBotHandler(isOwner bool) *BotHandler {
+func NewBotHandler(isOwner bool, invite string) *BotHandler {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &BotHandler{
 		context: ctx,
 		cancel:  cancel,
-		isOwner: isOwner}
+		isOwner: isOwner,
+		invite:  invite}
 }
 
-func (h *BotHandler) Run(conn ConnectData, table string, invite string) {
-	ctx := h.context
-	service, err := GetClientService(conn, ctx)
-	if err != nil {
-		log.Print(err)
-		return
+func (h *BotHandler) OnConnect(service *ClientService) {
+	h.service = service
+}
+func (h *BotHandler) OnWelcome(client *KarlchenClient, us *api.UserState) {
+	if us.CurrentTable != nil {
+		log.Printf("already at table. Continuing ...")
 	}
-	c := service.Api
-	defer h.cancel()
-	defer service.CloseConnection()
-
 	if h.isOwner {
-		tableData, err := service.Api.CreateTable(service.Context, &api.Empty{})
+		tableData, err := h.service.Grpc.CreateTable(h.service.Context, &api.Empty{})
 		if err != nil {
-			log.Fatalf("%s could not create table: %v", service.Name, err)
+			log.Fatalf("%s could not create table: %v", h.service.Name, err)
 		}
-		service.Logf("table %s created with invite code %s", tableData.TableId, tableData.InviteCode)
-		table = tableData.TableId
+		h.service.Logf("table %s created with invite code %s", tableData.TableId, tableData.InviteCode)
+		client.TableId = tableData.TableId
 	} else {
-		_, err = c.JoinTable(ctx, &api.JoinTableRequest{InviteCode: invite})
+		_, err := h.service.Grpc.JoinTable(h.Service.Context, &api.JoinTableRequest{InviteCode: h.invite})
 		if err != nil {
-			service.Logf("could not join table: %v", err)
+			h.service.Logf("could not join table: %v", err)
 			return
 		}
-		service.Logf("joined")
+		h.service.Logf("joined")
 	}
-	h.TableClient = NewTableClient(service, table, h)
-	h.TableClient.Start()
 }
-
 func (h *BotHandler) OnMatchStart(_ *api.MatchState) {
 	// pass
 }
@@ -170,7 +166,7 @@ func (h *BotHandler) OnPlayedCard(play *api.PlayedCard) {
 		h.Match().Phase = match.MatchFinished
 	}
 	if h.Match().Phase == match.MatchFinished && h.isOwner {
-		state, err := h.Service.Api.StartNextMatch(h.Service.Context, &api.StartNextMatchRequest{TableId: h.TableId})
+		state, err := h.Service.Grpc.StartNextMatch(h.Service.Context, &api.StartNextMatchRequest{TableId: h.TableId})
 		if err != nil {
 			h.Logf("Failed to start next match!")
 		}

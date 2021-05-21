@@ -61,9 +61,9 @@ func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err er
 		log.Printf("invalid user/secret combination %s/%s", userId, secret)
 		return ctx, status.Error(codes.Unauthenticated, "invalid user/secret combination")
 	}
-	name, ok := a.Users.GetName(userId)
-	if !ok {
-		log.Printf("unknown error: user does not exist in auth")
+	name, err := a.Users.GetName(userId)
+	if err != nil {
+		log.Printf("error getting user name: %v", err)
 		return ctx, status.Error(codes.Internal, "unknown error: did not find authenticated user")
 	}
 	userMd := UserData{Id: userId, Name: name}

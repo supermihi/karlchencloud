@@ -1,103 +1,61 @@
 package server
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"os"
+	"errors"
+	"github.com/supermihi/karlchencloud/utils/security"
 	"sync"
 )
 
 type MemoryUserDb struct {
-	users    map[string]*User
-	mtx      sync.RWMutex
-	filename string
+	users     map[UserId]*User
+	mtx       sync.RWMutex
+	largestId int64
 }
 
 type User struct {
-	Id     string
-	Name   string
-	Secret string
+	Id           UserId
+	Email        string
+	Name         string
+	PasswordHash string
 }
 
-func NewUser(id string, name string, secret string) *User {
-	return &User{id, name, secret}
+func NewUser(id UserId, email string, name string, passwordHash string) *User {
+	return &User{id, name, name, passwordHash}
 }
 
 func NewMemoryUserDb() *MemoryUserDb {
-	return &MemoryUserDb{users: make(map[string]*User)}
+	return &MemoryUserDb{users: make(map[UserId]*User), largestId: 1}
 }
 
-func NewExportedMemoryUserDb(filename string) (*MemoryUserDb, error) {
-	users := make(map[string]*User)
-	userList, err := importUsers(filename)
+func (m *MemoryUserDb) Add(email string, password string, name string, isAdmin bool) (id UserId, err error) {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+	for _, user := range m.users {
+		if user.Email == email {
+			return InvalidUserId, errors.New("user exists")
+		}
+	}
+	m.largestId += 1
+	id = UserId(m.largestId)
+	hash, err := security.HashAndSalt(password)
 	if err != nil {
-		return nil, err
+		return InvalidUserId, err
 	}
-	for _, u := range userList {
-		user := u
-		users[user.Id] = &user
-	}
-	ans := MemoryUserDb{users: users, filename: filename}
-	return &ans, nil
-}
-
-func importUsers(filename string) (users []User, err error) {
-	if _, statErr := os.Stat(filename); statErr != nil {
-		return
-	}
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(data, &users)
+	m.users[id] = NewUser(id, email, name, hash)
 	return
 }
 
-func (m *MemoryUserDb) Export() {
-	if m.filename == "" {
-		return
-	}
-	log.Printf("exporting user db to %s", m.filename)
-	users := make([]User, len(m.users))
-	i := 0
-	for _, u := range m.users {
-		users[i] = *u
-		i++
-	}
-	ans, err := json.Marshal(users)
-	if err != nil {
-		log.Fatalf("error exporting user db: %v", err)
-	}
-	if err := ioutil.WriteFile(m.filename, ans, 0644); err != nil {
-		log.Fatalf("error writing user db: %v", err)
-	}
-
-}
-
-func (m *MemoryUserDb) Add(user string, name string, secret string) bool {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
-	_, exists := m.users[user]
-	if exists {
-		return false
-	}
-	m.users[user] = NewUser(user, name, secret)
-	m.Export()
-	return true
-}
-
-func (m *MemoryUserDb) List() []string {
+func (m *MemoryUserDb) ListIds() ([]UserId, error) {
 	m.mtx.RLock()
-	ans := make([]string, 0, len(m.users))
+	ans := make([]UserId, 0, len(m.users))
 	for id := range m.users {
 		ans = append(ans, id)
 	}
 	m.mtx.RUnlock()
-	return ans
+	return ans, nil
 }
 
-func (m *MemoryUserDb) GetName(id string) (name string, ok bool) {
+func (m *MemoryUserDb) GetName(id UserId) (name string, ok bool) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	user, ok := m.users[id]
@@ -107,24 +65,24 @@ func (m *MemoryUserDb) GetName(id string) (name string, ok bool) {
 	return user.Name, true
 }
 
-func (m *MemoryUserDb) ChangeName(id string, newName string) (ok bool) {
+func (m *MemoryUserDb) ChangeName(id UserId, newName string) (ok bool) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	existing, ok := m.users[id]
 	if !ok {
 		return false
 	}
-	m.Export()
 	existing.Name = newName
 	return true
 }
 
-func (m *MemoryUserDb) Authenticate(id string, secret string) bool {
+func (m *MemoryUserDb) Authenticate(id UserId, password string) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	user, ok := m.users[id]
 	if !ok {
 		return false
 	}
-	return user.Secret == secret
+
+	return security.VerifyPassword(password, user.PasswordHash)
 }
