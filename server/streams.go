@@ -10,21 +10,21 @@ import (
 
 type clientStreams struct {
 	mtx     sync.RWMutex
-	streams map[string]chan *api.Event
+	streams map[UserId]chan *api.Event
 }
 
 func newStreams() clientStreams {
-	return clientStreams{streams: make(map[string]chan *api.Event, 1000)}
+	return clientStreams{streams: make(map[UserId]chan *api.Event, 1000)}
 }
 
-func (s *clientStreams) sendSingle(user string, event *api.Event) {
+func (s *clientStreams) sendSingle(user UserId, event *api.Event) {
 	stream, ok := s.streams[user]
 	if ok {
 		stream <- event
 	}
 }
 
-func (s *clientStreams) send(users []string, event *api.Event) {
+func (s *clientStreams) send(users []UserId, event *api.Event) {
 	s.mtx.RLock()
 	defer s.mtx.RUnlock()
 	for _, user := range users {
@@ -32,7 +32,7 @@ func (s *clientStreams) send(users []string, event *api.Event) {
 	}
 }
 
-func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user string) {
+func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user UserId) {
 	stream := s.createStream(user)
 	go func() {
 		defer s.removeStream(user)
@@ -59,13 +59,13 @@ func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user string) {
 	}()
 }
 
-func (s *clientStreams) createStream(user string) (stream chan *api.Event) {
+func (s *clientStreams) createStream(user UserId) (stream chan *api.Event) {
 	stream = make(chan *api.Event, 10)
 	s.streams[user] = stream
 	return
 }
 
-func (s *clientStreams) removeStream(user string) {
+func (s *clientStreams) removeStream(user UserId) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	if stream, ok := s.streams[user]; ok {
@@ -75,7 +75,7 @@ func (s *clientStreams) removeStream(user string) {
 	log.Printf("closed table stream for %s", user)
 }
 
-func (s *clientStreams) isOnline(user string) bool {
+func (s *clientStreams) isOnline(user UserId) bool {
 	_, ok := s.streams[user]
 	return ok
 }

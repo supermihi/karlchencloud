@@ -136,7 +136,6 @@ func (h *BotHandler) makeTurnGame() {
 	}
 }
 
-
 func (h *BotHandler) OnMemberEvent(ev *api.MemberEvent) {
 	switch ev.Type {
 	case api.MemberEventType_JOIN_TABLE:
@@ -147,7 +146,7 @@ func (h *BotHandler) OnMemberEvent(ev *api.MemberEvent) {
 		h.Logf("user %s joined table", ev.Name)
 
 		if len(h.View.MemberNamesById) >= 4 && h.isOwner {
-			matchState, err := h.Api().StartTable(h.Service.Context, &api.TableId{Value: h.TableId})
+			matchState, err := h.Api().StartTable(h.Service.Context, &api.StartTableRequest{TableId: h.TableId})
 			if err != nil {
 				log.Fatalf("error starting table: %v", err)
 			}
@@ -171,7 +170,7 @@ func (h *BotHandler) OnPlayedCard(play *api.PlayedCard) {
 		h.Match().Phase = match.MatchFinished
 	}
 	if h.Match().Phase == match.MatchFinished && h.isOwner {
-		state, err := h.Service.Api.StartNextMatch(h.Service.Context, &api.TableId{Value: h.TableId})
+		state, err := h.Service.Api.StartNextMatch(h.Service.Context, &api.StartNextMatchRequest{TableId: h.TableId})
 		if err != nil {
 			h.Logf("Failed to start next match!")
 		}

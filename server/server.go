@@ -29,20 +29,19 @@ func CreateServer(users Users, room *Room, config ServerConfig) *grpc.Server {
 	return grpcServer
 }
 
-func (s *dokoserver) Register(_ context.Context, req *api.UserName) (*api.RegisterReply, error) {
-	id := RandomLetters(8)
-	secret := RandomSecret()
-	ok := s.room.AddUser(id, req.GetName(), secret)
-	if !ok {
-		return nil, status.Error(codes.Internal, "user ID clash")
+func (s *dokoserver) Register(_ context.Context, req *api.RegisterRequest) (*api.RegisterReply, error) {
+	id, err := s.room.AddUser(req.Email, req.Name, req.Password)
+	if err != nil {
+		log.Printf("error registering: %v", err)
+		return nil, status.Error(codes.Internal, "error registering")
 	}
-	log.Printf("Registered user %v with id %v", req.GetName(), id)
-	return &api.RegisterReply{Id: id, Secret: secret}, nil
+	log.Printf("Registered user %v with id %v", req.Name, id)
+	return &api.RegisterReply{Id: id.String()}, nil
 }
 
-func (s *dokoserver) CheckLogin(ctx context.Context, _ *api.Empty) (*api.UserName, error) {
+func (s *dokoserver) CheckLogin(ctx context.Context, _ *api.Empty) (*api.CheckLoginReply, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	return &api.UserName{Name: user.Name}, nil
+	return &api.CheckLoginReply{Name: user.Name, Email: user.Email}, nil
 }
 
 func (s *dokoserver) CreateTable(ctx context.Context, _ *api.Empty) (*api.TableData, error) {
@@ -52,7 +51,7 @@ func (s *dokoserver) CreateTable(ctx context.Context, _ *api.Empty) (*api.TableD
 
 	table, err := s.room.CreateTable(
 		user.Id,
-		&s.config.Room.ConstantTableId,
+		s.config.Room.ConstantTableId,
 		&s.config.Room.ConstantInviteCode,
 		s.config.Room.Seed(),
 	)
@@ -64,16 +63,21 @@ func (s *dokoserver) CreateTable(ctx context.Context, _ *api.Empty) (*api.TableD
 	return ans, nil
 }
 
-func (s *dokoserver) StartTable(ctx context.Context, id *api.TableId) (*api.MatchState, error) {
+func (s *dokoserver) StartTable(ctx context.Context, req *api.StartTableRequest) (*api.MatchState, error) {
 	user, _ := GetAuthenticatedUser(ctx)
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
-	log.Printf("starting table %s", id.Value)
-	table, err := s.room.StartTable(id.Value, user.Id)
+	id, err := ParseTableId(req.TableId)
+	if err != nil {
+		log.Printf("could not parse table id %s: %v", req.TableId, err)
+		return nil, toGrpcError(err)
+	}
+	log.Printf("starting table %s", id)
+	table, err := s.room.StartTable(id, user.Id)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	matchData, err := s.room.GetMatchData(id.Value)
+	matchData, err := s.room.GetMatchData(id)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
@@ -95,7 +99,7 @@ func (s *dokoserver) JoinTable(ctx context.Context, req *api.JoinTableRequest) (
 		return nil, toGrpcError(err)
 	}
 	log.Printf("user %v joined table %v", user, table.Id)
-	s.streams.send(getOtherPlayers(table, user.Id), api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_JOIN_TABLE))
+	s.streams.send(getOtherPlayers(table, user.Id), api.NewMemberEvent(user.Id.String(), user.Name, api.MemberEventType_JOIN_TABLE))
 	return s.getTableState(table, user.Id)
 }
 
@@ -137,40 +141,44 @@ func (s *dokoserver) startEventSubscription(user UserData, srv api.Doko_StartSes
 	receivers := s.room.RelatedUsers(user.Id)
 	go func() {
 		// requires streams.mtx, hence the goroutine
-		s.streams.send(receivers, api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_GO_ONLINE))
+		s.streams.send(receivers, api.NewMemberEvent(user.Id.String(), user.Name, api.MemberEventType_GO_ONLINE))
 	}()
 	log.Printf("user %s connected", user)
 	return nil
 }
 
 func (s *dokoserver) endEventSubscription(srv api.Doko_StartSessionServer, user UserData) error {
-
 	log.Printf("user %s disconnected", user)
 	s.roomMtx.RLock()
 	defer s.roomMtx.RUnlock()
 	table := s.room.ActiveTableOf(user.Id)
 	if table != nil {
 		receivers := s.room.RelatedUsers(user.Id)
-		s.streams.send(receivers, api.NewMemberEvent(user.Id, user.Name, api.MemberEventType_GO_OFFLINE))
+		s.streams.send(receivers, api.NewMemberEvent(user.Id.String(), user.Name, api.MemberEventType_GO_OFFLINE))
 	}
 	return srv.Context().Err()
 }
 
-func getOtherPlayers(table *TableData, player string) []string {
-	return stringsExcept(table.Players, player)
+func getOtherPlayers(table *TableData, player UserId) []UserId {
+	return usersExcept(table.Players, player)
 }
 
 func (s *dokoserver) Declare(ctx context.Context, d *api.DeclareRequest) (*api.Declaration, error) {
 	user, _ := GetAuthenticatedUser(ctx)
+	tableId, err := ParseTableId(d.Table)
+	if err != nil {
+		log.Printf("declare: could not parse table id %s: %v\n", d.Table, err)
+		return nil, toGrpcError(err)
+	}
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
 	gameType := ToGameType(d.Declaration)
-	m, err := s.room.Declare(d.Table, user.Id, gameType)
+	m, err := s.room.Declare(tableId, user.Id, gameType)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
 	log.Printf("%v declares %v", user.Name, d.Declaration)
-	declaration := &api.Declaration{UserId: user.Id, Vorbehalt: !game.IsNormalspiel(gameType)}
+	declaration := &api.Declaration{UserId: user.Id.String(), Vorbehalt: !game.IsNormalspiel(gameType)}
 	if m.Phase == match.InGame {
 		log.Printf("game has started at table %s", d.Table)
 		declaration.DefinedGameMode = ToApiMode(m.Mode, m.Turn, m.Players)
@@ -182,34 +190,43 @@ func (s *dokoserver) Declare(ctx context.Context, d *api.DeclareRequest) (*api.D
 
 func (s *dokoserver) PlaceBid(ctx context.Context, req *api.PlaceBidRequest) (*api.Bid, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	_, err := s.room.PlaceBid(req.Table, user.Id, ToBid(req.Bid))
+	tableId, err := ParseTableId(req.Table)
+	if err != nil {
+		log.Printf("placeBid: could not parse table id %s: %v\n", req.Table, err)
+		return nil, toGrpcError(err)
+	}
+	_, err = s.room.PlaceBid(tableId, user.Id, ToBid(req.Bid))
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	bid := &api.Bid{UserId: user.Id, Bid: req.Bid}
+	bid := &api.Bid{UserId: user.Id.String(), Bid: req.Bid}
 	event := &api.Event{Event: &api.Event_PlacedBid{PlacedBid: bid}}
 	s.streams.send(s.room.RelatedUsers(user.Id), event)
 	return bid, nil
 }
 
-func (s *dokoserver) PlayCard(ctx context.Context, r *api.PlayCardRequest) (*api.PlayedCard, error) {
+func (s *dokoserver) PlayCard(ctx context.Context, req *api.PlayCardRequest) (*api.PlayedCard, error) {
 	user, _ := GetAuthenticatedUser(ctx)
+	tableId, err := ParseTableId(req.Table)
+	if err != nil {
+		log.Printf("playCard: could not parse table id %s: %v\n", req.Table, err)
+		return nil, toGrpcError(err)
+	}
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
-
-	m, err := s.room.PlayCard(r.Table, user.Id, ToCard(r.Card))
+	m, err := s.room.PlayCard(tableId, user.Id, ToCard(req.Card))
 	if err != nil {
-		log.Printf("%s failed to play %s: %s", user.Name, ToCard(r.Card), err)
+		log.Printf("%s failed to play %s: %s", user.Name, ToCard(req.Card), err)
 		return nil, toGrpcError(err)
 	}
-	log.Printf("%s plays %s", user.Name, ToCard(r.Card))
-	table, err := s.room.GetTable(r.Table)
+	log.Printf("%s plays %s", user.Name, ToCard(req.Card))
+	table, err := s.room.GetTable(tableId)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	card := &api.PlayedCard{UserId: user.Id, Card: r.Card}
+	card := &api.PlayedCard{UserId: user.Id.String(), Card: req.Card}
 	if m.CurrentTrick != nil && m.CurrentTrick.NumCardsPlayed() == 0 {
-		card.TrickWinner = &api.PlayerValue{UserId: table.Players[int(m.PreviousTrick.Winner)]}
+		card.TrickWinner = &api.PlayerValue{UserId: table.Players[m.PreviousTrick.Winner].String()}
 	}
 	if m.Phase == match.MatchFinished {
 		card.Winner = &api.PartyValue{}
@@ -225,16 +242,20 @@ func (s *dokoserver) PlayCard(ctx context.Context, r *api.PlayCardRequest) (*api
 	return card, nil
 }
 
-func (s *dokoserver) StartNextMatch(ctx context.Context, tableId *api.TableId) (*api.MatchState, error) {
+func (s *dokoserver) StartNextMatch(ctx context.Context, req *api.StartNextMatchRequest) (*api.MatchState, error) {
 	user, _ := GetAuthenticatedUser(ctx)
 	s.roomMtx.Lock()
 	defer s.roomMtx.Unlock()
-
-	matchData, err := s.room.StartNextMatch(tableId.Value, user.Id)
+	tableId, err := ParseTableId(req.TableId)
+	if err != nil {
+		log.Printf("could not parse table id %s: %v\n", req.TableId, err)
+		return nil, toGrpcError(err)
+	}
+	matchData, err := s.room.StartNextMatch(tableId, user.Id)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	table, err := s.room.GetTable(tableId.Value)
+	table, err := s.room.GetTable(tableId)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
@@ -246,7 +267,7 @@ func (s *dokoserver) StartNextMatch(ctx context.Context, tableId *api.TableId) (
 	return ToMatchState(matchData, user.Id), nil
 }
 
-func (s *dokoserver) getTableState(table *TableData, user string) (*api.TableState, error) {
+func (s *dokoserver) getTableState(table *TableData, user UserId) (*api.TableState, error) {
 	data := ToTableData(table, user, s.createTableMembers(table))
 	state := &api.TableState{Data: data, Phase: table.Phase}
 	if table.Phase == api.TablePhase_PLAYING {
@@ -266,7 +287,7 @@ func (s *dokoserver) createTableMembers(table *TableData) []*api.TableMember {
 		if err != nil {
 			panic("not existingt user at table - should not be here!")
 		}
-		ans[i] = &api.TableMember{UserId: id, Name: data.Name, Online: s.streams.isOnline(id)}
+		ans[i] = &api.TableMember{UserId: id.String(), Name: data.Name, Online: s.streams.isOnline(id)}
 	}
 	return ans
 }

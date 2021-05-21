@@ -4,12 +4,45 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"strconv"
 	"time"
 )
 
+type UserId int64
+
+const InvalidUserId UserId = -1
+
+func (t UserId) String() string {
+	return strconv.FormatInt(int64(t), 10)
+}
+
+func ParseUserId(idStr string) (UserId, error) {
+	idInt, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return InvalidUserId, err
+	}
+	return UserId(idInt), nil
+}
+
+type TableId int64
+
+const InvalidTableId TableId = -1
+
+func (t TableId) String() string {
+	return strconv.FormatInt(int64(t), 10)
+}
+func ParseTableId(idStr string) (TableId, error) {
+	idInt, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return InvalidTableId, err
+	}
+	return TableId(idInt), nil
+}
+
 type UserData struct {
-	Id   string
-	Name string
+	Id    UserId
+	Name  string
+	Email string
 }
 
 func (d UserData) String() string {
@@ -17,20 +50,21 @@ func (d UserData) String() string {
 }
 
 type Users interface {
-	Add(user string, name string, secret string) bool
-	List() []string
-	GetName(id string) (name string, ok bool)
-	ChangeName(id string, name string) (ok bool)
-	Authenticate(id string, secret string) bool
+	Add(email string, password string, name string, isAdmin bool) (id UserId, err error)
+	ListIds() ([]UserId, error)
+	GetName(id UserId) (name string, ok bool)
+	ChangeName(id UserId, newName string) (ok bool)
+	Authenticate(id UserId, secret string) bool
 }
 
-type PlayerUserMap [game.NumPlayers]string
+type PlayerUserMap [game.NumPlayers]UserId
+
 type TableMatch struct {
 	Match   match.Match
 	Players PlayerUserMap
 }
 
-func (pm PlayerUserMap) PlayerFor(user string) game.Player {
+func (pm PlayerUserMap) PlayerFor(user UserId) game.Player {
 	for p, pId := range pm {
 		if pId == user {
 			return game.Player(p)
@@ -39,15 +73,15 @@ func (pm PlayerUserMap) PlayerFor(user string) game.Player {
 	return game.NoPlayer
 }
 
-func (pm PlayerUserMap) IdOf(p game.Player) string {
+func (pm PlayerUserMap) IdOf(p game.Player) UserId {
 	if p == game.NoPlayer {
-		return ""
+		return InvalidUserId
 	}
 	return pm[p]
 }
 
-func getActivePlayerIds(playersInOrder []string, pa match.PlayerAssignment) [game.NumPlayers]string {
-	var ans [game.NumPlayers]string
+func getActivePlayerIds(playersInOrder []UserId, pa match.PlayerAssignment) [game.NumPlayers]UserId {
+	var ans [game.NumPlayers]UserId
 	for inGamePlayerNumber, playerIndex := range pa.Playing() {
 		ans[inGamePlayerNumber] = playersInOrder[playerIndex]
 	}
@@ -55,10 +89,10 @@ func getActivePlayerIds(playersInOrder []string, pa match.PlayerAssignment) [gam
 }
 
 type TableData struct {
-	Id         string
-	Owner      string
+	Id         TableId
+	Owner      UserId
 	InviteCode string
-	Players    []string
+	Players    []UserId
 	Phase      api.TablePhase
 	Created    time.Time
 }
@@ -69,16 +103,16 @@ func GetData(t *Table) *TableData {
 		players = t.players
 	}
 	return &TableData{
-		Id: t.Id,
-		Owner: t.Owner(),
+		Id:         t.Id,
+		Owner:      t.Owner(),
 		InviteCode: t.InviteCode,
-		Players: players,
-		Phase: t.Phase,
-		Created: t.Created,
+		Players:    players,
+		Phase:      t.Phase,
+		Created:    t.Created,
 	}
 }
 
-func (d *TableData) ContainsPlayer(id string) bool {
+func (d *TableData) ContainsPlayer(id UserId) bool {
 	for _, p := range d.Players {
 		if p == id {
 			return true

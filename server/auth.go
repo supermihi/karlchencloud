@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -23,18 +24,22 @@ func NewAuth(users Users) Auth {
 
 type userMDKey struct{}
 
-func parseUserIdSecret(auth string) (string, string, error) {
+func parseUserIdSecret(auth string) (UserId, string, error) {
 	contentB, err := base64.StdEncoding.DecodeString(auth)
 	if err != nil {
-		return "", "", status.Error(codes.Unauthenticated, "invalid base64 in header")
+		return -1, "", status.Error(codes.Unauthenticated, "invalid base64 in header")
 	}
 	content := string(contentB)
 	colonPos := strings.IndexByte(content, ':')
 	if colonPos < 0 {
-		return "", "", status.Error(codes.Unauthenticated, "invalid basic auth format")
+		return -1, "", status.Error(codes.Unauthenticated, "invalid basic auth format")
 	}
-	user, secret := content[:colonPos], content[colonPos+1:]
-	return user, secret, nil
+	idStr, secret := content[:colonPos], content[colonPos+1:]
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return -1, "", status.Error(codes.Unauthenticated, "cannot parse user id")
+	}
+	return UserId(id), secret, nil
 }
 
 func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err error) {

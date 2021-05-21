@@ -18,15 +18,15 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DokoClient interface {
-	Register(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*RegisterReply, error)
-	CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UserName, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
+	CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*CheckLoginReply, error)
 	CreateTable(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableData, error)
-	StartTable(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*MatchState, error)
+	StartTable(ctx context.Context, in *StartTableRequest, opts ...grpc.CallOption) (*MatchState, error)
 	JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*TableState, error)
 	PlayCard(ctx context.Context, in *PlayCardRequest, opts ...grpc.CallOption) (*PlayedCard, error)
 	PlaceBid(ctx context.Context, in *PlaceBidRequest, opts ...grpc.CallOption) (*Bid, error)
 	Declare(ctx context.Context, in *DeclareRequest, opts ...grpc.CallOption) (*Declaration, error)
-	StartNextMatch(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*MatchState, error)
+	StartNextMatch(ctx context.Context, in *StartNextMatchRequest, opts ...grpc.CallOption) (*MatchState, error)
 	StartSession(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Doko_StartSessionClient, error)
 }
 
@@ -38,7 +38,7 @@ func NewDokoClient(cc grpc.ClientConnInterface) DokoClient {
 	return &dokoClient{cc}
 }
 
-func (c *dokoClient) Register(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*RegisterReply, error) {
+func (c *dokoClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error) {
 	out := new(RegisterReply)
 	err := c.cc.Invoke(ctx, "/api.Doko/Register", in, out, opts...)
 	if err != nil {
@@ -47,8 +47,8 @@ func (c *dokoClient) Register(ctx context.Context, in *UserName, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *dokoClient) CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UserName, error) {
-	out := new(UserName)
+func (c *dokoClient) CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*CheckLoginReply, error) {
+	out := new(CheckLoginReply)
 	err := c.cc.Invoke(ctx, "/api.Doko/CheckLogin", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (c *dokoClient) CreateTable(ctx context.Context, in *Empty, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *dokoClient) StartTable(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*MatchState, error) {
+func (c *dokoClient) StartTable(ctx context.Context, in *StartTableRequest, opts ...grpc.CallOption) (*MatchState, error) {
 	out := new(MatchState)
 	err := c.cc.Invoke(ctx, "/api.Doko/StartTable", in, out, opts...)
 	if err != nil {
@@ -110,7 +110,7 @@ func (c *dokoClient) Declare(ctx context.Context, in *DeclareRequest, opts ...gr
 	return out, nil
 }
 
-func (c *dokoClient) StartNextMatch(ctx context.Context, in *TableId, opts ...grpc.CallOption) (*MatchState, error) {
+func (c *dokoClient) StartNextMatch(ctx context.Context, in *StartNextMatchRequest, opts ...grpc.CallOption) (*MatchState, error) {
 	out := new(MatchState)
 	err := c.cc.Invoke(ctx, "/api.Doko/StartNextMatch", in, out, opts...)
 	if err != nil {
@@ -155,15 +155,15 @@ func (x *dokoStartSessionClient) Recv() (*Event, error) {
 // All implementations must embed UnimplementedDokoServer
 // for forward compatibility
 type DokoServer interface {
-	Register(context.Context, *UserName) (*RegisterReply, error)
-	CheckLogin(context.Context, *Empty) (*UserName, error)
+	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
+	CheckLogin(context.Context, *Empty) (*CheckLoginReply, error)
 	CreateTable(context.Context, *Empty) (*TableData, error)
-	StartTable(context.Context, *TableId) (*MatchState, error)
+	StartTable(context.Context, *StartTableRequest) (*MatchState, error)
 	JoinTable(context.Context, *JoinTableRequest) (*TableState, error)
 	PlayCard(context.Context, *PlayCardRequest) (*PlayedCard, error)
 	PlaceBid(context.Context, *PlaceBidRequest) (*Bid, error)
 	Declare(context.Context, *DeclareRequest) (*Declaration, error)
-	StartNextMatch(context.Context, *TableId) (*MatchState, error)
+	StartNextMatch(context.Context, *StartNextMatchRequest) (*MatchState, error)
 	StartSession(*Empty, Doko_StartSessionServer) error
 	mustEmbedUnimplementedDokoServer()
 }
@@ -172,16 +172,16 @@ type DokoServer interface {
 type UnimplementedDokoServer struct {
 }
 
-func (UnimplementedDokoServer) Register(context.Context, *UserName) (*RegisterReply, error) {
+func (UnimplementedDokoServer) Register(context.Context, *RegisterRequest) (*RegisterReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedDokoServer) CheckLogin(context.Context, *Empty) (*UserName, error) {
+func (UnimplementedDokoServer) CheckLogin(context.Context, *Empty) (*CheckLoginReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckLogin not implemented")
 }
 func (UnimplementedDokoServer) CreateTable(context.Context, *Empty) (*TableData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTable not implemented")
 }
-func (UnimplementedDokoServer) StartTable(context.Context, *TableId) (*MatchState, error) {
+func (UnimplementedDokoServer) StartTable(context.Context, *StartTableRequest) (*MatchState, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartTable not implemented")
 }
 func (UnimplementedDokoServer) JoinTable(context.Context, *JoinTableRequest) (*TableState, error) {
@@ -196,7 +196,7 @@ func (UnimplementedDokoServer) PlaceBid(context.Context, *PlaceBidRequest) (*Bid
 func (UnimplementedDokoServer) Declare(context.Context, *DeclareRequest) (*Declaration, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Declare not implemented")
 }
-func (UnimplementedDokoServer) StartNextMatch(context.Context, *TableId) (*MatchState, error) {
+func (UnimplementedDokoServer) StartNextMatch(context.Context, *StartNextMatchRequest) (*MatchState, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartNextMatch not implemented")
 }
 func (UnimplementedDokoServer) StartSession(*Empty, Doko_StartSessionServer) error {
@@ -216,7 +216,7 @@ func RegisterDokoServer(s grpc.ServiceRegistrar, srv DokoServer) {
 }
 
 func _Doko_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserName)
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func _Doko_Register_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/api.Doko/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokoServer).Register(ctx, req.(*UserName))
+		return srv.(DokoServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -270,7 +270,7 @@ func _Doko_CreateTable_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Doko_StartTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TableId)
+	in := new(StartTableRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func _Doko_StartTable_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/api.Doko/StartTable",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokoServer).StartTable(ctx, req.(*TableId))
+		return srv.(DokoServer).StartTable(ctx, req.(*StartTableRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -360,7 +360,7 @@ func _Doko_Declare_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 func _Doko_StartNextMatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TableId)
+	in := new(StartNextMatchRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -372,7 +372,7 @@ func _Doko_StartNextMatch_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/api.Doko/StartNextMatch",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokoServer).StartNextMatch(ctx, req.(*TableId))
+		return srv.(DokoServer).StartNextMatch(ctx, req.(*StartNextMatchRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

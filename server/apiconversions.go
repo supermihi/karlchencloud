@@ -11,11 +11,11 @@ func ToApiUserId(p game.Player, users PlayerUserMap) string {
 	if p == game.NoPlayer {
 		panic("cannot convert NoPlayer to user id")
 	}
-	return users[p]
+	return users[p].String()
 }
 func ToPlayerValue(p game.Player, users PlayerUserMap) *api.PlayerValue {
 	if p != game.NoPlayer {
-		return &api.PlayerValue{UserId: string(users[p])}
+		return &api.PlayerValue{UserId: users[p].String()}
 	}
 	return nil
 }
@@ -121,7 +121,7 @@ func ToApiMode(mode game.Mode, forehand game.Player, users PlayerUserMap) *api.M
 		spouse = ToPlayerValue(h.Partner(), users)
 	}
 	return &api.Mode{Type: ToApiGameType(mode.Type()), Soloist: soloist, Spouse: spouse,
-		Forehand: users[int(forehand)]}
+		Forehand: users[int(forehand)].String()}
 }
 
 func ToApiSuit(s game.Suit) api.Suit {
@@ -223,7 +223,7 @@ func toAuctionState(data *MatchData) *api.AuctionState {
 	declarations := make([]*api.Declaration, len(data.Declarations))
 	i := 0
 	for player, decl := range data.Declarations {
-		declarations[i] = &api.Declaration{UserId: data.Players[player], Vorbehalt: !decl.Healthy}
+		declarations[i] = &api.Declaration{UserId: data.Players[player].String(), Vorbehalt: !decl.Healthy}
 		i++
 	}
 	return &api.AuctionState{Declarations: declarations}
@@ -255,10 +255,10 @@ func ToGameState(m *MatchData) *api.GameState {
 		PreviousTrick:   prevTrick,
 	}
 }
-func ToMatchState(matchData *MatchData, user string) *api.MatchState {
+func ToMatchState(matchData *MatchData, user UserId) *api.MatchState {
 	turn := &api.PlayerValue{}
 	if matchData.Turn != game.NoPlayer {
-		turn.UserId = matchData.Players[matchData.Turn]
+		turn.UserId = matchData.Players[matchData.Turn].String()
 	}
 	self := game.NoPlayer
 	for i, p := range game.Players() {
@@ -272,10 +272,10 @@ func ToMatchState(matchData *MatchData, user string) *api.MatchState {
 		effectiveSelf = matchData.InitialForehand
 	}
 	players := &api.Players{
-		UserIdSelf:  matchData.Players[effectiveSelf],
-		UserIdLeft:  matchData.Players[effectiveSelf.NextPlayer()],
-		UserIdFace:  matchData.Players[effectiveSelf.NthNext(2)],
-		UserIdRight: matchData.Players[effectiveSelf.NthNext(3)],
+		UserIdSelf:  matchData.Players[effectiveSelf].String(),
+		UserIdLeft:  matchData.Players[effectiveSelf.NextPlayer()].String(),
+		UserIdFace:  matchData.Players[effectiveSelf.NthNext(2)].String(),
+		UserIdRight: matchData.Players[effectiveSelf.NthNext(3)].String(),
 	}
 	ans := &api.MatchState{Turn: turn, Players: players}
 	addDetails(ans, matchData)
@@ -328,8 +328,8 @@ func ToMatchPhase(p api.MatchPhase) match.Phase {
 	panic(fmt.Sprintf("unknown match phase: %v", p))
 }
 
-func ToTableData(table *TableData, user string, members []*api.TableMember) *api.TableData {
-	ans := &api.TableData{TableId: table.Id, Owner: table.Owner, Members: members,
+func ToTableData(table *TableData, user UserId, members []*api.TableMember) *api.TableData {
+	ans := &api.TableData{TableId: table.Id.String(), Owner: table.Owner.String(), Members: members,
 		Created: api.NewTimestamp(table.Created)}
 	if table.Owner == user {
 		ans.InviteCode = table.InviteCode

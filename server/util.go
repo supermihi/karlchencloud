@@ -12,10 +12,10 @@ func RandomLetters(n int) string {
 	return string(res)
 }
 
-func stringsExcept(strings []string, except string) []string {
-	ans := make([]string, len(strings)-1)
+func usersExcept(users []UserId, except UserId) []UserId {
+	ans := make([]UserId, len(users)-1)
 	i := 0
-	for _, p := range strings {
+	for _, p := range users {
 		if p != except {
 			ans[i] = p
 			i++

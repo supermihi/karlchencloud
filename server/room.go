@@ -7,14 +7,14 @@ import (
 
 type Room struct {
 	users  Users
-	tables map[string]*Table
+	tables map[TableId]*Table
 }
 
 func NewRoom(users Users) *Room {
-	return &Room{users, make(map[string]*Table)}
+	return &Room{users, make(map[TableId]*Table)}
 }
 
-func (r *Room) CreateTable(owner string, fixedTableId *string, fixedInviteCode *string, seed int64) (table *TableData, err error) {
+func (r *Room) CreateTable(owner UserId, fixedTableId TableId, fixedInviteCode *string, seed int64) (table *TableData, err error) {
 	if r.ActiveTableOf(owner) != nil {
 		return nil, NewCloudError(TableAlreadyExists)
 	}
@@ -23,11 +23,11 @@ func (r *Room) CreateTable(owner string, fixedTableId *string, fixedInviteCode *
 	return GetData(t), nil
 }
 
-func (r *Room) AddUser(user string, name string, secret string) bool {
-	return r.users.Add(user, name, secret)
+func (r *Room) AddUser(email string, name string, password string) (id UserId, err error) {
+	return r.users.Add(email, password, name, false)
 }
 
-func (r *Room) GetUserData(userId string) (data UserData, err error) {
+func (r *Room) GetUserData(userId UserId) (data UserData, err error) {
 	name, ok := r.users.GetName(userId)
 	if ok {
 		return UserData{Id: userId, Name: name}, nil
@@ -35,7 +35,7 @@ func (r *Room) GetUserData(userId string) (data UserData, err error) {
 	return UserData{}, NewCloudError(UserDoesNotExist)
 }
 
-func (r *Room) GetTable(tableId string) (table *TableData, err error) {
+func (r *Room) GetTable(tableId TableId) (table *TableData, err error) {
 	t, ok := r.tables[tableId]
 	if ok {
 		return GetData(t), nil
@@ -52,7 +52,7 @@ func (r *Room) findTableWithInviteCode(inviteCode string) *Table {
 	return nil
 }
 
-func (r *Room) JoinTable(userId string, inviteCode string) (*TableData, error) {
+func (r *Room) JoinTable(userId UserId, inviteCode string) (*TableData, error) {
 	t := r.findTableWithInviteCode(inviteCode)
 	if t == nil {
 		return nil, NewCloudError(InvalidInviteCode)
@@ -67,7 +67,7 @@ func (r *Room) JoinTable(userId string, inviteCode string) (*TableData, error) {
 
 }
 
-func (r *Room) ensureIsOwner(tableId string, userId string) (*Table, error) {
+func (r *Room) ensureIsOwner(tableId TableId, userId UserId) (*Table, error) {
 	t, tableExists := r.tables[tableId]
 	if !tableExists {
 		return nil, NewCloudError(TableDoesNotExist)
@@ -81,7 +81,7 @@ func (r *Room) ensureIsOwner(tableId string, userId string) (*Table, error) {
 	return t, nil
 }
 
-func (r *Room) StartTable(tableId string, userId string) (*TableData, error) {
+func (r *Room) StartTable(tableId TableId, userId UserId) (*TableData, error) {
 	t, err := r.ensureIsOwner(tableId, userId)
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ type Declaration struct {
 type MatchData struct {
 	Phase           match.Phase
 	Turn            game.Player
-	Players         [game.NumPlayers]string
+	Players         [game.NumPlayers]UserId
 	InitialForehand game.Player
 	Cards           game.Cards
 	Declarations    map[game.Player]Declaration
@@ -109,7 +109,7 @@ type MatchData struct {
 	CurrentTrick    *game.IncompleteTrick
 	PreviousTrick   *game.Trick
 	Mode            game.Mode
-	Evaluation		*match.GameEvaluation
+	Evaluation      *match.GameEvaluation
 }
 
 func GetMatchData(tm *TableMatch) *MatchData {
@@ -139,14 +139,14 @@ func GetMatchData(tm *TableMatch) *MatchData {
 		ans.Mode = g.Mode
 		ans.Cards = g.HandCards
 	case match.InAuction:
-			ans.Cards = tm.Match.DealtCards()
+		ans.Cards = tm.Match.DealtCards()
 	case match.MatchFinished:
 		evaluation := match.EvaluateGame(tm.Match.Game, tm.Match.Bids)
 		ans.Evaluation = &evaluation
 	}
 	return ans
 }
-func (r *Room) GetMatchData(tableId string) (m *MatchData, err error) {
+func (r *Room) GetMatchData(tableId TableId) (m *MatchData, err error) {
 	t, ok := r.tables[tableId]
 	if !ok {
 		return nil, NewCloudError(TableDoesNotExist)
@@ -158,7 +158,7 @@ func (r *Room) GetMatchData(tableId string) (m *MatchData, err error) {
 	return GetMatchData(tm), nil
 }
 
-func (r *Room) PlayCard(tableId string, userId string, card game.Card) (matchData *MatchData, err error) {
+func (r *Room) PlayCard(tableId TableId, userId UserId, card game.Card) (matchData *MatchData, err error) {
 	m, player, err := r.getMatchAndPlayer(tableId, userId)
 	if err != nil {
 		return nil, err
@@ -173,7 +173,7 @@ func (r *Room) PlayCard(tableId string, userId string, card game.Card) (matchDat
 	return GetMatchData(m), nil
 }
 
-func (r *Room) Declare(tableId string, userId string, gameType game.AnnouncedGameType) (*MatchData, error) {
+func (r *Room) Declare(tableId TableId, userId UserId, gameType game.AnnouncedGameType) (*MatchData, error) {
 	m, player, err := r.getMatchAndPlayer(tableId, userId)
 	if err != nil {
 		return nil, err
@@ -184,7 +184,7 @@ func (r *Room) Declare(tableId string, userId string, gameType game.AnnouncedGam
 	return GetMatchData(m), nil
 }
 
-func (r *Room) PlaceBid(tableId string, userId string, bid match.Bid) (*MatchData, error) {
+func (r *Room) PlaceBid(tableId TableId, userId UserId, bid match.Bid) (*MatchData, error) {
 	m, player, err := r.getMatchAndPlayer(tableId, userId)
 	if err != nil {
 		return nil, err
@@ -195,7 +195,7 @@ func (r *Room) PlaceBid(tableId string, userId string, bid match.Bid) (*MatchDat
 	return GetMatchData(m), nil
 }
 
-func (r *Room) StartNextMatch(tableId string, userId string) (*MatchData, error) {
+func (r *Room) StartNextMatch(tableId TableId, userId UserId) (*MatchData, error) {
 	table, err := r.ensureIsOwner(tableId, userId)
 	if err != nil {
 		return nil, err
@@ -207,7 +207,7 @@ func (r *Room) StartNextMatch(tableId string, userId string) (*MatchData, error)
 	return r.GetMatchData(tableId)
 }
 
-func (r *Room) getMatchAndPlayer(tableId string, user string) (match *TableMatch, p game.Player, err error) {
+func (r *Room) getMatchAndPlayer(tableId TableId, user UserId) (match *TableMatch, p game.Player, err error) {
 	table, exists := r.tables[tableId]
 	if !exists {
 		err = NewCloudError(TableDoesNotExist)
@@ -226,7 +226,7 @@ func (r *Room) getMatchAndPlayer(tableId string, user string) (match *TableMatch
 	return table.CurrentMatch, p, nil
 }
 
-func (r *Room) activeTableOf(user string) *Table {
+func (r *Room) activeTableOf(user UserId) *Table {
 	for _, table := range r.tables {
 		if table.ContainsPlayer(user) {
 			return table
@@ -234,7 +234,7 @@ func (r *Room) activeTableOf(user string) *Table {
 	}
 	return nil
 }
-func (r *Room) ActiveTableOf(user string) *TableData {
+func (r *Room) ActiveTableOf(user UserId) *TableData {
 	t := r.activeTableOf(user)
 	if t != nil {
 		return GetData(t)
@@ -242,10 +242,10 @@ func (r *Room) ActiveTableOf(user string) *TableData {
 	return nil
 }
 
-func (r *Room) RelatedUsers(userId string) []string {
+func (r *Room) RelatedUsers(userId UserId) []UserId {
 	table := r.activeTableOf(userId)
 	if table == nil {
-		return []string{}
+		return []UserId{}
 	}
-	return stringsExcept(table.players, userId)
+	return usersExcept(table.players, userId)
 }

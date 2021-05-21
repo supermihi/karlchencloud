@@ -20,10 +20,6 @@ type User struct {
 	Secret string
 }
 
-func RandomSecret() string {
-	return RandomLetters(16)
-}
-
 func NewUser(id string, name string, secret string) *User {
 	return &User{id, name, secret}
 }

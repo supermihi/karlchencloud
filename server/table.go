@@ -11,18 +11,18 @@ import (
 )
 
 type Table struct {
-	Id             string
+	Id             TableId
 	Created        time.Time
 	InviteCode     string
 	Phase          api.TablePhase
-	players        []string
-	playersInOrder []string
+	players        []UserId
+	playersInOrder []UserId
 	round          *match.Round
 	CurrentMatch   *TableMatch
 	Rng            *rand.Rand
 }
 
-func (t *Table) Owner() string {
+func (t *Table) Owner() UserId {
 	return t.players[0]
 }
 
@@ -30,14 +30,18 @@ func (t *Table) String() string {
 	return fmt.Sprintf("Table %v", t.Id)
 }
 
-func NewTable(owner string, fixedTableId *string, fixedInviteCode *string, seed int64) *Table {
+func NewTable(owner UserId, fixedTableId TableId, fixedInviteCode *string, seed int64) *Table {
 	log.Printf("Creating table (seed: %d)", seed)
+	tableId := fixedTableId
+	if tableId == InvalidTableId {
+		tableId = randomTableId()
+	}
 	return &Table{
-		getStringWithDefault(fixedTableId, randomTableId),
+		tableId,
 		time.Now(),
 		getStringWithDefault(fixedInviteCode, randomInviteCode),
 		api.TablePhase_NOT_STARTED,
-		[]string{owner},
+		[]UserId{owner},
 		nil,
 		nil,
 		nil,
@@ -45,8 +49,8 @@ func NewTable(owner string, fixedTableId *string, fixedInviteCode *string, seed 
 	}
 }
 
-func randomTableId() string {
-	return RandomLetters(6)
+func randomTableId() TableId {
+	return TableId(rand.Int63())
 }
 
 func randomInviteCode() string {
@@ -60,7 +64,7 @@ func (t *Table) Start() error {
 	if len(t.players) < game.NumPlayers || len(t.players) >= 7 {
 		return NewCloudError(InvalidNumberOfPlayers)
 	}
-	t.playersInOrder = make([]string, len(t.players))
+	t.playersInOrder = make([]UserId, len(t.players))
 	copy(t.playersInOrder, t.players)
 	t.Rng.Shuffle(len(t.players), func(i int, j int) {
 		t.playersInOrder[i], t.playersInOrder[j] = t.playersInOrder[j], t.playersInOrder[i]
@@ -92,7 +96,7 @@ func (t *Table) StartMatch() error {
 	return nil
 }
 
-func (t *Table) ContainsPlayer(player string) bool {
+func (t *Table) ContainsPlayer(player UserId) bool {
 	for _, p := range t.players {
 		if p == player {
 			return true
@@ -101,11 +105,11 @@ func (t *Table) ContainsPlayer(player string) bool {
 	return false
 }
 
-func (t *Table) Users() []string {
+func (t *Table) Users() []UserId {
 	return t.players
 }
 
-func (t *Table) Join(user string) error {
+func (t *Table) Join(user UserId) error {
 	if t.Phase != api.TablePhase_NOT_STARTED {
 		return NewCloudError(UnableToJoinStartedTable)
 	}

@@ -28,13 +28,22 @@ func main() {
 		log.Fatal(randErr)
 	}
 	rand.Seed(v)
-	users, err := server.NewExportedMemoryUserDb("users.json")
+	users, err := server.NewSqlUserDatabase("users.sqlite")
 	if err != nil {
 		log.Fatalf("error creating users: %v", err)
 	}
-	if len(users.List()) == 0 {
+	ids, err := users.ListIds()
+	if err != nil {
+		log.Fatalf("error listing userids: %v", err)
+	}
+	if len(ids) == 0 {
 		for i := 1; i < 5; i++ {
-			users.Add(fmt.Sprintf("%d", i), fmt.Sprintf("dummy %d", i), "123")
+			name := fmt.Sprintf("dummy%d", i)
+			email := fmt.Sprintf("%s@example.com", name)
+			_, err := users.Add(email, "123", name, false)
+			if err != nil {
+				log.Fatalf("error adding user %s: %v", name, err)
+			}
 		}
 	}
 	room := server.NewRoom(users)
