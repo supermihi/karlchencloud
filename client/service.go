@@ -38,7 +38,7 @@ func GetConnectedClientService(login LoginData, ctx context.Context) (*ClientSer
 	loggedIn := login.UserId != "" && CheckExistingLogin(dokoClient, ctx)
 	if !loggedIn {
 		if !login.RegisterIfEmptyUserId {
-			return nil, errors.New("could not login with given credentials")
+			return nil, errors.New("given credentials wrong or missing and RegisterIfEmptyUserId not set")
 		}
 		request := &api.RegisterRequest{Name: login.Name, Email: login.Email, Password: login.Password}
 		ans, err := dokoClient.Register(ctx, request)
