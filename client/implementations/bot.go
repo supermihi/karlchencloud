@@ -1,14 +1,15 @@
 package implementations
 
 import (
-  "fmt"
-  pb "github.com/supermihi/karlchencloud/api"
-  "github.com/supermihi/karlchencloud/client"
-  "github.com/supermihi/karlchencloud/doko/game"
-  "github.com/supermihi/karlchencloud/doko/match"
-  "os"
-  "strings"
-  "time"
+	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	pb "github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/client"
+	"github.com/supermihi/karlchencloud/doko/game"
+	"github.com/supermihi/karlchencloud/doko/match"
 )
 
 const superSecretBotPassword = "123"
@@ -139,7 +140,7 @@ func (h *BotClient) OnMyTurnGame() {
     }
   }
   if cardIndex == -1 {
-    cardIndex = 0 // no matchnig card -> can play anything
+    cardIndex = 0 // no matching card -> can play anything
   }
   time.Sleep(h.delay)
   err := h.PlayCard(cardIndex)
@@ -159,7 +160,20 @@ func (h *BotClient) OnMemberJoin(_ string, _ string) {
   }
 }
 
-func (h *BotClient) OnPlayedCard(_ *pb.PlayedCard) {
+func (h *BotClient) OnPlayedCard(play *pb.PlayedCard) {
+  if play.TrickWinner != nil && play.TrickWinner.UserId == h.User().Id {
+    h.Logf("I won the trick!")
+    for _, extraPoint := range play.TrickEvent {
+      switch pb.TrickEvent(extraPoint) {
+      case pb.TrickEvent_FOXCAUGHT:
+        h.Logf("and caught a fox!")
+      case pb.TrickEvent_DOPPELKOPFSCORED:
+        h.Logf("and scored a Doppelkopf!")
+      case pb.TrickEvent_CHARLIESCORED:
+        h.Logf("and my Charlie Miller won the last trick of the match!")
+      }
+    }
+  }
   if h.Match().Phase == match.MatchFinished && h.isOwner {
     h.Logf("I'm the owner, starting next match ...")
     time.Sleep(h.delay)

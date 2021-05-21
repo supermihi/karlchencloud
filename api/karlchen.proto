@@ -61,6 +61,7 @@ message PlayedCard {
   Card card = 2;
   PlayerValue trick_winner = 3;
   PartyValue winner = 4;
+  repeated TrickEvent trick_event = 5;
 }
 
 message Bid {
@@ -263,6 +264,12 @@ enum Rank {
   ACE = 5;
 }
 
+
+enum TrickEvent {
+    FOXCAUGHT = 0;
+    DOPPELKOPFSCORED = 1;
+    CHARLIESCORED = 2;
+}
 
 enum Party {
   RE = 0;

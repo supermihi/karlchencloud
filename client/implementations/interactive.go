@@ -2,14 +2,15 @@ package implementations
 
 import (
 	"bufio"
+	"log"
+	"os"
+	"strconv"
+
 	"github.com/eiannone/keyboard"
 	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/server/pbconv"
-	"log"
-	"os"
-	"strconv"
 )
 
 type CliHandler struct {
@@ -81,7 +82,18 @@ func (h *CliHandler) OnPlayedCard(ev *pb.PlayedCard) {
 		h.Logf("%v played %v", h.Table().MemberNamesById[ev.UserId], pbconv.ToCard(ev.Card))
 	}
 	if len(h.Match().Trick.Cards) == 0 {
-		h.Logf("trick finished. Winner: %s", h.Table().MemberNamesById[h.Match().Trick.Forehand])
+		var winnerName = h.Table().MemberNamesById[h.Match().Trick.Forehand]
+		h.Logf("trick finished. Winner: %s", winnerName)
+		for _, extraPoint := range ev.TrickEvent {
+			switch pb.TrickEvent(extraPoint) {
+			case pb.TrickEvent_FOXCAUGHT:
+				h.Logf("%s caught a fox!", winnerName)
+			case pb.TrickEvent_DOPPELKOPFSCORED:
+				h.Logf("%s scored a Doppelkopf!", winnerName)
+			case pb.TrickEvent_CHARLIESCORED:
+				h.Logf("%s won with Charlie Miller the last trick of the match!", winnerName)
+			}
+		}
 	}
 }
 

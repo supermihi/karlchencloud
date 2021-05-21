@@ -57,6 +57,7 @@ type MatchData struct {
 	PreviousTrick   *game.Trick
 	Mode            game.Mode
 	Evaluation      *match.GameEvaluation
+	TrickEvent      []match.ExtraPointType
 }
 
 func NewMatchData(tm *TableMatch) *MatchData {
@@ -84,6 +85,9 @@ func NewMatchData(tm *TableMatch) *MatchData {
 		ans.CurrentTrick = &tmp
 		ans.Mode = g.Mode
 		ans.Cards = g.HandCards
+		if ans.CurrentTrick.NumCardsPlayed() == 0 && ans.PreviousTrick != nil {
+			ans.TrickEvent = match.EventsOccured(g, ans.PreviousTrick)
+		}
 	case match.InAuction:
 		ans.Cards = tm.Match.DealtCards()
 	case match.MatchFinished:

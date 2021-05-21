@@ -2,6 +2,7 @@ package pbconv
 
 import (
 	"fmt"
+
 	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
@@ -109,4 +110,16 @@ func ToMatchPhase(p pb.MatchPhase) match.Phase {
 		return match.MatchFinished
 	}
 	panic(fmt.Sprintf("unknown match phase: %v", p))
+}
+
+func ToExtraPointType(t pb.TrickEvent) match.ExtraPointType {
+	switch t {
+	case pb.TrickEvent_FOXCAUGHT:
+		return match.FoxCaught;
+	case pb.TrickEvent_DOPPELKOPFSCORED:
+		return match.Doppelkopf;
+	case pb.TrickEvent_CHARLIESCORED:
+		return match.Charlie;
+	}
+	panic(fmt.Sprintf("not a trick event type: %s", t))
 }
