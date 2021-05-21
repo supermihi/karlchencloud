@@ -63,9 +63,9 @@ func PointsByPlayer(eval *GameEvaluation, mode game.Mode) [game.NumPlayers]int {
 }
 
 const (
-	Karlchen ExtraPointType = iota
+	Charlie ExtraPointType = iota
 	Doppelkopf
-	FuchsGefangen
+	FoxCaught
 )
 
 func countReScoreAndTricks(g *game.Game) (int, int) {
