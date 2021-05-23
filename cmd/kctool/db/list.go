@@ -15,11 +15,11 @@ var listUsersCommand = &cobra.Command{
 			log.Fatalf("error listing users: %v", err)
 		}
 		for _, id := range ids {
-			user, err := db.GetName(id)
+			user, err := db.GetData(id)
 			if err != nil {
 				log.Fatalf("error retrieving user name: %v", err)
 			}
-			log.Print(user)
+			log.Printf("[%s] %s (%s)", user.Id, user.Name, user.Email)
 		}
 
 	},

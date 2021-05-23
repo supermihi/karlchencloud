@@ -7,14 +7,14 @@ import (
 )
 
 func TestTable_Start(t *testing.T) {
-	table := NewTable("user1", nil, nil, 0)
-	_ = table.Join("user2")
-	_ = table.Join("user3")
-	_ = table.Join("user4")
+	table := NewTable(UserId(1), InvalidTableId, nil, 0)
+	_ = table.Join(UserId(2))
+	_ = table.Join(UserId(3))
+	_ = table.Join(UserId(4))
 	_ = table.Start()
-	assert.Contains(t, table.CurrentMatch.Players, "user1")
-	assert.Contains(t, table.CurrentMatch.Players, "user2")
-	assert.Contains(t, table.CurrentMatch.Players, "user3")
-	assert.Contains(t, table.CurrentMatch.Players, "user4")
+	assert.Contains(t, table.CurrentMatch.Players, UserId(1))
+	assert.Contains(t, table.CurrentMatch.Players, UserId(2))
+	assert.Contains(t, table.CurrentMatch.Players, UserId(3))
+	assert.Contains(t, table.CurrentMatch.Players, UserId(4))
 	assert.Equal(t, api.TablePhase_PLAYING, table.Phase)
 }

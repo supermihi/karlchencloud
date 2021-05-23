@@ -40,7 +40,7 @@ func main() {
 		for i := 1; i < 5; i++ {
 			name := fmt.Sprintf("dummy%d", i)
 			email := fmt.Sprintf("%s@example.com", name)
-			_, err := users.Add(email, "123", name, false)
+			_, err := users.Add(email, "123", name)
 			if err != nil {
 				log.Fatalf("error adding user %s: %v", name, err)
 			}

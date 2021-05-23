@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/supermihi/karlchencloud/client"
+	"github.com/supermihi/karlchencloud/client/implementations"
 	"log"
 )
 
@@ -19,5 +20,5 @@ func main() {
 	if err == nil {
 		bots = botConfig.Bots
 	}*/
-	client.StartBots(address, config.NumberOfBots, config.InviteCode, config.InitTable, []client.LoginData{})
+	implementations.StartBots(address, config.NumberOfBots, config.InviteCode, config.InitTable, []client.LoginData{})
 }

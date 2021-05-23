@@ -45,14 +45,18 @@ type UserData struct {
 	Email string
 }
 
+func NewUserData(id UserId, name string, email string) UserData {
+	return UserData{id, name, email}
+}
+
 func (d UserData) String() string {
 	return d.Name
 }
 
 type Users interface {
-	Add(email string, password string, name string, isAdmin bool) (id UserId, err error)
+	Add(email string, password string, name string) (id UserId, err error)
 	ListIds() ([]UserId, error)
-	GetName(id UserId) (name string, err error)
+	GetData(id UserId) (data UserData, err error)
 	ChangeName(id UserId, newName string) error
 	Authenticate(id UserId, secret string) bool
 }

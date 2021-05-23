@@ -11,27 +11,18 @@ CREATE TABLE IF NOT EXISTS user (
 	id integer PRIMARY KEY,
     email text NOT NULL UNIQUE,
     name text NOT NULL,
-    secret text,
-    is_admin boolean
+    secret text
 );
 `
-
-type SqlUser struct {
-	Id              int    `db:"user_id"`
-	Email           string `db:"email"`
-	Name            string `db:"name"`
-	PasswordHash    string `db:"secret"`
-	IsAdministrator bool   `db:"is_admin"`
-}
 
 type SqlUserDatabase struct {
 	db *sqlx.DB
 }
 
-func (s *SqlUserDatabase) Add(email string, password string, name string, isAdmin bool) (id UserId, err error) {
+func (s *SqlUserDatabase) Add(email string, password string, name string) (id UserId, err error) {
 	hash, err := security.HashAndSalt(password)
-	result, err := s.db.Exec("INSERT INTO user (email, name, secret, is_admin) VALUES (?, ?, ?, ?)",
-		email, name, hash, isAdmin)
+	result, err := s.db.Exec("INSERT INTO user (email, name, secret) VALUES (?, ?, ?)",
+		email, name, hash)
 	if err != nil {
 		return 0, err
 	}
@@ -59,9 +50,10 @@ func (s *SqlUserDatabase) ListIds() ([]UserId, error) {
 	return ids, nil
 }
 
-func (s *SqlUserDatabase) GetName(id UserId) (name string, err error) {
-	row := s.db.QueryRow("SELECT name FROM user WHERE id = ?", id)
-	err = row.Scan(&name)
+func (s *SqlUserDatabase) GetData(id UserId) (data UserData, err error) {
+	row := s.db.QueryRow("SELECT name, email FROM user WHERE id = ?", id)
+	data.Id = id
+	err = row.Scan(&data.Name, &data.Email)
 	return
 }
 

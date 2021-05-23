@@ -24,15 +24,11 @@ func (r *Room) CreateTable(owner UserId, fixedTableId TableId, fixedInviteCode *
 }
 
 func (r *Room) AddUser(email string, name string, password string) (id UserId, err error) {
-	return r.users.Add(email, password, name, false)
+	return r.users.Add(email, password, name)
 }
 
 func (r *Room) GetUserData(userId UserId) (data UserData, err error) {
-	name, err := r.users.GetName(userId)
-	if err != nil {
-		return UserData{Id: userId, Name: name}, nil
-	}
-	return UserData{}, NewCloudError(UserDoesNotExist)
+	return r.users.GetData(userId)
 }
 
 func (r *Room) GetTable(tableId TableId) (table *TableData, err error) {
@@ -168,7 +164,7 @@ func (r *Room) PlayCard(tableId TableId, userId UserId, card game.Card) (matchDa
 	}
 	if m.Match.Phase() == match.MatchFinished {
 		table := r.activeTableOf(userId)
-		err = table.EndMatch()
+		return nil, table.EndMatch()
 	}
 	return GetMatchData(m), nil
 }

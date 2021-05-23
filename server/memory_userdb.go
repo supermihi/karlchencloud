@@ -55,25 +55,25 @@ func (m *MemoryUserDb) ListIds() ([]UserId, error) {
 	return ans, nil
 }
 
-func (m *MemoryUserDb) GetName(id UserId) (name string, ok bool) {
+func (m *MemoryUserDb) GetName(id UserId) (name string, err error) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	user, ok := m.users[id]
 	if !ok {
-		return "", false
+		return "", errors.New("user does not exist")
 	}
-	return user.Name, true
+	return user.Name, nil
 }
 
-func (m *MemoryUserDb) ChangeName(id UserId, newName string) (ok bool) {
+func (m *MemoryUserDb) ChangeName(id UserId, newName string) error {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	existing, ok := m.users[id]
 	if !ok {
-		return false
+		return errors.New("user does not exist")
 	}
 	existing.Name = newName
-	return true
+	return nil
 }
 
 func (m *MemoryUserDb) Authenticate(id UserId, password string) bool {

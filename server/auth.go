@@ -61,12 +61,11 @@ func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err er
 		log.Printf("invalid user/secret combination %s/%s", userId, secret)
 		return ctx, status.Error(codes.Unauthenticated, "invalid user/secret combination")
 	}
-	name, err := a.Users.GetName(userId)
+	userMd, err := a.Users.GetData(userId)
 	if err != nil {
-		log.Printf("error getting user name: %v", err)
+		log.Printf("error getting user data: %v", err)
 		return ctx, status.Error(codes.Internal, "unknown error: did not find authenticated user")
 	}
-	userMd := UserData{Id: userId, Name: name}
 	return context.WithValue(ctx, userMDKey{}, userMd), nil
 
 }

@@ -41,6 +41,8 @@ type MatchView struct {
 	Mode    *ModeView
 }
 type TableView struct {
+	Id              string
+	Invite          string
 	Match           *MatchView
 	MemberNamesById map[string]string
 }
@@ -88,7 +90,7 @@ func NewMatchView(state *api.MatchState) *MatchView {
 }
 
 func NewTableView(ts *api.TableState) *TableView {
-	ans := TableView{MemberNamesById: make(map[string]string)}
+	ans := TableView{MemberNamesById: make(map[string]string), Id: ts.Data.TableId, Invite: ts.Data.InviteCode}
 	for _, m := range ts.Data.Members {
 		ans.MemberNamesById[m.UserId] = m.Name
 	}
