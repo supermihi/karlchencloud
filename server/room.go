@@ -23,14 +23,6 @@ func (r *Room) CreateTable(owner UserId, fixedTableId TableId, fixedInviteCode *
 	return GetData(t), nil
 }
 
-func (r *Room) AddUser(email string, name string, password string) (id UserId, err error) {
-	return r.users.Add(email, password, name)
-}
-
-func (r *Room) GetUserData(userId UserId) (data UserData, err error) {
-	return r.users.GetData(userId)
-}
-
 func (r *Room) GetTable(tableId TableId) (table *TableData, err error) {
 	t, ok := r.tables[tableId]
 	if ok {

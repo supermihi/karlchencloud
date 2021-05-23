@@ -2,16 +2,10 @@ package client
 
 import (
 	"context"
-	"encoding/base64"
 )
 
 type ClientCredentials struct {
-	userId   string
-	password string
-}
-
-func (c *ClientCredentials) UserId() string {
-	return c.userId
+	token string
 }
 
 func (c *ClientCredentials) RequireTransportSecurity() bool {
@@ -19,13 +13,11 @@ func (c *ClientCredentials) RequireTransportSecurity() bool {
 }
 
 func (c *ClientCredentials) GetRequestMetadata(_ context.Context, _ ...string) (map[string]string, error) {
-	return getAuthMeta(c.userId, c.password), nil
+	return getAuthMeta(c.token), nil
 }
 
-func getAuthMeta(userId string, password string) map[string]string {
-	auth := userId + ":" + password
-	enc := base64.StdEncoding.EncodeToString([]byte(auth))
+func getAuthMeta(token string) map[string]string {
 	return map[string]string{
-		"authorization": "basic " + enc,
+		"authorization": "basic " + token,
 	}
 }

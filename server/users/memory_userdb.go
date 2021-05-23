@@ -1,53 +1,54 @@
-package server
+package users
 
 import (
 	"errors"
+	"github.com/supermihi/karlchencloud/server"
 	"github.com/supermihi/karlchencloud/utils/security"
 	"sync"
 )
 
 type MemoryUserDb struct {
-	users     map[UserId]*User
+	users     map[server.UserId]*User
 	mtx       sync.RWMutex
 	largestId int64
 }
 
 type User struct {
-	Id           UserId
+	Id           server.UserId
 	Email        string
 	Name         string
 	PasswordHash string
 }
 
-func NewUser(id UserId, email string, name string, passwordHash string) *User {
+func NewUser(id server.UserId, email string, name string, passwordHash string) *User {
 	return &User{id, name, name, passwordHash}
 }
 
 func NewMemoryUserDb() *MemoryUserDb {
-	return &MemoryUserDb{users: make(map[UserId]*User), largestId: 1}
+	return &MemoryUserDb{users: make(map[server.UserId]*User), largestId: 1}
 }
 
-func (m *MemoryUserDb) Add(email string, password string, name string, isAdmin bool) (id UserId, err error) {
+func (m *MemoryUserDb) Add(email string, password string, name string, isAdmin bool) (id server.UserId, err error) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	for _, user := range m.users {
 		if user.Email == email {
-			return InvalidUserId, errors.New("user exists")
+			return server.InvalidUserId, errors.New("user exists")
 		}
 	}
 	m.largestId += 1
-	id = UserId(m.largestId)
+	id = server.UserId(m.largestId)
 	hash, err := security.HashAndSalt(password)
 	if err != nil {
-		return InvalidUserId, err
+		return server.InvalidUserId, err
 	}
 	m.users[id] = NewUser(id, email, name, hash)
 	return
 }
 
-func (m *MemoryUserDb) ListIds() ([]UserId, error) {
+func (m *MemoryUserDb) ListIds() ([]server.UserId, error) {
 	m.mtx.RLock()
-	ans := make([]UserId, 0, len(m.users))
+	ans := make([]server.UserId, 0, len(m.users))
 	for id := range m.users {
 		ans = append(ans, id)
 	}
@@ -55,7 +56,7 @@ func (m *MemoryUserDb) ListIds() ([]UserId, error) {
 	return ans, nil
 }
 
-func (m *MemoryUserDb) GetName(id UserId) (name string, err error) {
+func (m *MemoryUserDb) GetName(id server.UserId) (name string, err error) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	user, ok := m.users[id]
@@ -65,7 +66,7 @@ func (m *MemoryUserDb) GetName(id UserId) (name string, err error) {
 	return user.Name, nil
 }
 
-func (m *MemoryUserDb) ChangeName(id UserId, newName string) error {
+func (m *MemoryUserDb) ChangeName(id server.UserId, newName string) error {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	existing, ok := m.users[id]
@@ -76,7 +77,7 @@ func (m *MemoryUserDb) ChangeName(id UserId, newName string) error {
 	return nil
 }
 
-func (m *MemoryUserDb) Authenticate(id UserId, password string) bool {
+func (m *MemoryUserDb) Authenticate(id server.UserId, password string) bool {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 	user, ok := m.users[id]

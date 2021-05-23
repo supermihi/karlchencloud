@@ -2,7 +2,7 @@ package db
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/supermihi/karlchencloud/server"
+	"github.com/supermihi/karlchencloud/server/users"
 	"log"
 )
 
@@ -13,8 +13,8 @@ var DbCommand = &cobra.Command{
 
 var dbConnection string
 
-func getUsersOrFail() *server.SqlUserDatabase {
-	db, err := server.NewSqlUserDatabase(dbConnection)
+func getUsersOrFail() *users.SqlUserDatabase {
+	db, err := users.NewSqlUserDatabase(dbConnection)
 	if err != nil {
 		log.Fatal(err)
 	}

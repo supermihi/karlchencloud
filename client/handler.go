@@ -11,6 +11,5 @@ type ClientHandler interface {
 	OnMyTurnGame(client ClientApi)
 	OnMemberJoin(client ClientApi, userId string, name string)
 	OnMatchStart(client ClientApi)
-	OnDeclaration(client ClientApi, d *api.Declaration)
 	OnPlayedCard(client ClientApi, card *api.PlayedCard)
 }

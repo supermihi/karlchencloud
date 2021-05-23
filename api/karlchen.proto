@@ -6,7 +6,7 @@ service Doko {
     rpc Register (RegisterRequest) returns (RegisterReply) {
     }
 
-    rpc CheckLogin (Empty) returns (CheckLoginReply) {
+    rpc Login (LoginRequest) returns (LoginReply) {
     }
 
     rpc CreateTable (Empty) returns (TableData) {
@@ -192,12 +192,18 @@ message RegisterRequest {
 }
 
 message RegisterReply {
-    string id = 1;
+    string user_id = 1;
+    string token = 2;
 }
 
-message CheckLoginReply {
-    string name = 1;
-    string email = 2;
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+message LoginReply {
+    string token = 1;
+    string user_id = 2;
+    string name = 3;
 }
 
 message JoinTableRequest {

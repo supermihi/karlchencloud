@@ -5,7 +5,6 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/doko/match"
 	"github.com/supermihi/karlchencloud/server"
 	"log"
 	"os"
@@ -66,17 +65,11 @@ func (h *CliHandler) OnMatchStart(client client.ClientApi) {
 }
 
 func (h *CliHandler) OnPlayedCard(client client.ClientApi, ev *api.PlayedCard) {
-	if ev.UserId != client.UserId() {
+	if ev.UserId != client.User().Id {
 		client.Logf("%v played %v", client.Table().MemberNamesById[ev.UserId], server.ToCard(ev.Card))
 	}
 	if len(client.Match().Trick.Cards) == 0 {
 		client.Logf("trick finished. Winner: %s", client.Table().MemberNamesById[client.Match().Trick.Forehand])
-	}
-}
-
-func (h *CliHandler) OnDeclaration(client client.ClientApi, _ *api.Declaration) {
-	if client.Match().Phase == match.InGame {
-		client.Logf("now in game! Forehand: %s", client.Table().MemberNamesById[client.Match().Trick.Forehand])
 	}
 }
 

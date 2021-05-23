@@ -13,25 +13,35 @@ import (
 	"time"
 )
 
+const superSecretBotPassword = "123"
+
+func CreateBotLogin(num int, address string) client.LoginData {
+	name := fmt.Sprintf("bot_%v", num+1)
+	return client.LoginData{
+		Name:               name,
+		Email:              fmt.Sprintf("%s@example.com", name),
+		Password:           superSecretBotPassword,
+		RegisterOnAuthFail: true,
+		ServerAddress:      address,
+	}
+}
+
 func StartBots(address string, numBots int, inviteCode string, initTable bool, logins []client.LoginData) {
-	clients := make([]*client.KarlchenClient, numBots)
+	clients := make([]*client.ClientImplementation, numBots)
 	ctx := context.Background()
 	for i := 0; i < numBots; i++ {
 		var login client.LoginData
 		if len(logins) > i {
 			login = logins[i]
 		} else {
-			login.RegisterIfEmptyUserId = true
-			login.ServerAddress = address
-			login.Name = fmt.Sprintf("Bot %v", i+1)
-			login.Password = "123"
+			login = CreateBotLogin(i+1, address)
 		}
 		handler := NewBotHandler(i == 0 && initTable, inviteCode)
 		log.Printf("starting bot %d", i)
 		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
-		client := client.NewKarlchenClient(login, handler)
-		clients[i] = &client
-		go client.Start(ctx)
+		kc := client.NewClientImplementation(login, handler)
+		clients[i] = &kc
+		go kc.Start(ctx)
 	}
 	<-ctx.Done()
 	// TODO use nontrivial contexts
@@ -126,14 +136,7 @@ func (h *BotHandler) OnMemberJoin(client client.ClientApi, _ string, _ string) {
 	}
 }
 
-func (h *BotHandler) OnDeclaration(_ client.ClientApi, _ *api.Declaration) {
-	// pass
-}
-
-func (h *BotHandler) OnPlayedCard(client client.ClientApi, play *api.PlayedCard) {
-	if play.Winner != nil {
-		client.Match().Phase = match.MatchFinished
-	}
+func (h *BotHandler) OnPlayedCard(client client.ClientApi, _ *api.PlayedCard) {
 	if client.Match().Phase == match.MatchFinished && h.isOwner {
 		err := client.StartNextMatch()
 		if err != nil {

@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/supermihi/karlchencloud/server"
+	users2 "github.com/supermihi/karlchencloud/server/users"
 	"log"
 	"math/rand"
 	"net"
@@ -28,7 +29,7 @@ func main() {
 		log.Fatal(randErr)
 	}
 	rand.Seed(v)
-	users, err := server.NewSqlUserDatabase("users.sqlite")
+	users, err := users2.NewSqlUserDatabase("users.sqlite")
 	if err != nil {
 		log.Fatalf("error creating users: %v", err)
 	}

@@ -4,12 +4,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"github.com/supermihi/karlchencloud/server/users"
 	"math/rand"
 	"testing"
 )
 
 func TestRoom_JoinTable(t *testing.T) {
-	r := NewRoom(NewMemoryUserDb())
+	r := NewRoom(users.NewMemoryUserDb())
 	id, err := r.users.Add("owner@example.com", "secret", "owner", false)
 	assert.NotNil(t, err)
 	assert.NotEqual(t, InvalidUserId, id)

@@ -43,10 +43,11 @@ type UserData struct {
 	Id    UserId
 	Name  string
 	Email string
+	Token string
 }
 
-func NewUserData(id UserId, name string, email string) UserData {
-	return UserData{id, name, email}
+func NewUserData(id UserId, name string, email string, token string) UserData {
+	return UserData{id, name, email, token}
 }
 
 func (d UserData) String() string {
@@ -54,11 +55,12 @@ func (d UserData) String() string {
 }
 
 type Users interface {
-	Add(email string, password string, name string) (id UserId, err error)
+	Add(email string, password string, name string) (UserData, error)
 	ListIds() ([]UserId, error)
-	GetData(id UserId) (data UserData, err error)
+	GetData(id UserId) (UserData, error)
 	ChangeName(id UserId, newName string) error
-	Authenticate(id UserId, secret string) bool
+	VerifyToken(token string) (UserData, error)
+	Authenticate(email string, password string) (UserData, error)
 }
 
 type PlayerUserMap [game.NumPlayers]UserId

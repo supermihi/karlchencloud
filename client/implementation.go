@@ -10,41 +10,41 @@ import (
 	"log"
 )
 
-type KarlchenClient struct {
+type ClientImplementation struct {
 	clientData LoginData
-	service    *ClientService
+	client     *DokoClient
 	handler    ClientHandler
 	table      *TableView
 }
 
-func NewKarlchenClient(c LoginData, handler ClientHandler) KarlchenClient {
-	return KarlchenClient{clientData: c, handler: handler}
+func NewClientImplementation(c LoginData, handler ClientHandler) ClientImplementation {
+	return ClientImplementation{clientData: c, handler: handler}
 }
 
-func (c *KarlchenClient) Logf(format string, v ...interface{}) {
-	c.service.Logf(format, v...)
+func (c *ClientImplementation) Logf(format string, v ...interface{}) {
+	c.client.Logf(format, v...)
 }
 
-func (c *KarlchenClient) UserId() string {
-	return c.service.UserId()
-}
-
-func (c *KarlchenClient) Table() *TableView {
+func (c *ClientImplementation) Table() *TableView {
 	return c.table
 }
 
-func (c *KarlchenClient) Start(ctx context.Context) {
-	service, err := GetConnectedClientService(c.clientData, ctx)
+func (c *ClientImplementation) User() UserData {
+	return c.client.user
+}
+
+func (c *ClientImplementation) Start(ctx context.Context) {
+	service, err := GetConnectedDokoClient(c.clientData, ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer service.CloseConnection()
-	c.service = service
+	c.client = service
 	c.handler.OnConnect(c)
-	stream, err := c.service.Grpc.StartSession(c.service.Context, &api.Empty{})
-	c.service.Logf("Listening for match events ...")
+	stream, err := c.client.Grpc.StartSession(c.client.Context, &api.Empty{})
+	c.client.Logf("Listening for match events ...")
 	if err != nil {
-		c.service.Logf("error subscribing: %v", err)
+		c.client.Logf("error subscribing: %v", err)
 		log.Fatal(err)
 	}
 	for {
@@ -72,7 +72,7 @@ func (c *KarlchenClient) Start(ctx context.Context) {
 	}
 }
 
-func (c *KarlchenClient) handleMemberEvent(ev *api.MemberEvent) {
+func (c *ClientImplementation) handleMemberEvent(ev *api.MemberEvent) {
 	switch ev.Type {
 	case api.MemberEventType_JOIN_TABLE:
 		c.Logf("user %s joined table", ev.Name)
@@ -86,8 +86,8 @@ func (c *KarlchenClient) handleMemberEvent(ev *api.MemberEvent) {
 	}
 }
 
-func (c *KarlchenClient) CreateTable() error {
-	tableData, err := c.service.Grpc.CreateTable(c.service.Context, &api.Empty{})
+func (c *ClientImplementation) CreateTable() error {
+	tableData, err := c.client.Grpc.CreateTable(c.client.Context, &api.Empty{})
 	if err != nil {
 		return err
 	}
@@ -96,8 +96,8 @@ func (c *KarlchenClient) CreateTable() error {
 	return nil
 }
 
-func (c *KarlchenClient) JoinTable(invite string) (err error) {
-	tableState, err := c.service.Grpc.JoinTable(c.service.Context, &api.JoinTableRequest{InviteCode: invite})
+func (c *ClientImplementation) JoinTable(invite string) (err error) {
+	tableState, err := c.client.Grpc.JoinTable(c.client.Context, &api.JoinTableRequest{InviteCode: invite})
 	if err == nil {
 		c.Logf("table %s joined", tableState.Data.TableId)
 		c.initView(tableState)
@@ -105,46 +105,52 @@ func (c *KarlchenClient) JoinTable(invite string) (err error) {
 	return
 }
 
-func (c *KarlchenClient) StartTable() error {
-	matchState, err := c.service.Grpc.StartTable(c.service.Context, &api.StartTableRequest{TableId: c.table.Id})
+func (c *ClientImplementation) StartTable() error {
+	matchState, err := c.client.Grpc.StartTable(c.client.Context, &api.StartTableRequest{TableId: c.table.Id})
 	if err == nil {
 		c.handleStart(matchState)
 	}
 	return err
 }
 
-func (c *KarlchenClient) initView(state *api.TableState) {
+func (c *ClientImplementation) initView(state *api.TableState) {
 	c.table = NewTableView(state)
 }
-func (c *KarlchenClient) handleWelcome(us *api.UserState) {
+func (c *ClientImplementation) handleWelcome(us *api.UserState) {
 	c.handler.OnWelcome(c, us)
 	ts := us.CurrentTable
-	if ts != nil {
-		c.Logf("sitting at table %s", ts.Data.TableId)
+	if ts == nil {
+		return
 	}
+	c.Logf("sitting at table %s", ts.Data.TableId)
 	c.initView(ts)
 	c.checkMyTurn()
 }
 
-func (c *KarlchenClient) handleStart(s *api.MatchState) {
+func (c *ClientImplementation) handleStart(s *api.MatchState) {
 	c.table.Match = NewMatchView(s)
 	c.handler.OnMatchStart(c)
 	c.checkMyTurn()
 }
 
-func (c *KarlchenClient) handleDeclare(d *api.Declaration) {
-	c.table.Match.UpdateOnDeclare(d)
-	c.handler.OnDeclaration(c, d)
+func (c *ClientImplementation) handleDeclare(d *api.Declaration) {
+	c.Match().UpdateOnDeclare(d)
+	if c.Match().Phase == match.InGame {
+		c.Logf("now in game! Forehand: %s", c.Table().MemberNamesById[c.Match().Trick.Forehand])
+	}
 	c.checkMyTurn()
 }
 
-func (c *KarlchenClient) handlePlayedCard(card *api.PlayedCard) {
+func (c *ClientImplementation) handlePlayedCard(card *api.PlayedCard) {
 	c.table.Match.UpdateTrick(card)
+	if card.Winner != nil {
+		c.Match().Phase = match.MatchFinished
+	}
 	c.handler.OnPlayedCard(c, card)
 	c.checkMyTurn()
 }
 
-func (c *KarlchenClient) checkMyTurn() {
+func (c *ClientImplementation) checkMyTurn() {
 	matchView := c.Match()
 	if matchView != nil && matchView.MyTurn && len(matchView.Cards) > 0 {
 		switch matchView.Phase {
@@ -157,11 +163,11 @@ func (c *KarlchenClient) checkMyTurn() {
 		}
 	}
 }
-func (c *KarlchenClient) PlayCard(i int) error {
+func (c *ClientImplementation) PlayCard(i int) error {
 	card := c.Match().Cards[i]
 	log.Printf("playing card: %v", card)
-	result, err := c.service.Grpc.PlayCard(
-		c.service.Context,
+	result, err := c.client.Grpc.PlayCard(
+		c.client.Context,
 		&api.PlayCardRequest{Table: c.table.Id, Card: server.ToApiCard(card)})
 	if err == nil {
 		c.Match().DrawCard(i)
@@ -170,8 +176,8 @@ func (c *KarlchenClient) PlayCard(i int) error {
 	return err
 }
 
-func (c *KarlchenClient) Declare(t game.AnnouncedGameType) error {
-	result, err := c.service.Grpc.Declare(c.service.Context, &api.DeclareRequest{
+func (c *ClientImplementation) Declare(t game.AnnouncedGameType) error {
+	result, err := c.client.Grpc.Declare(c.client.Context, &api.DeclareRequest{
 		Table:       c.table.Id,
 		Declaration: server.ToApiGameType(t)})
 	if err == nil {
@@ -181,33 +187,20 @@ func (c *KarlchenClient) Declare(t game.AnnouncedGameType) error {
 	return err
 }
 
-func (c *KarlchenClient) Api() api.DokoClient {
-	return c.service.Grpc
+func (c *ClientImplementation) Api() api.DokoClient {
+	return c.client.Grpc
 }
 
-func (c *KarlchenClient) Match() *MatchView {
+func (c *ClientImplementation) Match() *MatchView {
 	return c.table.Match
 }
 
-func (c *KarlchenClient) StartNextMatch() error {
+func (c *ClientImplementation) StartNextMatch() error {
 	req := api.StartNextMatchRequest{TableId: c.table.Id}
-	ans, err := c.service.Grpc.StartNextMatch(c.service.Context, &req)
+	ans, err := c.client.Grpc.StartNextMatch(c.client.Context, &req)
 	if err != nil {
 		return err
 	}
 	c.handleStart(ans)
 	return nil
-}
-
-type ClientApi interface {
-	Logf(format string, v ...interface{})
-	UserId() string
-	Table() *TableView
-	Match() *MatchView
-	CreateTable() error
-	JoinTable(invite string) (err error)
-	StartTable() error
-	PlayCard(i int) error
-	Declare(t game.AnnouncedGameType) error
-	StartNextMatch() error
 }

@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DokoClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
-	CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*CheckLoginReply, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
 	CreateTable(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableData, error)
 	StartTable(ctx context.Context, in *StartTableRequest, opts ...grpc.CallOption) (*MatchState, error)
 	JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*TableState, error)
@@ -47,9 +47,9 @@ func (c *dokoClient) Register(ctx context.Context, in *RegisterRequest, opts ...
 	return out, nil
 }
 
-func (c *dokoClient) CheckLogin(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*CheckLoginReply, error) {
-	out := new(CheckLoginReply)
-	err := c.cc.Invoke(ctx, "/api.Doko/CheckLogin", in, out, opts...)
+func (c *dokoClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error) {
+	out := new(LoginReply)
+	err := c.cc.Invoke(ctx, "/api.Doko/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (x *dokoStartSessionClient) Recv() (*Event, error) {
 // for forward compatibility
 type DokoServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
-	CheckLogin(context.Context, *Empty) (*CheckLoginReply, error)
+	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	CreateTable(context.Context, *Empty) (*TableData, error)
 	StartTable(context.Context, *StartTableRequest) (*MatchState, error)
 	JoinTable(context.Context, *JoinTableRequest) (*TableState, error)
@@ -175,8 +175,8 @@ type UnimplementedDokoServer struct {
 func (UnimplementedDokoServer) Register(context.Context, *RegisterRequest) (*RegisterReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedDokoServer) CheckLogin(context.Context, *Empty) (*CheckLoginReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckLogin not implemented")
+func (UnimplementedDokoServer) Login(context.Context, *LoginRequest) (*LoginReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedDokoServer) CreateTable(context.Context, *Empty) (*TableData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTable not implemented")
@@ -233,20 +233,20 @@ func _Doko_Register_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Doko_CheckLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+func _Doko_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DokoServer).CheckLogin(ctx, in)
+		return srv.(DokoServer).Login(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Doko/CheckLogin",
+		FullMethod: "/api.Doko/Login",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokoServer).CheckLogin(ctx, req.(*Empty))
+		return srv.(DokoServer).Login(ctx, req.(*LoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -410,8 +410,8 @@ var Doko_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Doko_Register_Handler,
 		},
 		{
-			MethodName: "CheckLogin",
-			Handler:    _Doko_CheckLogin_Handler,
+			MethodName: "Login",
+			Handler:    _Doko_Login_Handler,
 		},
 		{
 			MethodName: "CreateTable",

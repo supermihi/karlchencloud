@@ -11,7 +11,6 @@ import (
 var (
 	name     string
 	email    string
-	userId   string
 	password string
 )
 
@@ -32,17 +31,16 @@ var interactiveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		askForMissingClientData()
 		conn := client.LoginData{
-			Email:                 email,
-			Name:                  name,
-			UserId:                userId,
-			Password:              password,
-			ServerAddress:         serverAddress,
-			RegisterIfEmptyUserId: true,
+			Email:              email,
+			Name:               name,
+			Password:           password,
+			ServerAddress:      serverAddress,
+			RegisterOnAuthFail: true,
 		}
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		cliHandler := implementations.CliHandler{}
-		karlchenClient := client.NewKarlchenClient(conn, &cliHandler)
+		karlchenClient := client.NewClientImplementation(conn, &cliHandler)
 		go karlchenClient.Start(ctx)
 		<-ctx.Done()
 	},
@@ -51,7 +49,6 @@ var interactiveCmd = &cobra.Command{
 func init() {
 	interactiveCmd.Flags().StringVarP(&name, "name", "n", "", "Your name")
 	interactiveCmd.Flags().StringVarP(&email, "email", "e", "", "Your email address")
-	interactiveCmd.Flags().StringVarP(&userId, "id", "i", "", "User ID")
 	interactiveCmd.Flags().StringVarP(&password, "password", "p", "", "Password")
 	rootCmd.AddCommand(interactiveCmd)
 }

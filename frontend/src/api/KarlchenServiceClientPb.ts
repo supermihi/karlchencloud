@@ -75,44 +75,44 @@ export class DokoClient {
     this.methodInfoRegister);
   }
 
-  methodInfoCheckLogin = new grpcWeb.AbstractClientBase.MethodInfo(
-    karlchen_pb.CheckLoginReply,
-    (request: karlchen_pb.Empty) => {
+  methodInfoLogin = new grpcWeb.AbstractClientBase.MethodInfo(
+    karlchen_pb.LoginReply,
+    (request: karlchen_pb.LoginRequest) => {
       return request.serializeBinary();
     },
-    karlchen_pb.CheckLoginReply.deserializeBinary
+    karlchen_pb.LoginReply.deserializeBinary
   );
 
-  checkLogin(
-    request: karlchen_pb.Empty,
-    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.CheckLoginReply>;
+  login(
+    request: karlchen_pb.LoginRequest,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.LoginReply>;
 
-  checkLogin(
-    request: karlchen_pb.Empty,
+  login(
+    request: karlchen_pb.LoginRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: karlchen_pb.CheckLoginReply) => void): grpcWeb.ClientReadableStream<karlchen_pb.CheckLoginReply>;
+               response: karlchen_pb.LoginReply) => void): grpcWeb.ClientReadableStream<karlchen_pb.LoginReply>;
 
-  checkLogin(
-    request: karlchen_pb.Empty,
+  login(
+    request: karlchen_pb.LoginRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: karlchen_pb.CheckLoginReply) => void) {
+               response: karlchen_pb.LoginReply) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.Doko/CheckLogin',
+          '/api.Doko/Login',
         request,
         metadata || {},
-        this.methodInfoCheckLogin,
+        this.methodInfoLogin,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.Doko/CheckLogin',
+      '/api.Doko/Login',
     request,
     metadata || {},
-    this.methodInfoCheckLogin);
+    this.methodInfoLogin);
   }
 
   methodInfoCreateTable = new grpcWeb.AbstractClientBase.MethodInfo(

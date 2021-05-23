@@ -30,18 +30,23 @@ func CreateServer(users Users, room *Room, config ServerConfig) *grpc.Server {
 }
 
 func (s *dokoserver) Register(_ context.Context, req *api.RegisterRequest) (*api.RegisterReply, error) {
-	id, err := s.room.AddUser(req.Email, req.Name, req.Password)
+	user, err := s.auth.Users.Add(req.Email, req.Password, req.Name)
 	if err != nil {
 		log.Printf("error registering: %v", err)
 		return nil, status.Error(codes.Internal, "error registering")
 	}
-	log.Printf("Registered user %v with id %v", req.Name, id)
-	return &api.RegisterReply{Id: id.String()}, nil
+	log.Printf("Registered user %v with id %v", user.Name, user.Id)
+
+	return &api.RegisterReply{UserId: user.Id.String(), Token: user.Token}, nil
 }
 
-func (s *dokoserver) CheckLogin(ctx context.Context, _ *api.Empty) (*api.CheckLoginReply, error) {
-	user, _ := GetAuthenticatedUser(ctx)
-	return &api.CheckLoginReply{Name: user.Name, Email: user.Email}, nil
+func (s *dokoserver) Login(ctx context.Context, req *api.LoginRequest) (*api.LoginReply, error) {
+	user, err := s.auth.Users.Authenticate(req.Email, req.Password)
+	if err != nil {
+		log.Printf("error logging in: %v", err)
+		return nil, err
+	}
+	return &api.LoginReply{Name: user.Name, UserId: user.Id.String(), Token: user.Token}, nil
 }
 
 func (s *dokoserver) CreateTable(ctx context.Context, _ *api.Empty) (*api.TableData, error) {
@@ -283,7 +288,7 @@ func (s *dokoserver) getTableState(table *TableData, user UserId) (*api.TableSta
 func (s *dokoserver) createTableMembers(table *TableData) []*api.TableMember {
 	ans := make([]*api.TableMember, len(table.Players))
 	for i, id := range table.Players {
-		data, err := s.room.GetUserData(id)
+		data, err := s.auth.Users.GetData(id)
 		if err != nil {
 			panic("not existingt user at table - should not be here!")
 		}
