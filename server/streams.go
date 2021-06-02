@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/room"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -10,21 +11,21 @@ import (
 
 type clientStreams struct {
 	mtx     sync.RWMutex
-	streams map[UserId]chan *api.Event
+	streams map[room.UserId]chan *api.Event
 }
 
 func newStreams() clientStreams {
-	return clientStreams{streams: make(map[UserId]chan *api.Event, 1000)}
+	return clientStreams{streams: make(map[room.UserId]chan *api.Event, 1000)}
 }
 
-func (s *clientStreams) sendSingle(user UserId, event *api.Event) {
+func (s *clientStreams) sendSingle(user room.UserId, event *api.Event) {
 	stream, ok := s.streams[user]
 	if ok {
 		stream <- event
 	}
 }
 
-func (s *clientStreams) send(users []UserId, event *api.Event) {
+func (s *clientStreams) send(users []room.UserId, event *api.Event) {
 	s.mtx.RLock()
 	defer s.mtx.RUnlock()
 	for _, user := range users {
@@ -32,7 +33,7 @@ func (s *clientStreams) send(users []UserId, event *api.Event) {
 	}
 }
 
-func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user UserId) {
+func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user room.UserId) {
 	stream := s.createStream(user)
 	go func() {
 		defer s.removeStream(user)
@@ -59,13 +60,13 @@ func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user UserId) {
 	}()
 }
 
-func (s *clientStreams) createStream(user UserId) (stream chan *api.Event) {
+func (s *clientStreams) createStream(user room.UserId) (stream chan *api.Event) {
 	stream = make(chan *api.Event, 10)
 	s.streams[user] = stream
 	return
 }
 
-func (s *clientStreams) removeStream(user UserId) {
+func (s *clientStreams) removeStream(user room.UserId) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	if stream, ok := s.streams[user]; ok {
@@ -75,7 +76,7 @@ func (s *clientStreams) removeStream(user UserId) {
 	log.Printf("closed table stream for %s", user)
 }
 
-func (s *clientStreams) isOnline(user UserId) bool {
+func (s *clientStreams) isOnline(user room.UserId) bool {
 	_, ok := s.streams[user]
 	return ok
 }

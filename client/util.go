@@ -4,14 +4,14 @@ import (
 	"context"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/server"
+	"github.com/supermihi/karlchencloud/server/pbconv"
 	"google.golang.org/grpc"
 )
 
 func ToHand(cards []*api.Card) game.Hand {
 	ans := make([]game.Card, len(cards))
 	for i := 0; i < len(ans); i++ {
-		ans[i] = server.ToCard(cards[i])
+		ans[i] = pbconv.ToCard(cards[i])
 	}
 	return ans
 }

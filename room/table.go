@@ -1,10 +1,11 @@
-package server
+package room
 
 import (
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"github.com/supermihi/karlchencloud/utils"
 	"log"
 	"math/rand"
 	"time"
@@ -14,6 +15,7 @@ type Table struct {
 	Id             TableId
 	Created        time.Time
 	InviteCode     string
+	Public         bool
 	Phase          api.TablePhase
 	players        []UserId
 	playersInOrder []UserId
@@ -30,16 +32,14 @@ func (t *Table) String() string {
 	return fmt.Sprintf("Table %v", t.Id)
 }
 
-func NewTable(owner UserId, fixedTableId TableId, fixedInviteCode *string, seed int64) *Table {
+func NewTable(owner UserId, public bool, seed int64) *Table {
 	log.Printf("Creating table (seed: %d)", seed)
-	tableId := fixedTableId
-	if tableId == InvalidTableId {
-		tableId = randomTableId()
-	}
+	tableId := randomTableId()
 	return &Table{
 		tableId,
 		time.Now(),
-		getStringWithDefault(fixedInviteCode, randomInviteCode),
+		randomInviteCode(),
+		public,
 		api.TablePhase_NOT_STARTED,
 		[]UserId{owner},
 		nil,
@@ -54,7 +54,7 @@ func randomTableId() TableId {
 }
 
 func randomInviteCode() string {
-	return RandomLetters(12)
+	return utils.RandomLetters(12)
 }
 
 func (t *Table) Start() error {

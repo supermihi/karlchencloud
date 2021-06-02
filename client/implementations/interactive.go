@@ -5,7 +5,7 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/server"
+	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 	"os"
 	"strconv"
@@ -21,7 +21,6 @@ func (h *CliHandler) OnConnect(_ client.ClientApi) {
 
 func (h *CliHandler) OnWelcome(client client.ClientApi, us *api.UserState) {
 	if us.CurrentTable != nil {
-		client.Logf("continuing table %s", us.CurrentTable.Data.TableId)
 		return
 	}
 	for {
@@ -29,7 +28,7 @@ func (h *CliHandler) OnWelcome(client client.ClientApi, us *api.UserState) {
 		action := UserInputRune()
 		if action == 'c' {
 			h.IsCreator = true
-			err := client.CreateTable()
+			err := client.CreateTable(true)
 			if err == nil {
 				return
 			}
@@ -38,7 +37,7 @@ func (h *CliHandler) OnWelcome(client client.ClientApi, us *api.UserState) {
 			h.IsCreator = false
 			log.Printf("Input invite code:")
 			invite := UserInputString()
-			err := client.JoinTable(invite)
+			err := client.JoinTable(invite, "")
 			if err == nil {
 				return
 			}
@@ -66,7 +65,7 @@ func (h *CliHandler) OnMatchStart(client client.ClientApi) {
 
 func (h *CliHandler) OnPlayedCard(client client.ClientApi, ev *api.PlayedCard) {
 	if ev.UserId != client.User().Id {
-		client.Logf("%v played %v", client.Table().MemberNamesById[ev.UserId], server.ToCard(ev.Card))
+		client.Logf("%v played %v", client.Table().MemberNamesById[ev.UserId], pbconv.ToCard(ev.Card))
 	}
 	if len(client.Match().Trick.Cards) == 0 {
 		client.Logf("trick finished. Winner: %s", client.Table().MemberNamesById[client.Match().Trick.Forehand])

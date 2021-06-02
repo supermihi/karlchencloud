@@ -6,9 +6,7 @@ import (
 )
 
 type RoomConfig struct {
-	ConstantTableId    TableId `yaml:"tableId" env:"CONSTANT_TABLE_ID" env-default:"-1"`
-	ConstantInviteCode string  `yaml:"inviteCode" env:"CONSTANT_INVITE_CODE" env-default:""`
-	InputSeed          int64   `yaml:"seed" env:"KC_DBG_SEED" env-default:"0"`
+	InputSeed int64 `yaml:"seed" env:"KC_DBG_SEED" env-default:"0"`
 }
 
 type ServerConfig struct {

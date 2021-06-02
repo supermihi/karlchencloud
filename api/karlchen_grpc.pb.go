@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type DokoClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
-	CreateTable(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableData, error)
+	CreateTable(ctx context.Context, in *CreateTableRequest, opts ...grpc.CallOption) (*TableData, error)
 	StartTable(ctx context.Context, in *StartTableRequest, opts ...grpc.CallOption) (*MatchState, error)
 	JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*TableState, error)
 	PlayCard(ctx context.Context, in *PlayCardRequest, opts ...grpc.CallOption) (*PlayedCard, error)
@@ -28,6 +28,7 @@ type DokoClient interface {
 	Declare(ctx context.Context, in *DeclareRequest, opts ...grpc.CallOption) (*Declaration, error)
 	StartNextMatch(ctx context.Context, in *StartNextMatchRequest, opts ...grpc.CallOption) (*MatchState, error)
 	StartSession(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Doko_StartSessionClient, error)
+	ListTables(ctx context.Context, in *ListTablesRequest, opts ...grpc.CallOption) (*ListTablesResult, error)
 }
 
 type dokoClient struct {
@@ -56,7 +57,7 @@ func (c *dokoClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.C
 	return out, nil
 }
 
-func (c *dokoClient) CreateTable(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TableData, error) {
+func (c *dokoClient) CreateTable(ctx context.Context, in *CreateTableRequest, opts ...grpc.CallOption) (*TableData, error) {
 	out := new(TableData)
 	err := c.cc.Invoke(ctx, "/api.Doko/CreateTable", in, out, opts...)
 	if err != nil {
@@ -76,7 +77,7 @@ func (c *dokoClient) StartTable(ctx context.Context, in *StartTableRequest, opts
 
 func (c *dokoClient) JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*TableState, error) {
 	out := new(TableState)
-	err := c.cc.Invoke(ctx, "/api.Doko/JoinTable", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/JoinTableByInviteCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -151,13 +152,22 @@ func (x *dokoStartSessionClient) Recv() (*Event, error) {
 	return m, nil
 }
 
+func (c *dokoClient) ListTables(ctx context.Context, in *ListTablesRequest, opts ...grpc.CallOption) (*ListTablesResult, error) {
+	out := new(ListTablesResult)
+	err := c.cc.Invoke(ctx, "/api.Doko/ListTables", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DokoServer is the server API for Doko service.
 // All implementations must embed UnimplementedDokoServer
 // for forward compatibility
 type DokoServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
-	CreateTable(context.Context, *Empty) (*TableData, error)
+	CreateTable(context.Context, *CreateTableRequest) (*TableData, error)
 	StartTable(context.Context, *StartTableRequest) (*MatchState, error)
 	JoinTable(context.Context, *JoinTableRequest) (*TableState, error)
 	PlayCard(context.Context, *PlayCardRequest) (*PlayedCard, error)
@@ -165,6 +175,7 @@ type DokoServer interface {
 	Declare(context.Context, *DeclareRequest) (*Declaration, error)
 	StartNextMatch(context.Context, *StartNextMatchRequest) (*MatchState, error)
 	StartSession(*Empty, Doko_StartSessionServer) error
+	ListTables(context.Context, *ListTablesRequest) (*ListTablesResult, error)
 	mustEmbedUnimplementedDokoServer()
 }
 
@@ -178,14 +189,14 @@ func (UnimplementedDokoServer) Register(context.Context, *RegisterRequest) (*Reg
 func (UnimplementedDokoServer) Login(context.Context, *LoginRequest) (*LoginReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedDokoServer) CreateTable(context.Context, *Empty) (*TableData, error) {
+func (UnimplementedDokoServer) CreateTable(context.Context, *CreateTableRequest) (*TableData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTable not implemented")
 }
 func (UnimplementedDokoServer) StartTable(context.Context, *StartTableRequest) (*MatchState, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartTable not implemented")
 }
 func (UnimplementedDokoServer) JoinTable(context.Context, *JoinTableRequest) (*TableState, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method JoinTable not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method JoinTableByInviteCode not implemented")
 }
 func (UnimplementedDokoServer) PlayCard(context.Context, *PlayCardRequest) (*PlayedCard, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PlayCard not implemented")
@@ -201,6 +212,9 @@ func (UnimplementedDokoServer) StartNextMatch(context.Context, *StartNextMatchRe
 }
 func (UnimplementedDokoServer) StartSession(*Empty, Doko_StartSessionServer) error {
 	return status.Errorf(codes.Unimplemented, "method StartSession not implemented")
+}
+func (UnimplementedDokoServer) ListTables(context.Context, *ListTablesRequest) (*ListTablesResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTables not implemented")
 }
 func (UnimplementedDokoServer) mustEmbedUnimplementedDokoServer() {}
 
@@ -252,7 +266,7 @@ func _Doko_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 }
 
 func _Doko_CreateTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(CreateTableRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -264,7 +278,7 @@ func _Doko_CreateTable_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/api.Doko/CreateTable",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DokoServer).CreateTable(ctx, req.(*Empty))
+		return srv.(DokoServer).CreateTable(ctx, req.(*CreateTableRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -297,7 +311,7 @@ func _Doko_JoinTable_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Doko/JoinTable",
+		FullMethod: "/api.Doko/JoinTableByInviteCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DokoServer).JoinTable(ctx, req.(*JoinTableRequest))
@@ -398,6 +412,24 @@ func (x *dokoStartSessionServer) Send(m *Event) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Doko_ListTables_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTablesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DokoServer).ListTables(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Doko/ListTables",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DokoServer).ListTables(ctx, req.(*ListTablesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Doko_ServiceDesc is the grpc.ServiceDesc for Doko service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -422,7 +454,7 @@ var Doko_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Doko_StartTable_Handler,
 		},
 		{
-			MethodName: "JoinTable",
+			MethodName: "JoinTableByInviteCode",
 			Handler:    _Doko_JoinTable_Handler,
 		},
 		{
@@ -440,6 +472,10 @@ var Doko_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StartNextMatch",
 			Handler:    _Doko_StartNextMatch_Handler,
+		},
+		{
+			MethodName: "ListTables",
+			Handler:    _Doko_ListTables_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

@@ -1,27 +1,27 @@
-package server
+package room
 
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/server/users"
+	users2 "github.com/supermihi/karlchencloud/room/users"
 	"math/rand"
 	"testing"
 )
 
 func TestRoom_JoinTable(t *testing.T) {
-	r := NewRoom(users.NewMemoryUserDb())
+	r := NewRoom(users2.NewMemoryUserDb())
 	id, err := r.users.Add("owner@example.com", "secret", "owner", false)
 	assert.NotNil(t, err)
 	assert.NotEqual(t, InvalidUserId, id)
 	table, err := r.CreateTable(id, InvalidTableId, nil, 0)
 	assert.Nil(t, err)
 	assert.NotEqual(t, InvalidTableId, table.Id)
-	_, err = r.JoinTable(2, "not the invite code")
+	_, err = r.JoinTableByInviteCode(2, "not the invite code")
 	assert.NotNil(t, err)
-	_, err = r.JoinTable(2, table.InviteCode)
+	_, err = r.JoinTableByInviteCode(2, table.InviteCode)
 	assert.Nil(t, err)
-	_, err = r.JoinTable(2, table.InviteCode) // joining again
+	_, err = r.JoinTableByInviteCode(2, table.InviteCode) // joining again
 	assert.NotNil(t, err)
 }
 

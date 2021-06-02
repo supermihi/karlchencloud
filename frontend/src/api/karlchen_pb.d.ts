@@ -304,6 +304,24 @@ export namespace PlaceBidRequest {
   }
 }
 
+export class CreateTableRequest extends jspb.Message {
+  getPublic(): boolean;
+  setPublic(value: boolean): CreateTableRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateTableRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateTableRequest): CreateTableRequest.AsObject;
+  static serializeBinaryToWriter(message: CreateTableRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateTableRequest;
+  static deserializeBinaryFromReader(message: CreateTableRequest, reader: jspb.BinaryReader): CreateTableRequest;
+}
+
+export namespace CreateTableRequest {
+  export type AsObject = {
+    pb_public: boolean,
+  }
+}
+
 export class DeclareRequest extends jspb.Message {
   getTable(): string;
   setTable(value: string): DeclareRequest;
@@ -323,6 +341,40 @@ export namespace DeclareRequest {
   export type AsObject = {
     table: string,
     declaration: GameType,
+  }
+}
+
+export class ListTablesRequest extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListTablesRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListTablesRequest): ListTablesRequest.AsObject;
+  static serializeBinaryToWriter(message: ListTablesRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListTablesRequest;
+  static deserializeBinaryFromReader(message: ListTablesRequest, reader: jspb.BinaryReader): ListTablesRequest;
+}
+
+export namespace ListTablesRequest {
+  export type AsObject = {
+  }
+}
+
+export class ListTablesResult extends jspb.Message {
+  getTablesList(): Array<TableData>;
+  setTablesList(value: Array<TableData>): ListTablesResult;
+  clearTablesList(): ListTablesResult;
+  addTables(value?: TableData, index?: number): TableData;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListTablesResult.AsObject;
+  static toObject(includeInstance: boolean, msg: ListTablesResult): ListTablesResult.AsObject;
+  static serializeBinaryToWriter(message: ListTablesResult, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListTablesResult;
+  static deserializeBinaryFromReader(message: ListTablesResult, reader: jspb.BinaryReader): ListTablesResult;
+}
+
+export namespace ListTablesResult {
+  export type AsObject = {
+    tablesList: Array<TableData.AsObject>,
   }
 }
 
@@ -795,8 +847,13 @@ export namespace LoginReply {
 }
 
 export class JoinTableRequest extends jspb.Message {
+  getTableId(): string;
+  setTableId(value: string): JoinTableRequest;
+
   getInviteCode(): string;
   setInviteCode(value: string): JoinTableRequest;
+
+  getTableDescriptionCase(): JoinTableRequest.TableDescriptionCase;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): JoinTableRequest.AsObject;
@@ -808,7 +865,14 @@ export class JoinTableRequest extends jspb.Message {
 
 export namespace JoinTableRequest {
   export type AsObject = {
+    tableId: string,
     inviteCode: string,
+  }
+
+  export enum TableDescriptionCase { 
+    TABLE_DESCRIPTION_NOT_SET = 0,
+    TABLE_ID = 1,
+    INVITE_CODE = 2,
   }
 }
 

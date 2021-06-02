@@ -74,16 +74,36 @@ func (h *BotHandler) OnWelcome(client client.ClientApi, us *api.UserState) {
 		client.Logf("already at table. Continuing ...")
 	}
 	if h.isOwner {
-		err := client.CreateTable()
+		err := client.CreateTable(true)
 		if err != nil {
 			Fatalf(client, "%s could not create table: %v", err)
 		}
-	} else {
-		err := client.JoinTable(h.invite)
+	} else if h.invite != "" {
+		err := client.JoinTable(h.invite, "")
 		if err != nil {
 			Fatalf(client, "could not join table: %v", err)
 			return
 		}
+	} else {
+		tables, err := client.ListOpenTables()
+		if err != nil {
+			Fatalf(client, "could not list open tables: %v", err)
+			return
+		}
+		for _, table := range tables {
+			fmt.Printf("Table %s. Members:\n", table.Id)
+			for _, name := range table.MemberNamesById {
+				fmt.Printf("  %s\n", name)
+			}
+		}
+		if len(tables) > 0 {
+			err := client.JoinTable("", tables[0].Id)
+			if err != nil {
+				Fatalf(client, "could not join table: %v", err)
+				return
+			}
+		}
+
 	}
 }
 func (h *BotHandler) OnMatchStart(_ client.ClientApi) {

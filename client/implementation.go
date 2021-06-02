@@ -6,7 +6,7 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/server"
+	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 )
 
@@ -72,6 +72,21 @@ func (c *ClientImplementation) Start(ctx context.Context) {
 	}
 }
 
+func (c *ClientImplementation) ListOpenTables() ([]OpenTable, error) {
+	response, err := c.client.Grpc.ListTables(c.client.Context, &api.ListTablesRequest{})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]OpenTable, len(response.Tables))
+	for i, table := range response.Tables {
+		result[i] = OpenTable{Id: table.TableId, Invite: table.InviteCode, MemberNamesById: make(map[string]string)}
+		for _, member := range table.Members {
+			result[i].MemberNamesById[member.UserId] = member.Name
+		}
+	}
+	return result, nil
+}
+
 func (c *ClientImplementation) handleMemberEvent(ev *api.MemberEvent) {
 	switch ev.Type {
 	case api.MemberEventType_JOIN_TABLE:
@@ -86,18 +101,25 @@ func (c *ClientImplementation) handleMemberEvent(ev *api.MemberEvent) {
 	}
 }
 
-func (c *ClientImplementation) CreateTable() error {
-	tableData, err := c.client.Grpc.CreateTable(c.client.Context, &api.Empty{})
+func (c *ClientImplementation) CreateTable(public bool) error {
+	tableData, err := c.client.Grpc.CreateTable(c.client.Context, &api.CreateTableRequest{Public: public})
 	if err != nil {
 		return err
 	}
-	c.Logf("table %s created with invite code %s", tableData.TableId, tableData.InviteCode)
+	c.Logf("table %s created with invite code %s. Waiting for players ...", tableData.TableId, tableData.InviteCode)
 	c.initView(&api.TableState{Data: tableData, Phase: api.TablePhase_NOT_STARTED})
 	return nil
 }
 
-func (c *ClientImplementation) JoinTable(invite string) (err error) {
-	tableState, err := c.client.Grpc.JoinTable(c.client.Context, &api.JoinTableRequest{InviteCode: invite})
+func (c *ClientImplementation) JoinTable(invite string, tableId string) (err error) {
+	request := &api.JoinTableRequest{}
+	if invite != "" {
+		request.TableDescription = &api.JoinTableRequest_InviteCode{InviteCode: invite}
+	} else {
+		request.TableDescription = &api.JoinTableRequest_TableId{TableId: tableId}
+	}
+	tableState, err := c.client.Grpc.JoinTable(c.client.Context, request)
+
 	if err == nil {
 		c.Logf("table %s joined", tableState.Data.TableId)
 		c.initView(tableState)
@@ -168,7 +190,7 @@ func (c *ClientImplementation) PlayCard(i int) error {
 	log.Printf("playing card: %v", card)
 	result, err := c.client.Grpc.PlayCard(
 		c.client.Context,
-		&api.PlayCardRequest{Table: c.table.Id, Card: server.ToApiCard(card)})
+		&api.PlayCardRequest{Table: c.table.Id, Card: pbconv.ToPbCard(card)})
 	if err == nil {
 		c.Match().DrawCard(i)
 		c.handlePlayedCard(result)
@@ -179,7 +201,7 @@ func (c *ClientImplementation) PlayCard(i int) error {
 func (c *ClientImplementation) Declare(t game.AnnouncedGameType) error {
 	result, err := c.client.Grpc.Declare(c.client.Context, &api.DeclareRequest{
 		Table:       c.table.Id,
-		Declaration: server.ToApiGameType(t)})
+		Declaration: pbconv.ToPbGameType(t)})
 	if err == nil {
 		c.Logf("successfully declared %s", t)
 		c.table.Match.UpdateOnDeclare(result)

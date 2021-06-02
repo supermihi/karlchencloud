@@ -117,24 +117,24 @@ export class DokoClient {
 
   methodInfoCreateTable = new grpcWeb.AbstractClientBase.MethodInfo(
     karlchen_pb.TableData,
-    (request: karlchen_pb.Empty) => {
+    (request: karlchen_pb.CreateTableRequest) => {
       return request.serializeBinary();
     },
     karlchen_pb.TableData.deserializeBinary
   );
 
   createTable(
-    request: karlchen_pb.Empty,
+    request: karlchen_pb.CreateTableRequest,
     metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.TableData>;
 
   createTable(
-    request: karlchen_pb.Empty,
+    request: karlchen_pb.CreateTableRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
                response: karlchen_pb.TableData) => void): grpcWeb.ClientReadableStream<karlchen_pb.TableData>;
 
   createTable(
-    request: karlchen_pb.Empty,
+    request: karlchen_pb.CreateTableRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
                response: karlchen_pb.TableData) => void) {
@@ -412,6 +412,46 @@ export class DokoClient {
       request,
       metadata || {},
       this.methodInfoStartSession);
+  }
+
+  methodInfoListTables = new grpcWeb.AbstractClientBase.MethodInfo(
+    karlchen_pb.ListTablesResult,
+    (request: karlchen_pb.ListTablesRequest) => {
+      return request.serializeBinary();
+    },
+    karlchen_pb.ListTablesResult.deserializeBinary
+  );
+
+  listTables(
+    request: karlchen_pb.ListTablesRequest,
+    metadata: grpcWeb.Metadata | null): Promise<karlchen_pb.ListTablesResult>;
+
+  listTables(
+    request: karlchen_pb.ListTablesRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: karlchen_pb.ListTablesResult) => void): grpcWeb.ClientReadableStream<karlchen_pb.ListTablesResult>;
+
+  listTables(
+    request: karlchen_pb.ListTablesRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: karlchen_pb.ListTablesResult) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.Doko/ListTables',
+        request,
+        metadata || {},
+        this.methodInfoListTables,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.Doko/ListTables',
+    request,
+    metadata || {},
+    this.methodInfoListTables);
   }
 
 }

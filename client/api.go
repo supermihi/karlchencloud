@@ -9,8 +9,9 @@ type ClientApi interface {
 	Table() *TableView
 	Match() *MatchView
 	User() UserData
-	CreateTable() error
-	JoinTable(invite string) (err error)
+	CreateTable(public bool) error
+	JoinTable(invite string, tableId string) (err error)
+	ListOpenTables() ([]OpenTable, error)
 	StartTable() error
 	PlayCard(i int) error
 	Declare(t game.AnnouncedGameType) error

@@ -1,6 +1,7 @@
-package server
+package room
 
 import (
+	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 )
@@ -14,11 +15,11 @@ func NewRoom(users Users) *Room {
 	return &Room{users, make(map[TableId]*Table)}
 }
 
-func (r *Room) CreateTable(owner UserId, fixedTableId TableId, fixedInviteCode *string, seed int64) (table *TableData, err error) {
+func (r *Room) CreateTable(owner UserId, public bool, seed int64) (table *TableData, err error) {
 	if r.ActiveTableOf(owner) != nil {
 		return nil, NewCloudError(TableAlreadyExists)
 	}
-	t := NewTable(owner, fixedTableId, fixedInviteCode, seed)
+	t := NewTable(owner, public, seed)
 	r.tables[t.Id] = t
 	return GetData(t), nil
 }
@@ -40,7 +41,7 @@ func (r *Room) findTableWithInviteCode(inviteCode string) *Table {
 	return nil
 }
 
-func (r *Room) JoinTable(userId UserId, inviteCode string) (*TableData, error) {
+func (r *Room) JoinTableByInviteCode(userId UserId, inviteCode string) (*TableData, error) {
 	t := r.findTableWithInviteCode(inviteCode)
 	if t == nil {
 		return nil, NewCloudError(InvalidInviteCode)
@@ -52,7 +53,20 @@ func (r *Room) JoinTable(userId UserId, inviteCode string) (*TableData, error) {
 		return nil, err
 	}
 	return GetData(t), nil
+}
 
+func (r *Room) JoinTableByTableId(userId UserId, id TableId) (*TableData, error) {
+	t := r.tables[id]
+	if t == nil {
+		return nil, NewCloudError(TableDoesNotExist)
+	}
+	if r.ActiveTableOf(userId) != nil {
+		return nil, NewCloudError(UserAlreadyAtOtherTable)
+	}
+	if err := t.Join(userId); err != nil {
+		return nil, err
+	}
+	return GetData(t), nil
 }
 
 func (r *Room) ensureIsOwner(tableId TableId, userId UserId) (*Table, error) {
@@ -79,25 +93,6 @@ func (r *Room) StartTable(tableId TableId, userId UserId) (*TableData, error) {
 		return nil, err
 	}
 	return GetData(t), nil
-}
-
-type Declaration struct {
-	Healthy     bool
-	Reservation game.AnnouncedGameType
-}
-type MatchData struct {
-	Phase           match.Phase
-	Turn            game.Player
-	Players         [game.NumPlayers]UserId
-	InitialForehand game.Player
-	Cards           game.Cards
-	Declarations    map[game.Player]Declaration
-	Bids            match.Bids
-	CompletedTricks int
-	CurrentTrick    *game.IncompleteTrick
-	PreviousTrick   *game.Trick
-	Mode            game.Mode
-	Evaluation      *match.GameEvaluation
 }
 
 func GetMatchData(tm *TableMatch) *MatchData {
@@ -235,5 +230,15 @@ func (r *Room) RelatedUsers(userId UserId) []UserId {
 	if table == nil {
 		return []UserId{}
 	}
-	return usersExcept(table.players, userId)
+	return UsersExcept(table.players, userId)
+}
+func (r *Room) GetOpenTables(user UserId) []*TableData {
+	ans := make([]*TableData, 0)
+	for _, table := range r.tables {
+		if table.Phase != api.TablePhase_NOT_STARTED || !table.Public {
+			continue
+		}
+		ans = append(ans, GetData(table))
+	}
+	return ans
 }

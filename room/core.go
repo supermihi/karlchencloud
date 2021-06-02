@@ -1,4 +1,4 @@
-package server
+package room
 
 import (
 	"github.com/supermihi/karlchencloud/api"

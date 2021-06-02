@@ -5,7 +5,7 @@ import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/server"
+	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 	"sort"
 )
@@ -47,6 +47,12 @@ type TableView struct {
 	MemberNamesById map[string]string
 }
 
+type OpenTable struct {
+	Id              string
+	Invite          string
+	MemberNamesById map[string]string
+}
+
 func (m *TableView) PlayerNames() string {
 	if m.Match == nil {
 		return "- no match -"
@@ -80,11 +86,11 @@ func NewMatchView(state *api.MatchState) *MatchView {
 		if gs.CurrentTrick != nil {
 			v.Trick = NewTrickView(gs.CurrentTrick.UserIdForehand)
 			if len(gs.CurrentTrick.Cards) > 0 {
-				v.Trick.Cards[v.Trick.Forehand] = server.ToCard(gs.CurrentTrick.Cards[0])
+				v.Trick.Cards[v.Trick.Forehand] = pbconv.ToCard(gs.CurrentTrick.Cards[0])
 			}
 		}
 	}
-	v.Phase = server.ToMatchPhase(state.Phase)
+	v.Phase = pbconv.ToMatchPhase(state.Phase)
 	v.MyTurn = state.Turn.UserId == v.Players.Me
 	return v
 }
@@ -104,7 +110,7 @@ func (v *MatchView) UpdateTrick(pc *api.PlayedCard) {
 	if v.Trick == nil {
 		v.Trick = NewTrickView(pc.UserId)
 	}
-	v.Trick.Cards[pc.UserId] = server.ToCard(pc.Card)
+	v.Trick.Cards[pc.UserId] = pbconv.ToCard(pc.Card)
 	v.MyTurn = pc.UserId == v.Players.Right
 	if pc.TrickWinner != nil {
 		v.Trick = NewTrickView(pc.TrickWinner.UserId)
@@ -119,7 +125,7 @@ func (v *MatchView) DrawCard(index int) game.Card {
 }
 
 func (v *MatchView) setMode(m *api.Mode) {
-	v.Mode = &ModeView{Type: server.ToGameType(m.Type)}
+	v.Mode = &ModeView{Type: pbconv.ToGameType(m.Type)}
 	if m.Soloist != nil {
 		v.Mode.Soloist = &m.Soloist.UserId
 	}

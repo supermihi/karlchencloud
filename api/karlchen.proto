@@ -3,181 +3,194 @@ package api;
 //option go_package = "github.com/supermihi/karlchencloud/api";
 option go_package = "/api";
 service Doko {
-    rpc Register (RegisterRequest) returns (RegisterReply) {
-    }
+  rpc Register (RegisterRequest) returns (RegisterReply) {
+  }
 
-    rpc Login (LoginRequest) returns (LoginReply) {
-    }
+  rpc Login (LoginRequest) returns (LoginReply) {
+  }
 
-    rpc CreateTable (Empty) returns (TableData) {
-    }
+  rpc CreateTable (CreateTableRequest) returns (TableData) {
+  }
 
-    rpc StartTable (StartTableRequest) returns (MatchState) {
-    }
+  rpc StartTable (StartTableRequest) returns (MatchState) {
+  }
 
-    rpc JoinTable (JoinTableRequest) returns (TableState) {
-    }
+  rpc JoinTable (JoinTableRequest) returns (TableState) {
+  }
 
-    rpc PlayCard (PlayCardRequest) returns (PlayedCard) {
-    }
+  rpc PlayCard (PlayCardRequest) returns (PlayedCard) {
+  }
 
-    rpc PlaceBid (PlaceBidRequest) returns (Bid) {
-    }
+  rpc PlaceBid (PlaceBidRequest) returns (Bid) {
+  }
 
-    rpc Declare (DeclareRequest) returns (Declaration) {
-    }
+  rpc Declare (DeclareRequest) returns (Declaration) {
+  }
 
-    rpc StartNextMatch (StartNextMatchRequest) returns (MatchState) {
-    }
+  rpc StartNextMatch (StartNextMatchRequest) returns (MatchState) {
+  }
 
-    rpc StartSession (Empty) returns (stream Event) {
-    }
+  rpc StartSession (Empty) returns (stream Event) {
+  }
+
+  rpc ListTables (ListTablesRequest) returns (ListTablesResult) {
+  }
 }
 
 message Card {
-    Suit suit = 1;
-    Rank rank = 2;
+  Suit suit = 1;
+  Rank rank = 2;
 }
 
 message PlayerValue {
-    string user_id = 1;
+  string user_id = 1;
 }
 
 message PartyValue {
-    Party party = 1;
+  Party party = 1;
 }
 
 message Declaration {
-    string user_id = 1;
-    bool vorbehalt = 2;
-    Mode definedGameMode = 3;
+  string user_id = 1;
+  bool vorbehalt = 2;
+  Mode definedGameMode = 3;
 }
 
 message PlayedCard {
-    string user_id = 1;
-    Card card = 2;
-    PlayerValue trick_winner = 3;
-    PartyValue winner = 4;
+  string user_id = 1;
+  Card card = 2;
+  PlayerValue trick_winner = 3;
+  PartyValue winner = 4;
 }
 
 message Bid {
-    string user_id = 1;
-    BidType bid = 3;
+  string user_id = 1;
+  BidType bid = 3;
 }
 
 message Event {
-    oneof event {
-        UserState welcome = 1;
-        MatchState start = 2;
-        Declaration declared = 3;
-        PlayedCard played_card = 4;
-        Bid placed_bid = 5;
-        MemberEvent member = 6;
-    }
+  oneof event {
+    UserState welcome = 1;
+    MatchState start = 2;
+    Declaration declared = 3;
+    PlayedCard played_card = 4;
+    Bid placed_bid = 5;
+    MemberEvent member = 6;
+  }
 }
 
 message UserState {
-    TableState currentTable = 1;
-    string name = 2;
+  TableState currentTable = 1;
+  string name = 2;
 }
 enum MemberEventType {
-    JOIN_TABLE = 0;
-    LEAVE_TABLE = 1;
-    GO_OFFLINE = 2;
-    GO_ONLINE = 3;
+  JOIN_TABLE = 0;
+  LEAVE_TABLE = 1;
+  GO_OFFLINE = 2;
+  GO_ONLINE = 3;
 }
 message MemberEvent {
-    string user_id = 1;
-    string name = 2;
-    MemberEventType type = 3;
+  string user_id = 1;
+  string name = 2;
+  MemberEventType type = 3;
 }
 
 message PlayCardRequest {
-    string table = 1;
-    Card card = 2;
+  string table = 1;
+  Card card = 2;
 }
 
 message PlaceBidRequest {
-    string table = 1;
-    BidType bid = 2;
+  string table = 1;
+  BidType bid = 2;
 }
 
+message CreateTableRequest {
+  bool public = 1;
+}
 message DeclareRequest {
-    string table = 1;
-    GameType declaration = 2;
+  string table = 1;
+  GameType declaration = 2;
+}
+
+message ListTablesRequest {
+}
+
+message ListTablesResult {
+  repeated TableData tables = 1;
 }
 message AuctionState {
-    repeated Declaration declarations = 1;
+  repeated Declaration declarations = 1;
 }
 
 message Mode {
-    GameType type = 1;
-    PlayerValue soloist = 2;
-    PlayerValue spouse = 3;
-    string forehand = 4;
+  GameType type = 1;
+  PlayerValue soloist = 2;
+  PlayerValue spouse = 3;
+  string forehand = 4;
 }
 
 message Trick {
-    repeated Card cards = 1;
-    string user_id_forehand = 5;
-    PlayerValue user_id_winner = 6;
+  repeated Card cards = 1;
+  string user_id_forehand = 5;
+  PlayerValue user_id_winner = 6;
 }
 
 message GameState {
-    repeated Bid bids = 1;
-    int32 completed_tricks = 2;
-    Trick current_trick = 3;
-    Trick previous_trick = 4;
-    Mode mode = 5;
+  repeated Bid bids = 1;
+  int32 completed_tricks = 2;
+  Trick current_trick = 3;
+  Trick previous_trick = 4;
+  Mode mode = 5;
 }
 
 message Cards {
-    repeated Card cards = 1;
+  repeated Card cards = 1;
 }
 
 message MatchState {
-    MatchPhase phase = 1;
-    PlayerValue turn = 2;
-    Players players = 3;
-    oneof role {
-        Empty spectator = 4;
-        Cards own_cards = 5;
-    }
-    oneof details {
-        AuctionState auction_state = 6;
-        GameState game_state = 7;
-    }
+  MatchPhase phase = 1;
+  PlayerValue turn = 2;
+  Players players = 3;
+  oneof role {
+    Empty spectator = 4;
+    Cards own_cards = 5;
+  }
+  oneof details {
+    AuctionState auction_state = 6;
+    GameState game_state = 7;
+  }
 }
 
 message Players {
-    string user_id_self = 1;
-    string user_id_left = 2;
-    string user_id_face = 3;
-    string user_id_right = 4;
+  string user_id_self = 1;
+  string user_id_left = 2;
+  string user_id_face = 3;
+  string user_id_right = 4;
 }
 
 message TableData {
-    string table_id = 1;
-    string owner = 2;
-    string invite_code = 3;
-    repeated TableMember members = 4;
-    Timestamp created = 5;
+  string table_id = 1;
+  string owner = 2;
+  string invite_code = 3;
+  repeated TableMember members = 4;
+  Timestamp created = 5;
 }
 
 message Timestamp {
-    int64 nanos = 1;
+  int64 nanos = 1;
 }
 message TableState {
-    TablePhase phase = 1;
-    MatchState current_match = 2;
-    TableData data = 3;
+  TablePhase phase = 1;
+  MatchState current_match = 2;
+  TableData data = 3;
 }
 
 
 message TableMember {
-    string user_id = 1;
-    string name = 2;
-    bool online = 3;
+  string user_id = 1;
+  string name = 2;
+  bool online = 3;
 }
 
 
@@ -186,90 +199,94 @@ message Empty {
 }
 
 message RegisterRequest {
-    string name = 1;
-    string email = 2;
-    string password = 3;
+  string name = 1;
+  string email = 2;
+  string password = 3;
 }
 
 message RegisterReply {
-    string user_id = 1;
-    string token = 2;
+  string user_id = 1;
+  string token = 2;
 }
 
 message LoginRequest {
-    string email = 1;
-    string password = 2;
+  string email = 1;
+  string password = 2;
 }
 message LoginReply {
-    string token = 1;
-    string user_id = 2;
-    string name = 3;
+  string token = 1;
+  string user_id = 2;
+  string name = 3;
 }
 
 message JoinTableRequest {
-    string invite_code = 1;
-}
-message StartTableRequest {
+  oneof table_description {
     string table_id = 1;
+    string invite_code = 2;
+  }
+}
+
+message StartTableRequest {
+  string table_id = 1;
 }
 message StartNextMatchRequest {
-    string table_id = 1;
+  string table_id = 1;
 }
 
 
 enum TablePhase {
-    NOT_STARTED = 0;
-    PLAYING = 1;
-    BETWEEN_GAMES = 2;
-    TABLE_ENDED = 3;
+  NOT_STARTED = 0;
+  PLAYING = 1;
+  BETWEEN_GAMES = 2;
+  TABLE_ENDED = 3;
 }
 enum MatchPhase {
-    AUCTION = 0;
-    GAME = 1;
-    FINISHED = 2;
+  AUCTION = 0;
+  GAME = 1;
+  FINISHED = 2;
 }
 enum Suit {
-    DIAMONDS = 0;
-    HEARTS = 1;
-    SPADES = 2;
-    CLUBS = 3;
+  DIAMONDS = 0;
+  HEARTS = 1;
+  SPADES = 2;
+  CLUBS = 3;
 }
 
 enum Rank {
-    NINE = 0;
-    JACK = 1;
-    QUEEN = 2;
-    KING = 3;
-    TEN = 4;
-    ACE = 5;
+  NINE = 0;
+  JACK = 1;
+  QUEEN = 2;
+  KING = 3;
+  TEN = 4;
+  ACE = 5;
 }
 
 
 enum Party {
-    RE = 0;
-    CONTRA = 1;
+  RE = 0;
+  CONTRA = 1;
 }
 
 enum BidType {
-    RE_BID = 0;
-    CONTRA_BID = 1;
-    RE_NO_NINETY = 2;
-    RE_NO_SIXTY = 3;
-    RE_NO_THIRTY = 4;
-    RE_SCHWARZ = 5;
-    CONTRA_NO_NINETY = 6;
-    CONTRA_NO_SIXTY = 7;
-    CONTRA_NO_THIRTY = 8;
-    CONTRA_SCHWARZ = 9;
+  RE_BID = 0;
+  CONTRA_BID = 1;
+  RE_NO_NINETY = 2;
+  RE_NO_SIXTY = 3;
+  RE_NO_THIRTY = 4;
+  RE_SCHWARZ = 5;
+  CONTRA_NO_NINETY = 6;
+  CONTRA_NO_SIXTY = 7;
+  CONTRA_NO_THIRTY = 8;
+  CONTRA_SCHWARZ = 9;
 }
 
 
 enum GameType {
-    NORMAL_GAME = 0;
-    MARRIAGE = 1;
-    DIAMONDS_SOLO = 2;
-    HEARTS_SOLO = 3;
-    SPADES_SOLO = 4;
-    CLUBS_SOLO = 5;
-    MEATLESS_SOLO = 6;
+  NORMAL_GAME = 0;
+  MARRIAGE = 1;
+  DIAMONDS_SOLO = 2;
+  HEARTS_SOLO = 3;
+  SPADES_SOLO = 4;
+  CLUBS_SOLO = 5;
+  MEATLESS_SOLO = 6;
 }
