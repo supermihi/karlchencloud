@@ -16,6 +16,6 @@ func TestGetData_PlayersAreInGameOrder(t *testing.T) {
 	playersInOrder := []UserId{UserId(3), UserId(2), UserId(4), UserId(1)}
 	table := &Table{TableId(123), time.Now(), "123", api.TablePhase_NOT_STARTED, players, playersInOrder,
 		match.NewRound(4, rng), nil, rng}
-	data := GetData(table)
+	data := getData(table)
 	assert.Equal(t, playersInOrder, data.Players)
 }

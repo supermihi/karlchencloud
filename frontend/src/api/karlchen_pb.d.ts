@@ -177,6 +177,11 @@ export class Event extends jspb.Message {
   hasMember(): boolean;
   clearMember(): Event;
 
+  getNewTable(): TableData | undefined;
+  setNewTable(value?: TableData): Event;
+  hasNewTable(): boolean;
+  clearNewTable(): Event;
+
   getEventCase(): Event.EventCase;
 
   serializeBinary(): Uint8Array;
@@ -195,6 +200,7 @@ export namespace Event {
     playedCard?: PlayedCard.AsObject,
     placedBid?: Bid.AsObject,
     member?: MemberEvent.AsObject,
+    newTable?: TableData.AsObject,
   }
 
   export enum EventCase { 
@@ -205,6 +211,7 @@ export namespace Event {
     PLAYED_CARD = 4,
     PLACED_BID = 5,
     MEMBER = 6,
+    NEW_TABLE = 7,
   }
 }
 
@@ -644,6 +651,9 @@ export class TableData extends jspb.Message {
   hasCreated(): boolean;
   clearCreated(): TableData;
 
+  getPublic(): boolean;
+  setPublic(value: boolean): TableData;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TableData.AsObject;
   static toObject(includeInstance: boolean, msg: TableData): TableData.AsObject;
@@ -659,6 +669,7 @@ export namespace TableData {
     inviteCode: string,
     membersList: Array<TableMember.AsObject>,
     created?: Timestamp.AsObject,
+    pb_public: boolean,
   }
 }
 

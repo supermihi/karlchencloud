@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/api/pbconv"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 )
 
@@ -22,7 +22,7 @@ func NewClient(c LoginData, handler ClientHandler) Client {
 }
 
 func (c *Client) Logf(format string, v ...interface{}) {
-	c.client.Logf(format, v...)
+	log.Printf(c.clientData.Name+": "+format, v...)
 }
 
 func (c *Client) Table() *TableView {
@@ -42,9 +42,9 @@ func (c *Client) Start(ctx context.Context) {
 	c.client = dokoclient
 	c.handler.OnConnect()
 	stream, err := c.client.Grpc.StartSession(c.client.Context, &api.Empty{})
-	c.client.Logf("Listening for match events ...")
+	c.Logf("Listening for match events ...")
 	if err != nil {
-		c.client.Logf("error subscribing: %v", err)
+		c.Logf("error subscribing: %v", err)
 		log.Fatal(err)
 	}
 	for {
@@ -55,6 +55,8 @@ func (c *Client) Start(ctx context.Context) {
 		switch ev := msg.Event.(type) {
 		case *api.Event_Welcome:
 			c.handleWelcome(ev.Welcome)
+		case *api.Event_NewTable:
+			c.handler.OnNewTable(NewTableInfo(ev.NewTable))
 		case *api.Event_Member:
 			if ev.Member.Type == api.MemberEventType_JOIN_TABLE {
 				c.table.MemberNamesById[ev.Member.UserId] = ev.Member.Name
@@ -72,17 +74,14 @@ func (c *Client) Start(ctx context.Context) {
 	}
 }
 
-func (c *Client) ListOpenTables() ([]OpenTable, error) {
+func (c *Client) ListOpenTables() ([]TableInfo, error) {
 	response, err := c.client.Grpc.ListTables(c.client.Context, &api.ListTablesRequest{})
 	if err != nil {
 		return nil, err
 	}
-	result := make([]OpenTable, len(response.Tables))
+	result := make([]TableInfo, len(response.Tables))
 	for i, table := range response.Tables {
-		result[i] = OpenTable{Id: table.TableId, Invite: table.InviteCode, MemberNamesById: make(map[string]string)}
-		for _, member := range table.Members {
-			result[i].MemberNamesById[member.UserId] = member.Name
-		}
+		result[i] = NewTableInfo(table)
 	}
 	return result, nil
 }

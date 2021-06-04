@@ -21,13 +21,13 @@ func (r *Room) CreateTable(owner UserId, public bool, seed int64) (table *TableD
 	}
 	t := NewTable(owner, public, seed)
 	r.tables[t.Id] = t
-	return GetData(t), nil
+	return getData(t), nil
 }
 
 func (r *Room) GetTable(tableId TableId) (table *TableData, err error) {
 	t, ok := r.tables[tableId]
 	if ok {
-		return GetData(t), nil
+		return getData(t), nil
 	}
 	return nil, NewCloudError(TableDoesNotExist)
 }
@@ -52,7 +52,7 @@ func (r *Room) JoinTableByInviteCode(userId UserId, inviteCode string) (*TableDa
 	if err := t.Join(userId); err != nil {
 		return nil, err
 	}
-	return GetData(t), nil
+	return getData(t), nil
 }
 
 func (r *Room) JoinTableByTableId(userId UserId, id TableId) (*TableData, error) {
@@ -66,7 +66,7 @@ func (r *Room) JoinTableByTableId(userId UserId, id TableId) (*TableData, error)
 	if err := t.Join(userId); err != nil {
 		return nil, err
 	}
-	return GetData(t), nil
+	return getData(t), nil
 }
 
 func (r *Room) ensureIsOwner(tableId TableId, userId UserId) (*Table, error) {
@@ -92,14 +92,13 @@ func (r *Room) StartTable(tableId TableId, userId UserId) (*TableData, error) {
 	if err != nil {
 		return nil, err
 	}
-	return GetData(t), nil
+	return getData(t), nil
 }
 
 func GetMatchData(tm *TableMatch) *MatchData {
 	decls := tm.Match.Auction.Declarations
 	declarations := make(map[game.Player]Declaration, len(decls))
 	for k, v := range decls {
-
 		if v.Healthy {
 			declarations[k] = Declaration{true, game.NormalGameType}
 		} else {
@@ -151,7 +150,10 @@ func (r *Room) PlayCard(tableId TableId, userId UserId, card game.Card) (matchDa
 	}
 	if m.Match.Phase() == match.MatchFinished {
 		table := r.activeTableOf(userId)
-		return nil, table.EndMatch()
+		err = table.EndMatch()
+		if err != nil {
+			return nil, err
+		}
 	}
 	return GetMatchData(m), nil
 }
@@ -220,25 +222,41 @@ func (r *Room) activeTableOf(user UserId) *Table {
 func (r *Room) ActiveTableOf(user UserId) *TableData {
 	t := r.activeTableOf(user)
 	if t != nil {
-		return GetData(t)
+		return getData(t)
 	}
 	return nil
 }
 
-func (r *Room) RelatedUsers(userId UserId) []UserId {
+func (r *Room) UsersAtSameTable(userId UserId) []UserId {
 	table := r.activeTableOf(userId)
 	if table == nil {
 		return []UserId{}
 	}
 	return UsersExcept(table.players, userId)
 }
+
+func (r *Room) UsersNotAtAnyTable() ([]UserId, error) {
+	ids, err := r.users.ListIds()
+	if err != nil {
+		return nil, err
+	}
+	ans := make([]UserId, 0)
+	for _, user := range ids {
+		t := r.activeTableOf(user)
+		if t == nil {
+			ans = append(ans, user)
+		}
+	}
+	return ans, nil
+}
+
 func (r *Room) GetOpenTables(user UserId) []*TableData {
 	ans := make([]*TableData, 0)
 	for _, table := range r.tables {
 		if table.Phase != api.TablePhase_NOT_STARTED || !table.Public {
 			continue
 		}
-		ans = append(ans, GetData(table))
+		ans = append(ans, getData(table))
 	}
 	return ans
 }

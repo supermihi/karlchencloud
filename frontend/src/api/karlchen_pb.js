@@ -1858,7 +1858,7 @@ proto.api.Bid.prototype.setBid = function(value) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.api.Event.oneofGroups_ = [[1,2,3,4,5,6]];
+proto.api.Event.oneofGroups_ = [[1,2,3,4,5,6,7]];
 
 /**
  * @enum {number}
@@ -1870,7 +1870,8 @@ proto.api.Event.EventCase = {
   DECLARED: 3,
   PLAYED_CARD: 4,
   PLACED_BID: 5,
-  MEMBER: 6
+  MEMBER: 6,
+  NEW_TABLE: 7
 };
 
 /**
@@ -1916,7 +1917,8 @@ proto.api.Event.toObject = function(includeInstance, msg) {
     declared: (f = msg.getDeclared()) && proto.api.Declaration.toObject(includeInstance, f),
     playedCard: (f = msg.getPlayedCard()) && proto.api.PlayedCard.toObject(includeInstance, f),
     placedBid: (f = msg.getPlacedBid()) && proto.api.Bid.toObject(includeInstance, f),
-    member: (f = msg.getMember()) && proto.api.MemberEvent.toObject(includeInstance, f)
+    member: (f = msg.getMember()) && proto.api.MemberEvent.toObject(includeInstance, f),
+    newTable: (f = msg.getNewTable()) && proto.api.TableData.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1982,6 +1984,11 @@ proto.api.Event.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.api.MemberEvent;
       reader.readMessage(value,proto.api.MemberEvent.deserializeBinaryFromReader);
       msg.setMember(value);
+      break;
+    case 7:
+      var value = new proto.api.TableData;
+      reader.readMessage(value,proto.api.TableData.deserializeBinaryFromReader);
+      msg.setNewTable(value);
       break;
     default:
       reader.skipField();
@@ -2058,6 +2065,14 @@ proto.api.Event.serializeBinaryToWriter = function(message, writer) {
       6,
       f,
       proto.api.MemberEvent.serializeBinaryToWriter
+    );
+  }
+  f = message.getNewTable();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      proto.api.TableData.serializeBinaryToWriter
     );
   }
 };
@@ -2282,6 +2297,43 @@ proto.api.Event.prototype.clearMember = function() {
  */
 proto.api.Event.prototype.hasMember = function() {
   return jspb.Message.getField(this, 6) != null;
+};
+
+
+/**
+ * optional TableData new_table = 7;
+ * @return {?proto.api.TableData}
+ */
+proto.api.Event.prototype.getNewTable = function() {
+  return /** @type{?proto.api.TableData} */ (
+    jspb.Message.getWrapperField(this, proto.api.TableData, 7));
+};
+
+
+/**
+ * @param {?proto.api.TableData|undefined} value
+ * @return {!proto.api.Event} returns this
+*/
+proto.api.Event.prototype.setNewTable = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 7, proto.api.Event.oneofGroups_[0], value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.api.Event} returns this
+ */
+proto.api.Event.prototype.clearNewTable = function() {
+  return this.setNewTable(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.api.Event.prototype.hasNewTable = function() {
+  return jspb.Message.getField(this, 7) != null;
 };
 
 
@@ -5456,7 +5508,8 @@ proto.api.TableData.toObject = function(includeInstance, msg) {
     inviteCode: jspb.Message.getFieldWithDefault(msg, 3, ""),
     membersList: jspb.Message.toObjectList(msg.getMembersList(),
     proto.api.TableMember.toObject, includeInstance),
-    created: (f = msg.getCreated()) && proto.api.Timestamp.toObject(includeInstance, f)
+    created: (f = msg.getCreated()) && proto.api.Timestamp.toObject(includeInstance, f),
+    pb_public: jspb.Message.getBooleanFieldWithDefault(msg, 6, false)
   };
 
   if (includeInstance) {
@@ -5514,6 +5567,10 @@ proto.api.TableData.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.api.Timestamp;
       reader.readMessage(value,proto.api.Timestamp.deserializeBinaryFromReader);
       msg.setCreated(value);
+      break;
+    case 6:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setPublic(value);
       break;
     default:
       reader.skipField();
@@ -5579,6 +5636,13 @@ proto.api.TableData.serializeBinaryToWriter = function(message, writer) {
       5,
       f,
       proto.api.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getPublic();
+  if (f) {
+    writer.writeBool(
+      6,
+      f
     );
   }
 };
@@ -5710,6 +5774,24 @@ proto.api.TableData.prototype.clearCreated = function() {
  */
 proto.api.TableData.prototype.hasCreated = function() {
   return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional bool public = 6;
+ * @return {boolean}
+ */
+proto.api.TableData.prototype.getPublic = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 6, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.api.TableData} returns this
+ */
+proto.api.TableData.prototype.setPublic = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 6, value);
 };
 
 

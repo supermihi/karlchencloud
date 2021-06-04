@@ -2,10 +2,10 @@ package client
 
 import (
 	"fmt"
-	"github.com/supermihi/karlchencloud/api"
+	pb "github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/api/pbconv"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 	"sort"
 )
@@ -41,16 +41,24 @@ type MatchView struct {
 	Mode    *ModeView
 }
 type TableView struct {
-	Id              string
-	Invite          string
-	Match           *MatchView
-	MemberNamesById map[string]string
+	TableInfo
+	Match *MatchView
 }
 
-type OpenTable struct {
+type TableInfo struct {
 	Id              string
 	Invite          string
 	MemberNamesById map[string]string
+	Public          bool
+}
+
+func NewTableInfo(table *pb.TableData) TableInfo {
+	ans := TableInfo{Id: table.TableId, Invite: table.InviteCode, MemberNamesById: make(map[string]string),
+		Public: table.Public}
+	for _, member := range table.Members {
+		ans.MemberNamesById[member.UserId] = member.Name
+	}
+	return ans
 }
 
 func (m *TableView) PlayerNames() string {
@@ -61,12 +69,12 @@ func (m *TableView) PlayerNames() string {
 	return fmt.Sprintf("Left: %s, Face: %s, Right: %s", m.MemberNamesById[p.Left], m.MemberNamesById[p.Face], m.MemberNamesById[p.Right])
 }
 
-func NewMatchView(state *api.MatchState) *MatchView {
+func NewMatchView(state *pb.MatchState) *MatchView {
 	v := &MatchView{}
 	switch r := state.Role.(type) {
-	case *api.MatchState_Spectator:
+	case *pb.MatchState_Spectator:
 		log.Fatalf("unexpected role spectator")
-	case *api.MatchState_OwnCards:
+	case *pb.MatchState_OwnCards:
 		v.Cards = ToHand(r.OwnCards.Cards)
 		sort.Sort(game.BySuitAndRank(v.Cards))
 	}
@@ -75,9 +83,9 @@ func NewMatchView(state *api.MatchState) *MatchView {
 	v.Players.Right = state.Players.UserIdRight
 	v.Players.Me = state.Players.UserIdSelf
 	switch details := state.Details.(type) {
-	case *api.MatchState_AuctionState:
+	case *pb.MatchState_AuctionState:
 		v.Phase = match.InAuction
-	case *api.MatchState_GameState:
+	case *pb.MatchState_GameState:
 		v.Phase = match.InGame
 		gs := details.GameState
 		if gs.Mode != nil {
@@ -95,18 +103,15 @@ func NewMatchView(state *api.MatchState) *MatchView {
 	return v
 }
 
-func NewTableView(ts *api.TableState) *TableView {
-	ans := TableView{MemberNamesById: make(map[string]string), Id: ts.Data.TableId, Invite: ts.Data.InviteCode}
-	for _, m := range ts.Data.Members {
-		ans.MemberNamesById[m.UserId] = m.Name
-	}
+func NewTableView(ts *pb.TableState) *TableView {
+	ans := TableView{TableInfo: NewTableInfo(ts.Data)}
 	if ts.CurrentMatch != nil {
 		ans.Match = NewMatchView(ts.CurrentMatch)
 	}
 	return &ans
 }
 
-func (v *MatchView) UpdateTrick(pc *api.PlayedCard) {
+func (v *MatchView) UpdateTrick(pc *pb.PlayedCard) {
 	if v.Trick == nil {
 		v.Trick = NewTrickView(pc.UserId)
 	}
@@ -124,7 +129,7 @@ func (v *MatchView) DrawCard(index int) game.Card {
 	return card
 }
 
-func (v *MatchView) setMode(m *api.Mode) {
+func (v *MatchView) setMode(m *pb.Mode) {
 	v.Mode = &ModeView{Type: pbconv.ToGameType(m.Type)}
 	if m.Soloist != nil {
 		v.Mode.Soloist = &m.Soloist.UserId
@@ -140,7 +145,7 @@ func (v *MatchView) GameSuit(card game.Card) game.GameSuit {
 	return match.GameSuitOf(card, v.Mode.Type)
 }
 
-func (v *MatchView) UpdateOnDeclare(d *api.Declaration) {
+func (v *MatchView) UpdateOnDeclare(d *pb.Declaration) {
 	if d.DefinedGameMode != nil {
 		v.setMode(d.DefinedGameMode)
 		v.Phase = match.InGame

@@ -208,7 +208,7 @@ func ToPbTableData(table *room.TableData, user room.UserId, getPbTableMember Mem
 		pbMembers[i] = getPbTableMember(player)
 	}
 	ans := &pb.TableData{TableId: table.Id.String(), Owner: table.Owner.String(), Members: pbMembers,
-		Created: pb.NewTimestamp(table.Created)}
+		Created: pb.NewTimestamp(table.Created), Public: table.Public}
 	if table.Owner == user {
 		ans.InviteCode = table.InviteCode
 	}

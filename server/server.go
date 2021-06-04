@@ -3,10 +3,10 @@ package server
 import (
 	"context"
 	pb "github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/api/pbconv"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"github.com/supermihi/karlchencloud/room"
-	"github.com/supermihi/karlchencloud/server/pbconv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -65,8 +65,13 @@ func (s *dokoserver) CreateTable(ctx context.Context, request *pb.CreateTableReq
 		return nil, toGrpcError(err)
 	}
 	log.Printf("user %v created new table %s, code %s", user, table.Id, table.InviteCode)
-	ans := pbconv.ToPbTableData(table, user.Id, s.createPbTableMember)
-	return ans, nil
+	usersInLobby, err := s.room.UsersNotAtAnyTable()
+	if err != nil {
+		return nil, err
+	}
+	tableData := pbconv.ToPbTableData(table, user.Id, s.createPbTableMember)
+	s.streams.Send(usersInLobby, &pb.Event{Event: &pb.Event_NewTable{NewTable: tableData}})
+	return tableData, nil
 }
 
 func (s *dokoserver) StartTable(ctx context.Context, req *pb.StartTableRequest) (*pb.MatchState, error) {
@@ -160,7 +165,7 @@ func (s *dokoserver) startEventSubscription(user room.UserData, srv pb.Doko_Star
 		return nil, err
 	}
 	s.streams.SendSingle(user.Id, &pb.Event{Event: &pb.Event_Welcome{Welcome: userState}})
-	receivers := s.room.RelatedUsers(user.Id)
+	receivers := s.room.UsersAtSameTable(user.Id)
 	s.streams.Send(receivers, pb.NewMemberEvent(user.Id.String(), user.Name, pb.MemberEventType_GO_ONLINE))
 	log.Printf("user %s connected", user)
 	return
@@ -172,7 +177,7 @@ func (s *dokoserver) endEventSubscription(srv pb.Doko_StartSessionServer, user r
 	defer s.roomMtx.RUnlock()
 	table := s.room.ActiveTableOf(user.Id)
 	if table != nil {
-		receivers := s.room.RelatedUsers(user.Id)
+		receivers := s.room.UsersAtSameTable(user.Id)
 		s.streams.Send(receivers, pb.NewMemberEvent(user.Id.String(), user.Name, pb.MemberEventType_GO_OFFLINE))
 	}
 	return srv.Context().Err()
@@ -203,7 +208,7 @@ func (s *dokoserver) Declare(ctx context.Context, d *pb.DeclareRequest) (*pb.Dec
 		declaration.DefinedGameMode = pbconv.ToPbMode(m.Mode, m.Turn, m.Players)
 	}
 	event := &pb.Event{Event: &pb.Event_Declared{Declared: declaration}}
-	s.streams.Send(s.room.RelatedUsers(user.Id), event)
+	s.streams.Send(s.room.UsersAtSameTable(user.Id), event)
 	return declaration, nil
 }
 
@@ -220,7 +225,7 @@ func (s *dokoserver) PlaceBid(ctx context.Context, req *pb.PlaceBidRequest) (*pb
 	}
 	bid := &pb.Bid{UserId: user.Id.String(), Bid: req.Bid}
 	event := &pb.Event{Event: &pb.Event_PlacedBid{PlacedBid: bid}}
-	s.streams.Send(s.room.RelatedUsers(user.Id), event)
+	s.streams.Send(s.room.UsersAtSameTable(user.Id), event)
 	return bid, nil
 }
 

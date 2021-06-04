@@ -3,8 +3,8 @@ package client
 import (
 	"context"
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/api/pbconv"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/server/pbconv"
 	"google.golang.org/grpc"
 )
 

@@ -1,11 +1,9 @@
 package room
 
 import (
-	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"strconv"
-	"time"
 )
 
 type UserId int64
@@ -94,16 +92,7 @@ func getActivePlayerIds(playersInOrder []UserId, pa match.PlayerAssignment) [gam
 	return ans
 }
 
-type TableData struct {
-	Id         TableId
-	Owner      UserId
-	InviteCode string
-	Players    []UserId
-	Phase      api.TablePhase
-	Created    time.Time
-}
-
-func GetData(t *Table) *TableData {
+func getData(t *Table) *TableData {
 	players := t.playersInOrder
 	if t.playersInOrder == nil {
 		players = t.players
@@ -115,14 +104,6 @@ func GetData(t *Table) *TableData {
 		Players:    players,
 		Phase:      t.Phase,
 		Created:    t.Created,
+		Public:     t.Public,
 	}
-}
-
-func (d *TableData) ContainsPlayer(id UserId) bool {
-	for _, p := range d.Players {
-		if p == id {
-			return true
-		}
-	}
-	return false
 }

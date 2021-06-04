@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 	pb "github.com/supermihi/karlchencloud/api"
 	"google.golang.org/grpc"
 	"log"
@@ -22,7 +23,7 @@ type UserData struct {
 	Email string
 }
 
-// DokoClient encapuslates technical details such as auth from the Grpc client pb.DokoClient
+// DokoClient encapuslates technical details such as auth from the gRPC client pb.DokoClient
 type DokoClient struct {
 	Grpc       pb.DokoClient
 	connection *grpc.ClientConn
@@ -32,13 +33,13 @@ type DokoClient struct {
 }
 
 func GetConnectedDokoClient(login LoginData, ctx context.Context) (*DokoClient, error) {
-	log.Printf("connecting to %s ...", login.ServerAddress)
+	fmt.Printf("%s: connecting to %s ... ", login.Name, login.ServerAddress)
 	creds := &ClientCredentials{}
 	conn, err := GetGrpcClientConn(ctx, login.ServerAddress, creds)
 	if err != nil {
 		return nil, err
 	}
-	log.Print("connected")
+	fmt.Print("connected\n")
 	dokoClient := pb.NewDokoClient(conn)
 	userData := UserData{Email: login.Email}
 	loginResponse, err := dokoClient.Login(ctx, &pb.LoginRequest{Email: login.Email, Password: login.Password})
@@ -65,8 +66,4 @@ func GetConnectedDokoClient(login LoginData, ctx context.Context) (*DokoClient, 
 
 func (c *DokoClient) CloseConnection() {
 	_ = c.connection.Close()
-}
-
-func (c *DokoClient) Logf(format string, v ...interface{}) {
-	log.Printf(c.user.Name+": "+format, v...)
 }

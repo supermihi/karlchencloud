@@ -1,7 +1,5 @@
 package api
 
-import "time"
-
 func NewMemberEvent(user string, name string, eventType MemberEventType) *Event {
 	return &Event{
 		Event: &Event_Member{
@@ -11,8 +9,4 @@ func NewMemberEvent(user string, name string, eventType MemberEventType) *Event 
 				Type:   eventType},
 		},
 	}
-}
-
-func NewTimestamp(time time.Time) *Timestamp {
-	return &Timestamp{Nanos: time.UnixNano()}
 }

@@ -1,17 +1,14 @@
 package implementations
 
 import (
-	"context"
 	"fmt"
-	"github.com/supermihi/karlchencloud/api"
+	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
 	"log"
-	"math/rand"
 	"os"
 	"strings"
-	"time"
 )
 
 const superSecretBotPassword = "123"
@@ -25,27 +22,6 @@ func CreateBotLogin(num int, address string) client.LoginData {
 		RegisterOnAuthFail: true,
 		ServerAddress:      address,
 	}
-}
-
-func StartBots(address string, numBots int, inviteCode string, initTable bool, logins []client.LoginData) {
-	clients := make([]*BotClient, numBots)
-	ctx := context.Background()
-	for i := 0; i < numBots; i++ {
-		var login client.LoginData
-		if len(logins) > i {
-			login = logins[i]
-		} else {
-			login = CreateBotLogin(i+1, address)
-		}
-		log.Printf("starting bot %d", i)
-		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
-		clients[i] = NewBotClient(login, i == 0 && initTable, inviteCode)
-		go clients[i].Start(ctx)
-	}
-	<-ctx.Done()
-	// TODO use nontrivial contexts
-	log.Printf("all bots finished")
-
 }
 
 type BotClient struct {
@@ -70,7 +46,7 @@ func (h *BotClient) Fatalf(format string, v ...interface{}) {
 	os.Exit(1)
 }
 
-func (h *BotClient) OnWelcome(us *api.UserState) {
+func (h *BotClient) OnWelcome(us *pb.UserState) {
 	if us.CurrentTable != nil {
 		h.Logf("already at table. Continuing ...")
 		return
@@ -93,14 +69,7 @@ func (h *BotClient) OnWelcome(us *api.UserState) {
 			return
 		}
 		for _, table := range tables {
-			memberNames := make([]string, len(table.MemberNamesById))
-			i := 0
-			for _, name := range table.MemberNamesById {
-				memberNames[i] = name
-				i += 1
-			}
-			fmt.Printf("Seeing table %s [%s]", table.Id, strings.Join(memberNames, ", "))
-
+			fmt.Printf("Open table %s\n", formatTable(table))
 		}
 		if len(tables) > 0 {
 			err := h.JoinTable("", tables[0].Id)
@@ -112,8 +81,29 @@ func (h *BotClient) OnWelcome(us *api.UserState) {
 
 	}
 }
+
+func formatTable(table client.TableInfo) string {
+	memberNames := make([]string, len(table.MemberNamesById))
+	i := 0
+	for _, name := range table.MemberNamesById {
+		memberNames[i] = name
+		i += 1
+	}
+	return fmt.Sprintf("%s [%s]", table.Id, strings.Join(memberNames, ", "))
+}
+
 func (h *BotClient) OnMatchStart() {
 	// pass
+}
+
+func (h *BotClient) OnNewTable(table client.TableInfo) {
+	if h.Table() == nil && table.Public {
+		h.Logf("joining new public table %s", formatTable(table))
+		err := h.JoinTable("", table.Id)
+		if err != nil {
+			h.Fatalf("error joining new table: %v", err)
+		}
+	}
 }
 
 func (h *BotClient) OnMyTurnAuction() {
@@ -162,7 +152,7 @@ func (h *BotClient) OnMemberJoin(_ string, _ string) {
 	}
 }
 
-func (h *BotClient) OnPlayedCard(_ *api.PlayedCard) {
+func (h *BotClient) OnPlayedCard(_ *pb.PlayedCard) {
 	if h.Match().Phase == match.MatchFinished && h.isOwner {
 		err := h.StartNextMatch()
 		if err != nil {

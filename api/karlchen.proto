@@ -76,6 +76,7 @@ message Event {
     PlayedCard played_card = 4;
     Bid placed_bid = 5;
     MemberEvent member = 6;
+    TableData new_table = 7;
   }
 }
 
@@ -175,6 +176,7 @@ message TableData {
   string invite_code = 3;
   repeated TableMember members = 4;
   Timestamp created = 5;
+  bool public = 6;
 }
 
 message Timestamp {

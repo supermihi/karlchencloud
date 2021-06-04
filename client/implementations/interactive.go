@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"github.com/eiannone/keyboard"
 	"github.com/supermihi/karlchencloud/api"
+	"github.com/supermihi/karlchencloud/api/pbconv"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
-	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 	"os"
 	"strconv"
@@ -25,7 +25,9 @@ func NewCliHandler(login client.LoginData, isCreator bool) CliHandler {
 }
 
 func (h *CliHandler) OnConnect() {
-	// pass
+}
+
+func (h *CliHandler) OnNewTable(_ client.TableInfo) {
 }
 
 func (h *CliHandler) OnWelcome(us *api.UserState) {
