@@ -3,24 +3,27 @@ package commands
 import (
 	"context"
 	"github.com/spf13/cobra"
-	"github.com/supermihi/karlchencloud/client"
-	"github.com/supermihi/karlchencloud/client/implementations"
+	client_implementations "github.com/supermihi/karlchencloud/client/implementations"
 )
 
 var (
-	numBots int
-	invite  string
+	numBots         int
+	invite          string
+	firstBotIsOwner bool
 )
 var botCmd = &cobra.Command{
 	Use:   "bot",
 	Short: "bot client",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		conn := implementations.CreateBotLogin(1, serverAddress)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		botHandler := implementations.NewBotHandler(false, invite)
-		karlchenClient := client.NewClientImplementation(conn, botHandler)
-		go karlchenClient.Start(ctx)
+		bots := make([]*client_implementations.BotClient, numBots)
+		for i := 0; i < numBots; i++ {
+			conn := client_implementations.CreateBotLogin(i, serverAddress)
+			bots[i] = client_implementations.NewBotClient(conn, i == 0 && firstBotIsOwner, invite)
+			go bots[i].Start(ctx)
+		}
 		<-ctx.Done()
 	},
 }
@@ -28,5 +31,6 @@ var botCmd = &cobra.Command{
 func init() {
 	botCmd.Flags().IntVarP(&numBots, "num-bots", "n", 1, "number of bots to add")
 	botCmd.Flags().StringVarP(&invite, "invite", "i", "", "invite code")
+	botCmd.Flags().BoolVarP(&firstBotIsOwner, "owner", "o", false, "first bot is owner (starts tables")
 	rootCmd.AddCommand(botCmd)
 }

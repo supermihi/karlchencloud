@@ -10,6 +10,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -27,7 +28,7 @@ func CreateBotLogin(num int, address string) client.LoginData {
 }
 
 func StartBots(address string, numBots int, inviteCode string, initTable bool, logins []client.LoginData) {
-	clients := make([]*client.ClientImplementation, numBots)
+	clients := make([]*BotClient, numBots)
 	ctx := context.Background()
 	for i := 0; i < numBots; i++ {
 		var login client.LoginData
@@ -36,12 +37,10 @@ func StartBots(address string, numBots int, inviteCode string, initTable bool, l
 		} else {
 			login = CreateBotLogin(i+1, address)
 		}
-		handler := NewBotHandler(i == 0 && initTable, inviteCode)
 		log.Printf("starting bot %d", i)
 		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
-		kc := client.NewClientImplementation(login, handler)
-		clients[i] = &kc
-		go kc.Start(ctx)
+		clients[i] = NewBotClient(login, i == 0 && initTable, inviteCode)
+		go clients[i].Start(ctx)
 	}
 	<-ctx.Done()
 	// TODO use nontrivial contexts
@@ -49,81 +48,88 @@ func StartBots(address string, numBots int, inviteCode string, initTable bool, l
 
 }
 
-type BotHandler struct {
+type BotClient struct {
+	*client.Client
 	isOwner bool
 	invite  string
 }
 
-func NewBotHandler(isOwner bool, invite string) *BotHandler {
-	return &BotHandler{
-		isOwner: isOwner,
-		invite:  invite}
+func NewBotClient(login client.LoginData, isOwner bool, invite string) *BotClient {
+	bot := &BotClient{isOwner: isOwner, invite: invite}
+	embeddedClient := client.NewClient(login, bot)
+	bot.Client = &embeddedClient
+	return bot
 }
 
-func (h *BotHandler) OnConnect(_ client.ClientApi) {
+func (h *BotClient) OnConnect() {
 	// pass
 }
 
-func Fatalf(client client.ClientApi, format string, v ...interface{}) {
-	client.Logf(format, v...)
+func (h *BotClient) Fatalf(format string, v ...interface{}) {
+	h.Logf(format, v...)
 	os.Exit(1)
 }
 
-func (h *BotHandler) OnWelcome(client client.ClientApi, us *api.UserState) {
+func (h *BotClient) OnWelcome(us *api.UserState) {
 	if us.CurrentTable != nil {
-		client.Logf("already at table. Continuing ...")
+		h.Logf("already at table. Continuing ...")
+		return
 	}
 	if h.isOwner {
-		err := client.CreateTable(true)
+		err := h.CreateTable(true)
 		if err != nil {
-			Fatalf(client, "%s could not create table: %v", err)
+			h.Fatalf("%s could not create table: %v", err)
 		}
 	} else if h.invite != "" {
-		err := client.JoinTable(h.invite, "")
+		err := h.JoinTable(h.invite, "")
 		if err != nil {
-			Fatalf(client, "could not join table: %v", err)
+			h.Fatalf("could not join table: %v", err)
 			return
 		}
 	} else {
-		tables, err := client.ListOpenTables()
+		tables, err := h.ListOpenTables()
 		if err != nil {
-			Fatalf(client, "could not list open tables: %v", err)
+			h.Fatalf("could not list open tables: %v", err)
 			return
 		}
 		for _, table := range tables {
-			fmt.Printf("Table %s. Members:\n", table.Id)
+			memberNames := make([]string, len(table.MemberNamesById))
+			i := 0
 			for _, name := range table.MemberNamesById {
-				fmt.Printf("  %s\n", name)
+				memberNames[i] = name
+				i += 1
 			}
+			fmt.Printf("Seeing table %s [%s]", table.Id, strings.Join(memberNames, ", "))
+
 		}
 		if len(tables) > 0 {
-			err := client.JoinTable("", tables[0].Id)
+			err := h.JoinTable("", tables[0].Id)
 			if err != nil {
-				Fatalf(client, "could not join table: %v", err)
+				h.Fatalf("could not join table: %v", err)
 				return
 			}
 		}
 
 	}
 }
-func (h *BotHandler) OnMatchStart(_ client.ClientApi) {
+func (h *BotClient) OnMatchStart() {
 	// pass
 }
 
-func (h *BotHandler) OnMyTurnAuction(client client.ClientApi) {
+func (h *BotClient) OnMyTurnAuction() {
 	declaration := game.NormalGameType
-	if client.Match().Cards.NumQueensOfClubs() == 2 {
+	if h.Match().Cards.NumQueensOfClubs() == 2 {
 		declaration = game.MarriageType
 	}
-	err := client.Declare(declaration)
+	err := h.Declare(declaration)
 	if err != nil {
-		Fatalf(client, "could not make auction turn: %v", err)
+		h.Fatalf("could not make auction turn: %v", err)
 	}
 }
 
-func (h *BotHandler) OnMyTurnGame(client client.ClientApi) {
+func (h *BotClient) OnMyTurnGame() {
 	cardIndex := -1
-	m := client.Match()
+	m := h.Match()
 	trick := m.Trick
 	if len(trick.Cards) == 0 {
 		// I am forehand
@@ -141,26 +147,26 @@ func (h *BotHandler) OnMyTurnGame(client client.ClientApi) {
 	if cardIndex == -1 {
 		cardIndex = 0 // no matchnig card -> can play anything
 	}
-	err := client.PlayCard(cardIndex)
+	err := h.PlayCard(cardIndex)
 	if err != nil {
-		Fatalf(client, "could not play card: %v", err)
+		h.Fatalf("could not play card: %v", err)
 	}
 }
 
-func (h *BotHandler) OnMemberJoin(client client.ClientApi, _ string, _ string) {
-	if len(client.Table().MemberNamesById) >= 4 && h.isOwner {
-		err := client.StartTable()
+func (h *BotClient) OnMemberJoin(_ string, _ string) {
+	if len(h.Table().MemberNamesById) >= 4 && h.isOwner {
+		err := h.StartTable()
 		if err != nil {
 			log.Fatalf("error starting table: %v", err)
 		}
 	}
 }
 
-func (h *BotHandler) OnPlayedCard(client client.ClientApi, _ *api.PlayedCard) {
-	if client.Match().Phase == match.MatchFinished && h.isOwner {
-		err := client.StartNextMatch()
+func (h *BotClient) OnPlayedCard(_ *api.PlayedCard) {
+	if h.Match().Phase == match.MatchFinished && h.isOwner {
+		err := h.StartNextMatch()
 		if err != nil {
-			client.Logf("Failed to start next match!")
+			h.Logf("Failed to start next match!")
 		}
 	}
 }

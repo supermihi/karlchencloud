@@ -2987,7 +2987,7 @@ var file_api_karlchen_proto_depIdxs = []int32{
 	37, // 44: api.Doko.Login:input_type -> api.LoginRequest
 	19, // 45: api.Doko.CreateTable:input_type -> api.CreateTableRequest
 	40, // 46: api.Doko.StartTable:input_type -> api.StartTableRequest
-	39, // 47: api.Doko.JoinTableByInviteCode:input_type -> api.JoinTableRequest
+	39, // 47: api.Doko.JoinTable:input_type -> api.JoinTableRequest
 	17, // 48: api.Doko.PlayCard:input_type -> api.PlayCardRequest
 	18, // 49: api.Doko.PlaceBid:input_type -> api.PlaceBidRequest
 	20, // 50: api.Doko.Declare:input_type -> api.DeclareRequest
@@ -2998,7 +2998,7 @@ var file_api_karlchen_proto_depIdxs = []int32{
 	38, // 55: api.Doko.Login:output_type -> api.LoginReply
 	30, // 56: api.Doko.CreateTable:output_type -> api.TableData
 	28, // 57: api.Doko.StartTable:output_type -> api.MatchState
-	32, // 58: api.Doko.JoinTableByInviteCode:output_type -> api.TableState
+	32, // 58: api.Doko.JoinTable:output_type -> api.TableState
 	12, // 59: api.Doko.PlayCard:output_type -> api.PlayedCard
 	13, // 60: api.Doko.PlaceBid:output_type -> api.Bid
 	11, // 61: api.Doko.Declare:output_type -> api.Declaration

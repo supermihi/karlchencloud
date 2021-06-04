@@ -24,7 +24,7 @@ type userMDKey struct{}
 
 func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err error) {
 	meth, ok := grpc.Method(ctx)
-	if ok && (meth == "/api.Doko/Register" || meth == "/api.Doko/Login") {
+	if ok && (meth == "/api.GameApi/Register" || meth == "/api.GameApi/Login") {
 		return ctx, nil // ok to call register without auth
 	}
 	token, err := grpcAuth.AuthFromMD(ctx, "basic")

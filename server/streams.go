@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/supermihi/karlchencloud/api"
+	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/room"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -9,74 +9,105 @@ import (
 	"sync"
 )
 
-type clientStreams struct {
+type eventStream chan *pb.Event
+
+type ClientStream struct {
+	events eventStream
+	kicked chan int
+}
+
+type ClientStreams struct {
 	mtx     sync.RWMutex
-	streams map[room.UserId]chan *api.Event
+	clients map[room.UserId]ClientStream
 }
 
-func newStreams() clientStreams {
-	return clientStreams{streams: make(map[room.UserId]chan *api.Event, 1000)}
+func NewClientStreams() ClientStreams {
+	return ClientStreams{clients: make(map[room.UserId]ClientStream)}
 }
 
-func (s *clientStreams) sendSingle(user room.UserId, event *api.Event) {
-	stream, ok := s.streams[user]
+// SendSingle synchronously sends an event to a single user stream.
+func (cs *ClientStreams) SendSingle(user room.UserId, event *pb.Event) {
+	cs.mtx.RLock()
+	client, ok := cs.clients[user]
 	if ok {
-		stream <- event
+		client.events <- event
 	}
+	cs.mtx.RUnlock()
 }
 
-func (s *clientStreams) send(users []room.UserId, event *api.Event) {
-	s.mtx.RLock()
-	defer s.mtx.RUnlock()
+// Send synchronously sends an event to a list of users.
+func (cs *ClientStreams) Send(users []room.UserId, event *pb.Event) {
 	for _, user := range users {
-		s.sendSingle(user, event)
+		cs.SendSingle(user, event)
 	}
 }
 
-func (s *clientStreams) startNew(srv api.Doko_StartSessionServer, user room.UserId) {
-	stream := s.createStream(user)
+func (cs *ClientStreams) StartNew(srv pb.Doko_StartSessionServer, user room.UserId) chan int {
+	client := cs.createStream(user)
 	go func() {
-		defer s.removeStream(user)
 		for {
 			select {
 			case <-srv.Context().Done():
 				log.Printf("no longer waiting for messages to %s", user)
+				cs.onStreamEndedByClient(user)
 				return
-			case event := <-stream:
-				if s, ok := status.FromError(srv.Send(event)); ok {
+			case event, ok := <-client.events:
+				if !ok {
+					log.Printf("client kicked, returning stream loop")
+					return
+				}
+				if s, sendOk := status.FromError(srv.Send(event)); sendOk {
 					switch s.Code() {
 					case codes.OK:
 						// pass
 					case codes.Unavailable, codes.Canceled, codes.DeadlineExceeded:
 						log.Printf("client %s terminated connection", user)
+						cs.onStreamEndedByClient(user)
 						return
-
 					default:
-						log.Printf("failed to send to client %s: %v", user, s.Err())
+						log.Printf("failed to Send to client %s: %v", user, s.Err())
 					}
+				} else {
+					log.Printf("unknonw error: %s", s.Err())
 				}
 			}
 		}
 	}()
+	return client.kicked
 }
 
-func (s *clientStreams) createStream(user room.UserId) (stream chan *api.Event) {
-	stream = make(chan *api.Event, 10)
-	s.streams[user] = stream
-	return
-}
+const userStreamBufferSize = 10
 
-func (s *clientStreams) removeStream(user room.UserId) {
-	s.mtx.Lock()
-	defer s.mtx.Unlock()
-	if stream, ok := s.streams[user]; ok {
-		delete(s.streams, user)
-		close(stream)
+func (cs *ClientStreams) createStream(user room.UserId) ClientStream {
+	cs.mtx.Lock()
+	defer cs.mtx.Unlock()
+	if existingClient, exists := cs.clients[user]; exists {
+		delete(cs.clients, user)
+		close(existingClient.events)
+		close(existingClient.kicked)
+		log.Printf("kicked %s because she started a new session", user)
 	}
-	log.Printf("closed table stream for %s", user)
+	client := ClientStream{events: make(eventStream, userStreamBufferSize),
+		kicked: make(chan int)}
+	cs.clients[user] = client
+	return client
 }
 
-func (s *clientStreams) isOnline(user room.UserId) bool {
-	_, ok := s.streams[user]
+func (cs *ClientStreams) onStreamEndedByClient(user room.UserId) {
+	cs.mtx.Lock()
+	if client, exists := cs.clients[user]; exists {
+		delete(cs.clients, user)
+		close(client.events)
+		close(client.kicked)
+		log.Printf("closed table stream for %s", user)
+	}
+	cs.mtx.Unlock()
+
+}
+
+func (cs *ClientStreams) IsOnline(user room.UserId) bool {
+	cs.mtx.RLock()
+	defer cs.mtx.RUnlock()
+	_, ok := cs.clients[user]
 	return ok
 }

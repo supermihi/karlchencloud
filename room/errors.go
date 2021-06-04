@@ -34,6 +34,7 @@ const (
 	CannotPlayCard
 	CannotAnnounce
 	CannotPlaceBid
+	StartedAnotherSession
 )
 
 func NewCloudError(c ErrorCode) error {
@@ -79,6 +80,8 @@ func (c ErrorCode) Message() string {
 		return "Cannot annonuce game type"
 	case CannotPlaceBid:
 		return "Cannot place bid"
+	case StartedAnotherSession:
+		return "Closing session because another one was started"
 	}
 	return "unknown error code"
 }

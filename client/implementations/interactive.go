@@ -2,6 +2,7 @@ package implementations
 
 import (
 	"bufio"
+	"github.com/eiannone/keyboard"
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
@@ -13,13 +14,21 @@ import (
 
 type CliHandler struct {
 	IsCreator bool
+	*client.Client
 }
 
-func (h *CliHandler) OnConnect(_ client.ClientApi) {
+func NewCliHandler(login client.LoginData, isCreator bool) CliHandler {
+	cli := CliHandler{IsCreator: isCreator}
+	embeddedClient := client.NewClient(login, &cli)
+	cli.Client = &embeddedClient
+	return cli
+}
+
+func (h *CliHandler) OnConnect() {
 	// pass
 }
 
-func (h *CliHandler) OnWelcome(client client.ClientApi, us *api.UserState) {
+func (h *CliHandler) OnWelcome(us *api.UserState) {
 	if us.CurrentTable != nil {
 		return
 	}
@@ -28,65 +37,67 @@ func (h *CliHandler) OnWelcome(client client.ClientApi, us *api.UserState) {
 		action := UserInputRune()
 		if action == 'c' {
 			h.IsCreator = true
-			err := client.CreateTable(true)
+			err := h.CreateTable(true)
 			if err == nil {
 				return
 			}
-			client.Logf("%s could not create table: %v", err)
+			h.Logf("%s could not create table: %v", err)
 		} else if action == 'j' {
 			h.IsCreator = false
 			log.Printf("Input invite code:")
 			invite := UserInputString()
-			err := client.JoinTable(invite, "")
+			err := h.JoinTable(invite, "")
 			if err == nil {
 				return
 			}
-			client.Logf("could not join table: %v", err)
+			h.Logf("could not join table: %v", err)
 		} else {
-			client.Logf("Invalid action %c", action)
+			h.Logf("Invalid action %c", action)
 		}
 	}
 }
-
-func (h *CliHandler) OnMemberJoin(client client.ClientApi, id string, name string) {
-	if len(client.Table().MemberNamesById) >= 4 && h.IsCreator {
-		err := client.StartTable()
+func (h *CliHandler) Fatalf(format string, v ...interface{}) {
+	h.Logf(format, v...)
+	os.Exit(1)
+}
+func (h *CliHandler) OnMemberJoin(id string, name string) {
+	if len(h.Table().MemberNamesById) >= 4 && h.IsCreator {
+		err := h.StartTable()
 		if err != nil {
-			Fatalf(client, "error starting table: %v", err)
+			h.Fatalf("error starting table: %v", err)
 		}
 	}
 }
 
-func (h *CliHandler) OnMatchStart(client client.ClientApi) {
-	client.Logf("Game starts! Other players: %v", client.Table().PlayerNames())
-	client.Logf("Forehand: %s", client.Table().MemberNamesById[client.Match().Trick.Forehand])
-	client.Logf("my cards: %s", client.Match().Cards)
+func (h *CliHandler) OnMatchStart() {
+	h.Logf("Game starts! Other players: %v", h.Table().PlayerNames())
+	h.Logf("my cards: %s", h.Match().Cards)
 }
 
-func (h *CliHandler) OnPlayedCard(client client.ClientApi, ev *api.PlayedCard) {
-	if ev.UserId != client.User().Id {
-		client.Logf("%v played %v", client.Table().MemberNamesById[ev.UserId], pbconv.ToCard(ev.Card))
+func (h *CliHandler) OnPlayedCard(ev *api.PlayedCard) {
+	if ev.UserId != h.User().Id {
+		h.Logf("%v played %v", h.Table().MemberNamesById[ev.UserId], pbconv.ToCard(ev.Card))
 	}
-	if len(client.Match().Trick.Cards) == 0 {
-		client.Logf("trick finished. Winner: %s", client.Table().MemberNamesById[client.Match().Trick.Forehand])
+	if len(h.Match().Trick.Cards) == 0 {
+		h.Logf("trick finished. Winner: %s", h.Table().MemberNamesById[h.Match().Trick.Forehand])
 	}
 }
 
-func (h *CliHandler) OnMyTurnAuction(client client.ClientApi) {
+func (h *CliHandler) OnMyTurnAuction() {
 	log.Printf("Choose: [_g_esund, _h_ochzeit]")
 	char := UserInputRune()
 	declaration := game.NormalGameType
 	if char == 'h' {
 		declaration = game.MarriageType
 	}
-	declareErr := client.Declare(declaration)
+	declareErr := h.Declare(declaration)
 	if declareErr != nil {
 		log.Fatalf("error declaring game: %v", declareErr)
 	}
 }
 
-func (h *CliHandler) OnMyTurnGame(client client.ClientApi) {
-	log.Printf("your cards: %v", client.Match().Cards)
+func (h *CliHandler) OnMyTurnGame() {
+	log.Printf("your cards: %v", h.Match().Cards)
 	log.Printf("Choose index to play: ")
 	for {
 		line := UserInputString()
@@ -95,11 +106,11 @@ func (h *CliHandler) OnMyTurnGame(client client.ClientApi) {
 			log.Printf("could not read answer: %v. Please try again", err)
 			continue
 		}
-		if i < 0 || i > len(client.Match().Cards)-1 {
+		if i < 0 || i > len(h.Match().Cards)-1 {
 			log.Printf("invalid card index %d", i)
 			continue
 		}
-		err = client.PlayCard(i)
+		err = h.PlayCard(i)
 		if err != nil {
 			log.Printf("could not play card: %v. Try again", err)
 			continue
@@ -109,8 +120,7 @@ func (h *CliHandler) OnMyTurnGame(client client.ClientApi) {
 }
 
 func UserInputRune() rune {
-	reader := bufio.NewReader(os.Stdin)
-	char, _, err := reader.ReadRune()
+	char, _, err := keyboard.GetSingleKey()
 	if err != nil {
 		log.Fatalf("error reading rune: %v", err)
 	}

@@ -77,7 +77,7 @@ func (c *dokoClient) StartTable(ctx context.Context, in *StartTableRequest, opts
 
 func (c *dokoClient) JoinTable(ctx context.Context, in *JoinTableRequest, opts ...grpc.CallOption) (*TableState, error) {
 	out := new(TableState)
-	err := c.cc.Invoke(ctx, "/api.Doko/JoinTableByInviteCode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Doko/JoinTable", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (UnimplementedDokoServer) StartTable(context.Context, *StartTableRequest) (
 	return nil, status.Errorf(codes.Unimplemented, "method StartTable not implemented")
 }
 func (UnimplementedDokoServer) JoinTable(context.Context, *JoinTableRequest) (*TableState, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method JoinTableByInviteCode not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method JoinTable not implemented")
 }
 func (UnimplementedDokoServer) PlayCard(context.Context, *PlayCardRequest) (*PlayedCard, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PlayCard not implemented")
@@ -311,7 +311,7 @@ func _Doko_JoinTable_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Doko/JoinTableByInviteCode",
+		FullMethod: "/api.Doko/JoinTable",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DokoServer).JoinTable(ctx, req.(*JoinTableRequest))
@@ -454,7 +454,7 @@ var Doko_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Doko_StartTable_Handler,
 		},
 		{
-			MethodName: "JoinTableByInviteCode",
+			MethodName: "JoinTable",
 			Handler:    _Doko_JoinTable_Handler,
 		},
 		{

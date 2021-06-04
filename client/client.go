@@ -10,37 +10,37 @@ import (
 	"log"
 )
 
-type ClientImplementation struct {
+type Client struct {
 	clientData LoginData
 	client     *DokoClient
 	handler    ClientHandler
 	table      *TableView
 }
 
-func NewClientImplementation(c LoginData, handler ClientHandler) ClientImplementation {
-	return ClientImplementation{clientData: c, handler: handler}
+func NewClient(c LoginData, handler ClientHandler) Client {
+	return Client{clientData: c, handler: handler}
 }
 
-func (c *ClientImplementation) Logf(format string, v ...interface{}) {
+func (c *Client) Logf(format string, v ...interface{}) {
 	c.client.Logf(format, v...)
 }
 
-func (c *ClientImplementation) Table() *TableView {
+func (c *Client) Table() *TableView {
 	return c.table
 }
 
-func (c *ClientImplementation) User() UserData {
+func (c *Client) User() UserData {
 	return c.client.user
 }
 
-func (c *ClientImplementation) Start(ctx context.Context) {
-	service, err := GetConnectedDokoClient(c.clientData, ctx)
+func (c *Client) Start(ctx context.Context) {
+	dokoclient, err := GetConnectedDokoClient(c.clientData, ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer service.CloseConnection()
-	c.client = service
-	c.handler.OnConnect(c)
+	defer dokoclient.CloseConnection()
+	c.client = dokoclient
+	c.handler.OnConnect()
 	stream, err := c.client.Grpc.StartSession(c.client.Context, &api.Empty{})
 	c.client.Logf("Listening for match events ...")
 	if err != nil {
@@ -72,7 +72,7 @@ func (c *ClientImplementation) Start(ctx context.Context) {
 	}
 }
 
-func (c *ClientImplementation) ListOpenTables() ([]OpenTable, error) {
+func (c *Client) ListOpenTables() ([]OpenTable, error) {
 	response, err := c.client.Grpc.ListTables(c.client.Context, &api.ListTablesRequest{})
 	if err != nil {
 		return nil, err
@@ -87,11 +87,11 @@ func (c *ClientImplementation) ListOpenTables() ([]OpenTable, error) {
 	return result, nil
 }
 
-func (c *ClientImplementation) handleMemberEvent(ev *api.MemberEvent) {
+func (c *Client) handleMemberEvent(ev *api.MemberEvent) {
 	switch ev.Type {
 	case api.MemberEventType_JOIN_TABLE:
 		c.Logf("user %s joined table", ev.Name)
-		c.handler.OnMemberJoin(c, ev.UserId, ev.Name)
+		c.handler.OnMemberJoin(ev.UserId, ev.Name)
 	case api.MemberEventType_GO_ONLINE:
 		c.Logf("user %s is now online", c.table.MemberNamesById[ev.UserId])
 	case api.MemberEventType_GO_OFFLINE:
@@ -101,7 +101,7 @@ func (c *ClientImplementation) handleMemberEvent(ev *api.MemberEvent) {
 	}
 }
 
-func (c *ClientImplementation) CreateTable(public bool) error {
+func (c *Client) CreateTable(public bool) error {
 	tableData, err := c.client.Grpc.CreateTable(c.client.Context, &api.CreateTableRequest{Public: public})
 	if err != nil {
 		return err
@@ -111,7 +111,7 @@ func (c *ClientImplementation) CreateTable(public bool) error {
 	return nil
 }
 
-func (c *ClientImplementation) JoinTable(invite string, tableId string) (err error) {
+func (c *Client) JoinTable(invite string, tableId string) (err error) {
 	request := &api.JoinTableRequest{}
 	if invite != "" {
 		request.TableDescription = &api.JoinTableRequest_InviteCode{InviteCode: invite}
@@ -127,7 +127,7 @@ func (c *ClientImplementation) JoinTable(invite string, tableId string) (err err
 	return
 }
 
-func (c *ClientImplementation) StartTable() error {
+func (c *Client) StartTable() error {
 	matchState, err := c.client.Grpc.StartTable(c.client.Context, &api.StartTableRequest{TableId: c.table.Id})
 	if err == nil {
 		c.handleStart(matchState)
@@ -135,11 +135,11 @@ func (c *ClientImplementation) StartTable() error {
 	return err
 }
 
-func (c *ClientImplementation) initView(state *api.TableState) {
+func (c *Client) initView(state *api.TableState) {
 	c.table = NewTableView(state)
 }
-func (c *ClientImplementation) handleWelcome(us *api.UserState) {
-	c.handler.OnWelcome(c, us)
+func (c *Client) handleWelcome(us *api.UserState) {
+	c.handler.OnWelcome(us)
 	ts := us.CurrentTable
 	if ts == nil {
 		return
@@ -149,13 +149,13 @@ func (c *ClientImplementation) handleWelcome(us *api.UserState) {
 	c.checkMyTurn()
 }
 
-func (c *ClientImplementation) handleStart(s *api.MatchState) {
+func (c *Client) handleStart(s *api.MatchState) {
 	c.table.Match = NewMatchView(s)
-	c.handler.OnMatchStart(c)
+	c.handler.OnMatchStart()
 	c.checkMyTurn()
 }
 
-func (c *ClientImplementation) handleDeclare(d *api.Declaration) {
+func (c *Client) handleDeclare(d *api.Declaration) {
 	c.Match().UpdateOnDeclare(d)
 	if c.Match().Phase == match.InGame {
 		c.Logf("now in game! Forehand: %s", c.Table().MemberNamesById[c.Match().Trick.Forehand])
@@ -163,29 +163,29 @@ func (c *ClientImplementation) handleDeclare(d *api.Declaration) {
 	c.checkMyTurn()
 }
 
-func (c *ClientImplementation) handlePlayedCard(card *api.PlayedCard) {
+func (c *Client) handlePlayedCard(card *api.PlayedCard) {
 	c.table.Match.UpdateTrick(card)
 	if card.Winner != nil {
 		c.Match().Phase = match.MatchFinished
 	}
-	c.handler.OnPlayedCard(c, card)
+	c.handler.OnPlayedCard(card)
 	c.checkMyTurn()
 }
 
-func (c *ClientImplementation) checkMyTurn() {
+func (c *Client) checkMyTurn() {
 	matchView := c.Match()
 	if matchView != nil && matchView.MyTurn && len(matchView.Cards) > 0 {
 		switch matchView.Phase {
 		case match.InAuction:
-			c.handler.OnMyTurnAuction(c)
+			c.handler.OnMyTurnAuction()
 		case match.InGame:
-			c.handler.OnMyTurnGame(c)
+			c.handler.OnMyTurnGame()
 		default:
 			panic(fmt.Sprintf("should not be here: handleMyTurn in neither auction nor game"))
 		}
 	}
 }
-func (c *ClientImplementation) PlayCard(i int) error {
+func (c *Client) PlayCard(i int) error {
 	card := c.Match().Cards[i]
 	log.Printf("playing card: %v", card)
 	result, err := c.client.Grpc.PlayCard(
@@ -198,26 +198,26 @@ func (c *ClientImplementation) PlayCard(i int) error {
 	return err
 }
 
-func (c *ClientImplementation) Declare(t game.AnnouncedGameType) error {
+func (c *Client) Declare(t game.AnnouncedGameType) error {
 	result, err := c.client.Grpc.Declare(c.client.Context, &api.DeclareRequest{
 		Table:       c.table.Id,
 		Declaration: pbconv.ToPbGameType(t)})
 	if err == nil {
-		c.Logf("successfully declared %s", t)
+		c.Logf("declared %s", t)
 		c.table.Match.UpdateOnDeclare(result)
 	}
 	return err
 }
 
-func (c *ClientImplementation) Api() api.DokoClient {
+func (c *Client) Api() api.DokoClient {
 	return c.client.Grpc
 }
 
-func (c *ClientImplementation) Match() *MatchView {
+func (c *Client) Match() *MatchView {
 	return c.table.Match
 }
 
-func (c *ClientImplementation) StartNextMatch() error {
+func (c *Client) StartNextMatch() error {
 	req := api.StartNextMatchRequest{TableId: c.table.Id}
 	ans, err := c.client.Grpc.StartNextMatch(c.client.Context, &req)
 	if err != nil {

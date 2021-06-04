@@ -39,9 +39,8 @@ var interactiveCmd = &cobra.Command{
 		}
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		cliHandler := implementations.CliHandler{}
-		karlchenClient := client.NewClientImplementation(conn, &cliHandler)
-		go karlchenClient.Start(ctx)
+		cliClient := implementations.NewCliHandler(conn, true)
+		go cliClient.Start(ctx)
 		<-ctx.Done()
 	},
 }

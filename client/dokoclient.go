@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 	"errors"
-	"github.com/supermihi/karlchencloud/api"
+	pb "github.com/supermihi/karlchencloud/api"
 	"google.golang.org/grpc"
 	"log"
 )
@@ -22,9 +22,9 @@ type UserData struct {
 	Email string
 }
 
-// DokoClient encapuslates technical details such as auth from the Grpc client api.DokoClient
+// DokoClient encapuslates technical details such as auth from the Grpc client pb.DokoClient
 type DokoClient struct {
-	Grpc       api.DokoClient
+	Grpc       pb.DokoClient
 	connection *grpc.ClientConn
 	creds      *ClientCredentials
 	user       UserData
@@ -39,14 +39,14 @@ func GetConnectedDokoClient(login LoginData, ctx context.Context) (*DokoClient, 
 		return nil, err
 	}
 	log.Print("connected")
-	dokoClient := api.NewDokoClient(conn)
+	dokoClient := pb.NewDokoClient(conn)
 	userData := UserData{Email: login.Email}
-	loginResponse, err := dokoClient.Login(ctx, &api.LoginRequest{Email: login.Email, Password: login.Password})
+	loginResponse, err := dokoClient.Login(ctx, &pb.LoginRequest{Email: login.Email, Password: login.Password})
 	if err != nil {
 		if !login.RegisterOnAuthFail {
 			return nil, errors.New("given credentials wrong or missing and RegisterIfEmptyUserId not set")
 		}
-		request := &api.RegisterRequest{Name: login.Name, Email: login.Email, Password: login.Password}
+		request := &pb.RegisterRequest{Name: login.Name, Email: login.Email, Password: login.Password}
 		ans, err := dokoClient.Register(ctx, request)
 		if err != nil {
 			return nil, err
