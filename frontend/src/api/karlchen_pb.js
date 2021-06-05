@@ -2369,8 +2369,7 @@ proto.api.UserState.prototype.toObject = function(opt_includeInstance) {
  */
 proto.api.UserState.toObject = function(includeInstance, msg) {
   var f, obj = {
-    currenttable: (f = msg.getCurrenttable()) && proto.api.TableState.toObject(includeInstance, f),
-    name: jspb.Message.getFieldWithDefault(msg, 2, "")
+    currenttable: (f = msg.getCurrenttable()) && proto.api.TableState.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2412,10 +2411,6 @@ proto.api.UserState.deserializeBinaryFromReader = function(msg, reader) {
       reader.readMessage(value,proto.api.TableState.deserializeBinaryFromReader);
       msg.setCurrenttable(value);
       break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setName(value);
-      break;
     default:
       reader.skipField();
       break;
@@ -2451,13 +2446,6 @@ proto.api.UserState.serializeBinaryToWriter = function(message, writer) {
       1,
       f,
       proto.api.TableState.serializeBinaryToWriter
-    );
-  }
-  f = message.getName();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
     );
   }
 };
@@ -2497,24 +2485,6 @@ proto.api.UserState.prototype.clearCurrenttable = function() {
  */
 proto.api.UserState.prototype.hasCurrenttable = function() {
   return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * optional string name = 2;
- * @return {string}
- */
-proto.api.UserState.prototype.getName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.api.UserState} returns this
- */
-proto.api.UserState.prototype.setName = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 

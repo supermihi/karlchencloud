@@ -1,10 +1,10 @@
-import { Credentials, MyUserData } from 'session/model';
+import { MyUserData } from 'session/model';
 import { getLoginDataFromLocalStorage } from './localstorage';
 
 export interface SessionState {
   storedLogin: MyUserData | null;
-  session: MyUserData | null;
-  currentLoginCredentials: Credentials | null;
+  activeSession: MyUserData | null;
+  startingSession: MyUserData | null;
   error?: unknown;
   loading: boolean;
 }
@@ -13,8 +13,8 @@ export const initialState = (): SessionState => {
   const existingLogin = getLoginDataFromLocalStorage();
   return {
     storedLogin: existingLogin,
-    session: null,
-    currentLoginCredentials: null,
+    activeSession: null,
+    startingSession: null,
     loading: false,
   };
 };

@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import RegisterView from './RegisterView';
 import { createSelector } from '@reduxjs/toolkit';
 import { selectSession } from '../selectors';
-import { register } from '../thunks/register';
+import { register } from '../thunks/authenticate';
 
 const mapState = createSelector(selectSession, (session) => ({
   loading: session.loading,

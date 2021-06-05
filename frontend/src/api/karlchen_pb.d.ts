@@ -221,9 +221,6 @@ export class UserState extends jspb.Message {
   hasCurrenttable(): boolean;
   clearCurrenttable(): UserState;
 
-  getName(): string;
-  setName(value: string): UserState;
-
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserState.AsObject;
   static toObject(includeInstance: boolean, msg: UserState): UserState.AsObject;
@@ -235,7 +232,6 @@ export class UserState extends jspb.Message {
 export namespace UserState {
   export type AsObject = {
     currenttable?: TableState.AsObject,
-    name: string,
   }
 }
 

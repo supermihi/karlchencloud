@@ -1,32 +1,32 @@
 import { CaseReducer, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Credentials } from './model';
+import { MyUserData } from './model';
 import { initialState, SessionState } from './state';
 import * as grpc from 'grpc-web';
 import * as events from './events';
-import { localStorageUpdated, register } from './thunks/register';
+import { localStorageUpdated, login, register } from './thunks/authenticate';
 
-const reduceSessionStarted: CaseReducer<SessionState, PayloadAction<string>> = (
+const reduceSessionStarted: CaseReducer<SessionState, PayloadAction> = (
   state,
-  { payload: name }
 ) => {
-  if (!state.currentLoginCredentials) {
+  if (!state.startingSession) {
     return;
   }
-  state.session = { ...state.currentLoginCredentials, name };
-  state.currentLoginCredentials = null;
+  state.activeSession = state.startingSession;
+  state.startingSession = null;
 };
 
 const sessionSlice = createSlice({
   name: 'session',
   initialState: initialState(),
   reducers: {
-    sessionStarting: (_, { payload: creds }: PayloadAction<Credentials>) => ({
+    sessionStarting: (_, { payload: userData }: PayloadAction<MyUserData>) => ({
       ...initialState(),
-      currentLoginCredentials: creds,
+      startingSession: userData,
     }),
     sessionError: (state, { payload: error }: PayloadAction<grpc.Error>) => {
       state.loading = false;
-      state.session = null;
+      state.activeSession = null;
+      state.startingSession = null;
       state.error = error;
     },
     resetError: (state) => {
@@ -38,14 +38,25 @@ const sessionSlice = createSlice({
       .addCase(localStorageUpdated, (state, { payload }) => {
         state.storedLogin = payload;
       })
+      .addCase(login.fulfilled, (state) => {
+        state.loading = false;
+      })
       .addCase(register.fulfilled, (state) => {
         state.loading = false;
+      })
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error;
+      })
+      .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error;
       })

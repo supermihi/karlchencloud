@@ -1,7 +1,7 @@
 import React from 'react';
 import { Match } from 'model/match';
 import OwnCardsView from 'play/view/OwnCardsView';
-import { PlayingUsers, Pos, toPlayerMap } from 'model/players';
+import { Pos, toPlayerMap } from 'model/players';
 import PositionedPlayerView from 'play/view/PositionedPlayerView';
 import { Size } from 'shared/resizeHook';
 import { Table } from 'model/table';

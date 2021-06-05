@@ -1,10 +1,4 @@
-import { TableId, Timestamp, GameType, BidType } from './karlchen_pb';
-
-export function tableId(id: string): TableId {
-  const ans = new TableId();
-  ans.setValue(id);
-  return ans;
-}
+import { Timestamp, GameType, BidType } from './karlchen_pb';
 
 export function toDate(ts: Timestamp): Date {
   return new Date(ts.getNanos() / 1e6);

@@ -1,10 +1,11 @@
 package users
 
 import (
-	"errors"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/supermihi/karlchencloud/server/errors"
 	"github.com/supermihi/karlchencloud/utils/security"
+	"log"
 )
 
 var schema = `
@@ -68,10 +69,12 @@ func (s *SqlUserDatabase) Authenticate(email string, password string) (user Acco
 	var hash string
 	err = row.Scan(&user.Id, &user.Email, &user.Name, &hash)
 	if err != nil {
+		log.Printf("user not found: %v", err)
+		err = errors.NewCloudError(errors.AuthenticationFailed)
 		return
 	}
 	if !security.VerifyPassword(password, hash) {
-		err = errors.New("authentication failed")
+		err = errors.NewCloudError(errors.AuthenticationFailed)
 		return
 	}
 	user.Token = user.Id.String()
@@ -81,6 +84,9 @@ func (s *SqlUserDatabase) Authenticate(email string, password string) (user Acco
 func (s *SqlUserDatabase) VerifyToken(token string) (user AccountData, err error) {
 	row := s.db.QueryRow("SELECT id, email, name FROM user WHERE id = ?", token)
 	err = row.Scan(&user.Id, &user.Email, &user.Name)
+	if err != nil {
+		return AccountData{}, errors.NewCloudError(errors.InvalidSessionToken)
+	}
 	user.Token = user.Id.String()
 	return
 }

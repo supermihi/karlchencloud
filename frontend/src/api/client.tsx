@@ -1,7 +1,6 @@
 import * as karlchen from './KarlchenServiceClientPb';
 import * as proto from './karlchen_pb';
 import * as grpc from 'grpc-web';
-import { Base64 } from 'js-base64';
 import { MyUserData } from 'session/model';
 
 const url = 'http://localhost:8080';
@@ -12,28 +11,38 @@ export interface AuthenticatedClient {
   client: karlchen.DokoClient;
   meta: grpc.Metadata;
 }
-export function getClient(): karlchen.DokoClient {
+export function getPbClient(): karlchen.DokoClient {
   if (!_client) {
     _client = new karlchen.DokoClient(url, null, null);
   }
   return _client;
 }
 
-export function getAuthMeta(user: string, secret: string): grpc.Metadata {
-  const encoded = Base64.encode(`${user}:${secret}`);
-  return { authorization: `basic ${encoded}` };
+export function getAuthMeta(token: string): grpc.Metadata {
+  return { authorization: `basic ${token}` };
 }
 
-export function getAuthenticatedClient(user: string, secret: string): AuthenticatedClient {
-  return { client: getClient(), meta: getAuthMeta(user, secret) };
+export function getAuthenticatedClient(token: string): AuthenticatedClient {
+  return { client: getPbClient(), meta: getAuthMeta(token) };
 }
 
-export async function register(name: string): Promise<MyUserData> {
-  const userName = new proto.UserName();
-  userName.setName(name);
-  const ans = await getClient().register(userName, null);
-  const [id, secret] = [ans.getId(), ans.getSecret()];
-  return { name, id, secret };
+export async function register(email: string, name: string, password: string): Promise<MyUserData> {
+  const request = new proto.RegisterRequest();
+  request.setName(name);
+  request.setEmail(email)
+  request.setPassword(password)
+  const ans = await getPbClient().register(request, null);
+  const [id, token] = [ans.getUserId(), ans.getToken()];
+  return { name, id, token, email };
+}
+
+export async function login(email: string, password: string): Promise<MyUserData> {
+  const request = new proto.LoginRequest();
+  request.setEmail(email)
+  request.setPassword(password)
+  const ans = await getPbClient().login(request, null);
+  const [token, id, name] = [ans.getToken(), ans.getUserId(), ans.getName()];
+  return {name, id, token, email }
 }
 
 export function isGrpcError(error: unknown): error is grpc.Error {

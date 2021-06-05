@@ -45,6 +45,9 @@ module.exports = {
     contentBase: path.join(__dirname, 'build'),
     historyApiFallback: true,
     port: 4000,
+    proxy: {
+      '/api.Doko': 'http://localhost:8080',
+    },
     open: true,
     hot: true,
   },

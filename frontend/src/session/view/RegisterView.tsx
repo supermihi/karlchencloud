@@ -1,60 +1,76 @@
 import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import { formatError } from 'api/client';
 import MainPaper from 'shared/MainPaper';
 import SpinBackdrop from 'shared/SpinBackdrop';
 import ErrorAlert from 'shared/ErrorAlert';
+import { RegisterData } from '../model';
+import { isValidEmail } from './validation';
+import { useStyles } from './formstyle';
 
 interface Props {
-  register: (name: string) => void;
+  register: (data: RegisterData) => void;
   loading: boolean;
   error?: unknown;
 }
 
-const useStyles = makeStyles((theme) => ({
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginTop: theme.spacing(3),
-  },
-}));
-
 export default function RegisterView({ register, loading, error }: Props): React.ReactElement {
   const classes = useStyles();
   const [name, setName] = useState('');
-  const valid = name.trim() !== '';
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const nameValid = name.trim() !== '';
+  const emailValid = isValidEmail(email);
+  const passwordValid = password.length >= 6;
+
   return (
     <>
       <MainPaper>
-        <Typography component="h1" variant="h6">
+        <Typography component='h1' variant='h6'>
           Willkommen!
         </Typography>
-        <Typography component="p" variant="body1" gutterBottom>
+        <Typography component='p' variant='body1' gutterBottom>
           Sieht aus als wärst du zum ersten Mal hier. Wie heißt du?
         </Typography>
-        <Grid container>
-          <Grid item xs={12}>
-            <TextField
-              required
-              error={!valid}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              onSubmit={() => valid && register(name)}
-              placeholder="Gorm"
-            />
-          </Grid>
-        </Grid>
+        <form noValidate className={classes.root} autoComplete='off'>
+          <TextField
+            required
+            autoComplete='name'
+            error={!nameValid}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            placeholder='Karlchen Müller'
+          />
+          <TextField
+            required
+            autoComplete='email'
+            type='email'
+            error={!emailValid}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+            placeholder='karlchen@mueller.de'
+          />
+          <TextField
+            required
+            autoComplete='new-password'
+            error={!passwordValid}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            fullWidth
+            type='password'
+            placeholder='password'
+          />
+        </form>
         <div className={classes.buttons}>
           <Button
-            disabled={!valid}
-            variant="contained"
-            color="primary"
-            onClick={() => register(name)}
+            disabled={!(nameValid && emailValid && passwordValid)}
+            variant='contained'
+            color='primary'
+            onClick={() => register({ name, email, password })}
           >
             Los
           </Button>

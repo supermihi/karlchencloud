@@ -3,6 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectLocation, Location } from 'routing';
 import Login from 'session/view/Login';
+import LoginWithToken from 'session/view/LoginWithToken';
 import Register from 'session/view/Register';
 import Lobby from 'lobby/Lobby';
 import Play from 'play/view/Play';
@@ -24,6 +25,8 @@ function Content({ location }: { location: Location }) {
       return <Register />;
     case Location.login:
       return <Login />;
+    case Location.loginWithToken:
+      return <LoginWithToken />;
     case Location.lobby:
       return <Lobby />;
     case Location.table:

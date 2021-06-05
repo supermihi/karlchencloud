@@ -4,7 +4,7 @@ import { DeclareResult } from 'model/auction';
 import { User } from 'model/core';
 import { Match, PlayedCard } from 'model/match';
 
-export const sessionStarted = createAction<string>('event/sessionStarted');
+export const sessionStarted = createAction('event/sessionStarted');
 export const tableChanged = createAction<TableState | null>('event/tableChanged');
 export const memberJoined = createAction<User>('event/memberJoined');
 export const memberLeft = createAction<string>('event/memberLeft');

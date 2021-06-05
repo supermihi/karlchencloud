@@ -1,49 +1,69 @@
-import * as React from 'react';
-import Button from '@material-ui/core/Button';
+import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import ForwardIcon from '@material-ui/icons/Forward';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 import { formatError } from 'api/client';
 import MainPaper from 'shared/MainPaper';
 import SpinBackdrop from 'shared/SpinBackdrop';
 import ErrorAlert from 'shared/ErrorAlert';
+import { LoginData } from '../model';
+import { useStyles } from './formstyle';
+import { isValidEmail } from './validation';
 
 interface Props {
-  name: string;
+  login: (data: LoginData) => void;
   loading: boolean;
   error?: unknown;
-  login: () => void;
-  forgetLogin: () => void;
-  resetError?: () => void;
 }
 
-const LoginView: React.FC<Props> = ({ login, forgetLogin, loading, error, name, resetError }) => (
-  <>
-    <MainPaper>
-      <Typography component="h1" variant="h6" gutterBottom>
-        Willkommen zurück, {name}!
-      </Typography>
-      <Grid container spacing={1}>
-        <Grid item xs={12}>
-          <Button
-            endIcon={<ForwardIcon />}
+export default function LoginView({ login, loading, error }: Props): React.ReactElement {
+  const classes = useStyles();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const emailValid = isValidEmail(email);
+  const passwordValid = password.trim() !== '';
+
+  return (
+    <>
+      <MainPaper>
+        <Typography component='h1' variant='h6'>
+          Bei Karlchencloud einloggen
+        </Typography>
+        <form noValidate className={classes.root} autoComplete='off'>
+          <TextField
+            required
+            autoComplete='email'
+            type='email'
+            error={!emailValid}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            variant="contained"
-            color="primary"
-            onClick={login}
+            placeholder='karlchen@mueller.de'
+          />
+          <TextField
+            required
+            autoComplete='current-password'
+            error={!passwordValid}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            fullWidth
+            type='password'
+            placeholder='password'
+          />
+        </form>
+        <div className={classes.buttons}>
+          <Button
+            disabled={!(emailValid && passwordValid)}
+            variant='contained'
+            color='primary'
+            onClick={() => login({ email, password })}
           >
-            Weiter
+            Los
           </Button>
-        </Grid>
-        <Grid item xs={12}>
-          <Button onClick={forgetLogin} fullWidth>
-            Nicht {name}?
-          </Button>
-        </Grid>
-      </Grid>
-      <SpinBackdrop open={loading} />
-    </MainPaper>
-    {error && <ErrorAlert message={`Error logging in: ${formatError(error)}`} reset={resetError} />}
-  </>
-);
-export default LoginView;
+        </div>
+        <SpinBackdrop open={loading} />
+      </MainPaper>
+      {error && <ErrorAlert message={`Error logging in: ${formatError(error)}`} />}
+    </>
+  );
+}

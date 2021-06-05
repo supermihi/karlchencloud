@@ -1,4 +1,4 @@
-import { getClient, getAuthMeta } from 'api/client';
+import { getPbClient, getAuthMeta } from 'api/client';
 import { ClientReadableStream } from 'grpc-web';
 import { MyUserData } from 'session/model';
 import { AppThunk } from 'state';
@@ -11,12 +11,12 @@ import { Action } from '@reduxjs/toolkit';
 let _stream: ClientReadableStream<api.Event>;
 
 export const startSession = (): AppThunk => async (dispatch, getState) => {
-  const client = getClient();
-  const { id, secret } = selectSession(getState()).storedLogin as MyUserData;
-  const authMeta = getAuthMeta(id, secret);
-  dispatch(actions.sessionStarting({ id, secret }));
+  const pbClient = getPbClient();
+  const userData = selectSession(getState()).storedLogin as MyUserData;
+  const authMeta = getAuthMeta(userData.token);
+  dispatch(actions.sessionStarting(userData));
   try {
-    _stream = client.startSession(new api.Empty(), authMeta) as ClientReadableStream<api.Event>;
+    _stream = pbClient.startSession(new api.Empty(), authMeta) as ClientReadableStream<api.Event>;
     _stream
       .on('data', (e) => {
         const dispatchable = createEventAction(e);

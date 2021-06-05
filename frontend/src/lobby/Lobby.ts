@@ -8,7 +8,7 @@ import { createTable, startTable } from '../play/thunks';
 
 const mapStateToProps = createSelector(selectTable, selectSession, (table, session) => ({
   activeTable: table,
-  me: session.session as User,
+  me: session.activeSession as User,
 }));
 const mapDispatchToProps = {
   createTable,

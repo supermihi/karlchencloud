@@ -25,10 +25,9 @@ export const createEventAction = (event: api.Event): Dispatchable => {
 };
 
 function createWelcomeAction(userState: api.UserState): Dispatchable {
-  const name = userState.getName();
   const table = getCurrentTableState(userState);
   return (dispatch) => {
-    dispatch(events.sessionStarted(name));
+    dispatch(events.sessionStarted());
     dispatch(events.tableChanged(table));
   };
 }

@@ -46,7 +46,7 @@ func (s *dokoserver) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 	user, err := s.auth.Users.Authenticate(req.Email, req.Password)
 	if err != nil {
 		log.Printf("error logging in: %v", err)
-		return nil, err
+		return nil, toGrpcError(err)
 	}
 	return &pb.LoginReply{Name: user.Name, UserId: user.Id.String(), Token: user.Token}, nil
 }
@@ -135,7 +135,7 @@ func (s *dokoserver) JoinTable(ctx context.Context, req *pb.JoinTableRequest) (*
 }
 
 func (s *dokoserver) getUserState(user u.AccountData) (*pb.UserState, error) {
-	ans := &pb.UserState{Name: user.Name}
+	ans := &pb.UserState{}
 	activeTable := s.tables.ActiveTableOf(user.Id)
 	if activeTable != nil {
 		tableState, err := s.getTableState(activeTable, user.Id)

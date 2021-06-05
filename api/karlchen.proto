@@ -82,7 +82,6 @@ message Event {
 
 message UserState {
   TableState currentTable = 1;
-  string name = 2;
 }
 enum MemberEventType {
   JOIN_TABLE = 0;

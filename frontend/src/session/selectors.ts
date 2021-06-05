@@ -4,8 +4,8 @@ import { RootState } from 'state';
 import { SessionState } from './state';
 
 export const selectSession = (state: RootState): SessionState => state.session;
-export const selectClient = createSelector(selectSession, ({ session }) =>
-  session !== null ? getAuthenticatedClient(session.id, session.secret) : null
+export const selectClient = createSelector(selectSession, ({ activeSession }) =>
+  activeSession !== null ? getAuthenticatedClient(activeSession.token) : null
 );
 export const selectAuthenticatedClientOrThrow = createSelector(selectClient, (client) => {
   if (!client) {
