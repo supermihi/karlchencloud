@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	grpcAuth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/supermihi/karlchencloud/room"
+	"github.com/supermihi/karlchencloud/server/users"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
@@ -13,10 +13,10 @@ import (
 )
 
 type Auth struct {
-	Users room.Users
+	Users users.Users
 }
 
-func NewAuth(users room.Users) Auth {
+func NewAuth(users users.Users) Auth {
 	return Auth{users}
 }
 
@@ -41,13 +41,13 @@ func (a *Auth) Authenticate(ctx context.Context) (newCtx context.Context, err er
 
 }
 
-func GetAuthenticatedUser(ctx context.Context) (room.UserData, bool) {
+func GetAuthenticatedUser(ctx context.Context) (users.AccountData, bool) {
 	user := ctx.Value(userMDKey{})
 	switch md := user.(type) {
-	case room.UserData:
+	case users.AccountData:
 		return md, true
 	default:
-		return room.UserData{}, false
+		return users.AccountData{}, false
 	}
 }
 

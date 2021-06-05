@@ -6,9 +6,9 @@ import (
 	crand "crypto/rand"
 	"encoding/binary"
 	"fmt"
-	room2 "github.com/supermihi/karlchencloud/room"
-	users3 "github.com/supermihi/karlchencloud/room/users"
 	"github.com/supermihi/karlchencloud/server"
+	r "github.com/supermihi/karlchencloud/server/room"
+	u "github.com/supermihi/karlchencloud/server/users"
 	"log"
 	"math/rand"
 	"net"
@@ -30,7 +30,7 @@ func main() {
 		log.Fatal(randErr)
 	}
 	rand.Seed(v)
-	users, err := users3.NewSqlUserDatabase("users.sqlite")
+	users, err := u.NewSqlUserDatabase("users.sqlite")
 	if err != nil {
 		log.Fatalf("error creating users: %v", err)
 	}
@@ -48,7 +48,7 @@ func main() {
 			}
 		}
 	}
-	room := room2.NewRoom(users)
+	room := r.NewRoom()
 	srv := server.CreateServer(users, room, config)
 
 	startServer := func() {

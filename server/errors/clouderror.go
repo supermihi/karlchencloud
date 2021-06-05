@@ -1,4 +1,4 @@
-package room
+package errors
 
 import "fmt"
 
@@ -35,6 +35,8 @@ const (
 	CannotAnnounce
 	CannotPlaceBid
 	StartedAnotherSession
+	InvalidSessionToken
+	AuthenticationFailed
 )
 
 func NewCloudError(c ErrorCode) error {
@@ -82,6 +84,10 @@ func (c ErrorCode) Message() string {
 		return "Cannot place bid"
 	case StartedAnotherSession:
 		return "Closing session because another one was started"
+	case InvalidSessionToken:
+		return "Session token is invalid"
+	case AuthenticationFailed:
+		return "Authentication failed"
 	}
 	return "unknown error code"
 }

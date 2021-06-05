@@ -5,7 +5,7 @@ import (
 	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/room"
+	r "github.com/supermihi/karlchencloud/server/room"
 )
 
 func ToBid(b pb.BidType) match.Bid {
@@ -90,7 +90,7 @@ func ToCard(c *pb.Card) game.Card {
 	return game.Card{Suit: ToSuit(c.Suit), Rank: ToRank(c.Rank)}
 }
 
-func addRole(state *pb.MatchState, m *room.MatchData, self game.Player) {
+func addRole(state *pb.MatchState, m *r.MatchData, self game.Player) {
 	if self == game.NoPlayer {
 		state.Role = &pb.MatchState_Spectator{Spectator: &pb.Empty{}}
 	} else {

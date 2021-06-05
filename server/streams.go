@@ -2,7 +2,7 @@ package server
 
 import (
 	pb "github.com/supermihi/karlchencloud/api"
-	"github.com/supermihi/karlchencloud/room"
+	u "github.com/supermihi/karlchencloud/server/users"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -18,15 +18,15 @@ type ClientStream struct {
 
 type ClientStreams struct {
 	mtx     sync.RWMutex
-	clients map[room.UserId]ClientStream
+	clients map[u.Id]ClientStream
 }
 
 func NewClientStreams() ClientStreams {
-	return ClientStreams{clients: make(map[room.UserId]ClientStream)}
+	return ClientStreams{clients: make(map[u.Id]ClientStream)}
 }
 
 // SendSingle synchronously sends an event to a single user stream.
-func (cs *ClientStreams) SendSingle(user room.UserId, event *pb.Event) {
+func (cs *ClientStreams) SendSingle(user u.Id, event *pb.Event) {
 	cs.mtx.RLock()
 	client, ok := cs.clients[user]
 	if ok {
@@ -36,13 +36,13 @@ func (cs *ClientStreams) SendSingle(user room.UserId, event *pb.Event) {
 }
 
 // Send synchronously sends an event to a list of users.
-func (cs *ClientStreams) Send(users []room.UserId, event *pb.Event) {
+func (cs *ClientStreams) Send(users []u.Id, event *pb.Event) {
 	for _, user := range users {
 		cs.SendSingle(user, event)
 	}
 }
 
-func (cs *ClientStreams) StartNew(srv pb.Doko_StartSessionServer, user room.UserId) chan int {
+func (cs *ClientStreams) StartNew(srv pb.Doko_StartSessionServer, user u.Id) chan int {
 	client := cs.createStream(user)
 	go func() {
 		for {
@@ -78,7 +78,7 @@ func (cs *ClientStreams) StartNew(srv pb.Doko_StartSessionServer, user room.User
 
 const userStreamBufferSize = 10
 
-func (cs *ClientStreams) createStream(user room.UserId) ClientStream {
+func (cs *ClientStreams) createStream(user u.Id) ClientStream {
 	cs.mtx.Lock()
 	defer cs.mtx.Unlock()
 	if existingClient, exists := cs.clients[user]; exists {
@@ -93,7 +93,7 @@ func (cs *ClientStreams) createStream(user room.UserId) ClientStream {
 	return client
 }
 
-func (cs *ClientStreams) onStreamEndedByClient(user room.UserId) {
+func (cs *ClientStreams) onStreamEndedByClient(user u.Id) {
 	cs.mtx.Lock()
 	if client, exists := cs.clients[user]; exists {
 		delete(cs.clients, user)
@@ -105,7 +105,7 @@ func (cs *ClientStreams) onStreamEndedByClient(user room.UserId) {
 
 }
 
-func (cs *ClientStreams) IsOnline(user room.UserId) bool {
+func (cs *ClientStreams) IsOnline(user u.Id) bool {
 	cs.mtx.RLock()
 	defer cs.mtx.RUnlock()
 	_, ok := cs.clients[user]

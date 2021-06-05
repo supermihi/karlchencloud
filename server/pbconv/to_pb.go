@@ -5,16 +5,18 @@ import (
 	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	"github.com/supermihi/karlchencloud/room"
+	r "github.com/supermihi/karlchencloud/server/room"
+	t "github.com/supermihi/karlchencloud/server/table"
+	u "github.com/supermihi/karlchencloud/server/users"
 )
 
-func ToApiUserId(p game.Player, users room.PlayerUserMap) string {
+func ToApiUserId(p game.Player, users t.PlayerUserMap) string {
 	if p == game.NoPlayer {
 		panic("cannot convert NoPlayer to user id")
 	}
 	return users[p].String()
 }
-func ToPbPlayerValue(p game.Player, users room.PlayerUserMap) *pb.PlayerValue {
+func ToPbPlayerValue(p game.Player, users t.PlayerUserMap) *pb.PlayerValue {
 	if p != game.NoPlayer {
 		return &pb.PlayerValue{UserId: users[p].String()}
 	}
@@ -68,7 +70,7 @@ func ToPbGameType(t game.AnnouncedGameType) pb.GameType {
 	panic(fmt.Sprintf("not a solo type: %v", t))
 }
 
-func ToPbMode(mode game.Mode, forehand game.Player, users room.PlayerUserMap) *pb.Mode {
+func ToPbMode(mode game.Mode, forehand game.Player, users t.PlayerUserMap) *pb.Mode {
 	soloist := ToPbPlayerValue(game.Soloist(mode), users)
 	var spouse *pb.PlayerValue
 	switch h := mode.(type) {
@@ -115,7 +117,7 @@ func ToPbCard(c game.Card) *pb.Card {
 	return &pb.Card{Suit: ToPbSuit(c.Suit), Rank: ToPbRank(c.Rank)}
 }
 
-func ToPbTrick(t *game.IncompleteTrick, m game.Mode, users room.PlayerUserMap) *pb.Trick {
+func ToPbTrick(t *game.IncompleteTrick, m game.Mode, users t.PlayerUserMap) *pb.Trick {
 	result := &pb.Trick{UserIdForehand: ToApiUserId(t.Forehand, users)}
 	cards := make([]*pb.Card, t.NumCardsPlayed())
 	for i := 0; i < len(cards); i++ {
@@ -128,7 +130,7 @@ func ToPbTrick(t *game.IncompleteTrick, m game.Mode, users room.PlayerUserMap) *
 	return result
 }
 
-func ToPbTrickComplete(t game.Trick, users room.PlayerUserMap) *pb.Trick {
+func ToPbTrickComplete(t game.Trick, users t.PlayerUserMap) *pb.Trick {
 	result := &pb.Trick{UserIdForehand: ToApiUserId(t.Forehand, users)}
 	cards := make([]*pb.Card, game.NumPlayers)
 	for i := 0; i < len(cards); i++ {
@@ -138,7 +140,7 @@ func ToPbTrickComplete(t game.Trick, users room.PlayerUserMap) *pb.Trick {
 	return result
 }
 
-func toPbBids(bids *match.Bids, users room.PlayerUserMap) []*pb.Bid {
+func toPbBids(bids *match.Bids, users t.PlayerUserMap) []*pb.Bid {
 	var ans []*pb.Bid
 	for _, player := range game.Players() {
 		bidsOf := bids.BidsOf(player)
@@ -151,7 +153,7 @@ func toPbBids(bids *match.Bids, users room.PlayerUserMap) []*pb.Bid {
 	return ans
 }
 
-func ToPbGameState(m *room.MatchData) *pb.GameState {
+func ToPbGameState(m *r.MatchData) *pb.GameState {
 	var prevTrick *pb.Trick
 	prevTrickGame := m.PreviousTrick
 	if prevTrickGame != nil {
@@ -164,7 +166,7 @@ func ToPbGameState(m *room.MatchData) *pb.GameState {
 		PreviousTrick:   prevTrick,
 	}
 }
-func ToPbMatchState(matchData *room.MatchData, user room.UserId) *pb.MatchState {
+func ToPbMatchState(matchData *r.MatchData, user u.Id) *pb.MatchState {
 	turn := &pb.PlayerValue{}
 	if matchData.Turn != game.NoPlayer {
 		turn.UserId = matchData.Players[matchData.Turn].String()
@@ -200,9 +202,9 @@ func ToPbCards(cards game.Hand) []*pb.Card {
 	return ans
 }
 
-type MemberResolver func(room.UserId) *pb.TableMember
+type MemberResolver func(u.Id) *pb.TableMember
 
-func ToPbTableData(table *room.TableData, user room.UserId, getPbTableMember MemberResolver) *pb.TableData {
+func ToPbTableData(table *r.TableData, user u.Id, getPbTableMember MemberResolver) *pb.TableData {
 	pbMembers := make([]*pb.TableMember, len(table.Players))
 	for i, player := range table.Players {
 		pbMembers[i] = getPbTableMember(player)
@@ -215,7 +217,7 @@ func ToPbTableData(table *room.TableData, user room.UserId, getPbTableMember Mem
 	return ans
 }
 
-func ToPbTables(tables []*room.TableData, user room.UserId, getPbTableMember MemberResolver) []*pb.TableData {
+func ToPbTables(tables []*r.TableData, user u.Id, getPbTableMember MemberResolver) []*pb.TableData {
 	result := make([]*pb.TableData, len(tables))
 	for i, table := range tables {
 		result[i] = ToPbTableData(table, user, getPbTableMember)
@@ -223,7 +225,7 @@ func ToPbTables(tables []*room.TableData, user room.UserId, getPbTableMember Mem
 	return result
 }
 
-func toAuctionState(data *room.MatchData) *pb.AuctionState {
+func toPbAuctionState(data *r.MatchData) *pb.AuctionState {
 	declarations := make([]*pb.Declaration, len(data.Declarations))
 	i := 0
 	for player, decl := range data.Declarations {
@@ -233,11 +235,11 @@ func toAuctionState(data *room.MatchData) *pb.AuctionState {
 	return &pb.AuctionState{Declarations: declarations}
 }
 
-func addDetails(state *pb.MatchState, md *room.MatchData) {
+func addDetails(state *pb.MatchState, md *r.MatchData) {
 	switch md.Phase {
 	case match.InAuction:
 		state.Phase = pb.MatchPhase_AUCTION
-		state.Details = &pb.MatchState_AuctionState{AuctionState: toAuctionState(md)}
+		state.Details = &pb.MatchState_AuctionState{AuctionState: toPbAuctionState(md)}
 	case match.InGame:
 		state.Phase = pb.MatchPhase_GAME
 		gameState := ToPbGameState(md)

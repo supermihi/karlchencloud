@@ -4,28 +4,26 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	users2 "github.com/supermihi/karlchencloud/room/users"
+	t "github.com/supermihi/karlchencloud/server/table"
+	u "github.com/supermihi/karlchencloud/server/users"
 	"math/rand"
 	"testing"
 )
 
-func TestRoom_JoinTable(t *testing.T) {
-	r := NewRoom(users2.NewMemoryUserDb())
-	id, err := r.users.Add("owner@example.com", "secret", "owner", false)
-	assert.NotNil(t, err)
-	assert.NotEqual(t, InvalidUserId, id)
-	table, err := r.CreateTable(id, InvalidTableId, nil, 0)
-	assert.Nil(t, err)
-	assert.NotEqual(t, InvalidTableId, table.Id)
+func TestRoom_JoinTable(te *testing.T) {
+	r := NewRoom()
+	table, err := r.CreateTable(u.Id(1), true, 0)
+	assert.Nil(te, err)
+	assert.NotEqual(te, t.InvalidId, table.Id)
 	_, err = r.JoinTableByInviteCode(2, "not the invite code")
-	assert.NotNil(t, err)
+	assert.NotNil(te, err)
 	_, err = r.JoinTableByInviteCode(2, table.InviteCode)
-	assert.Nil(t, err)
+	assert.Nil(te, err)
 	_, err = r.JoinTableByInviteCode(2, table.InviteCode) // joining again
-	assert.NotNil(t, err)
+	assert.NotNil(te, err)
 }
 
-func TestRoom_GetMatchData(t *testing.T) {
+func TestRoom_GetMatchData(tx *testing.T) {
 	rng := rand.New(rand.NewSource(123))
 	cards := game.DealCards(rng)
 	theMatch := match.NewMatch(game.Player1, cards)
@@ -37,8 +35,8 @@ func TestRoom_GetMatchData(t *testing.T) {
 	curTrick.Play(game.Player2, game.Hearts10)
 	theMatch.Game = game.NewGame(cards, game.Player1, game.NewNormalGame(cards))
 	theMatch.Game.CurrentTrick = curTrick
-	players := [game.NumPlayers]UserId{UserId(1), UserId(2), UserId(3), UserId(4)}
-	tm := TableMatch{theMatch, players}
-	md := GetMatchData(&tm)
-	assert.Equal(t, curTrick, md.CurrentTrick)
+	players := [game.NumPlayers]u.Id{u.Id(1), u.Id(2), u.Id(3), u.Id(4)}
+	tm := t.TableMatch{Match: theMatch, Players: players}
+	md := NewMatchData(&tm)
+	assert.Equal(tx, curTrick, md.CurrentTrick)
 }

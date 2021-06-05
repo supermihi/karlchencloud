@@ -3,10 +3,10 @@ package implementations
 import (
 	"bufio"
 	"github.com/eiannone/keyboard"
-	"github.com/supermihi/karlchencloud/api"
-	"github.com/supermihi/karlchencloud/api/pbconv"
+	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/client"
 	"github.com/supermihi/karlchencloud/doko/game"
+	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 	"os"
 	"strconv"
@@ -30,7 +30,7 @@ func (h *CliHandler) OnConnect() {
 func (h *CliHandler) OnNewTable(_ client.TableInfo) {
 }
 
-func (h *CliHandler) OnWelcome(us *api.UserState) {
+func (h *CliHandler) OnWelcome(us *pb.UserState) {
 	if us.CurrentTable != nil {
 		return
 	}
@@ -62,7 +62,7 @@ func (h *CliHandler) Fatalf(format string, v ...interface{}) {
 	h.Logf(format, v...)
 	os.Exit(1)
 }
-func (h *CliHandler) OnMemberJoin(id string, name string) {
+func (h *CliHandler) OnMemberJoin(_ string, _ string) {
 	if len(h.Table().MemberNamesById) >= 4 && h.IsCreator {
 		err := h.StartTable()
 		if err != nil {
@@ -76,7 +76,7 @@ func (h *CliHandler) OnMatchStart() {
 	h.Logf("my cards: %s", h.Match().Cards)
 }
 
-func (h *CliHandler) OnPlayedCard(ev *api.PlayedCard) {
+func (h *CliHandler) OnPlayedCard(ev *pb.PlayedCard) {
 	if ev.UserId != h.User().Id {
 		h.Logf("%v played %v", h.Table().MemberNamesById[ev.UserId], pbconv.ToCard(ev.Card))
 	}

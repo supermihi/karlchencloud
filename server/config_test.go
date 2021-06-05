@@ -8,5 +8,5 @@ import (
 func TestReadConfig(t *testing.T) {
 	c, err := ReadConfig()
 	assert.Nil(t, err)
-	assert.True(t, c.NoProxy)
+	assert.False(t, c.NoProxy)
 }

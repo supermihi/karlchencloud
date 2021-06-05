@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/supermihi/karlchencloud/api"
-	"github.com/supermihi/karlchencloud/api/pbconv"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
+	"github.com/supermihi/karlchencloud/server/pbconv"
 	"log"
 )
 
