@@ -7,7 +7,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/supermihi/karlchencloud/server"
-	r "github.com/supermihi/karlchencloud/server/room"
+	"github.com/supermihi/karlchencloud/server/tables"
 	u "github.com/supermihi/karlchencloud/server/users"
 	"log"
 	"math/rand"
@@ -48,8 +48,7 @@ func main() {
 			}
 		}
 	}
-	room := r.NewRoom()
-	srv := server.CreateServer(users, room, config)
+	srv := server.CreateServer(users, tables.NewTables(), config)
 
 	startServer := func() {
 		log.Printf("starting grpc server")

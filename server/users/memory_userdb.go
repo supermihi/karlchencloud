@@ -1,8 +1,7 @@
 package users
 
 import (
-	"errors"
-	clouderr "github.com/supermihi/karlchencloud/server/errors"
+	"github.com/supermihi/karlchencloud/server/errors"
 	"github.com/supermihi/karlchencloud/utils/security"
 	"sync"
 )
@@ -37,7 +36,7 @@ func (m *MemoryUserDb) Add(email string, password string, name string) (AccountD
 	defer m.mtx.Unlock()
 	for _, user := range m.users {
 		if user.Email == email {
-			return AccountData{}, errors.New("user exists")
+			return AccountData{}, errors.NewCloudError(errors.UserAlreadyExists)
 		}
 	}
 	m.largestId += 1
@@ -64,7 +63,7 @@ func (m *MemoryUserDb) ListIds() ([]Id, error) {
 func (m *MemoryUserDb) GetData(id Id) (AccountData, error) {
 	user, ok := m.users[id]
 	if !ok {
-		return AccountData{}, clouderr.NewCloudError(clouderr.UserDoesNotExist)
+		return AccountData{}, errors.NewCloudError(errors.UserDoesNotExist)
 	}
 	return ToUserData(*user), nil
 }
@@ -72,11 +71,11 @@ func (m *MemoryUserDb) GetData(id Id) (AccountData, error) {
 func (m *MemoryUserDb) VerifyToken(token string) (AccountData, error) {
 	id, err := ParseId(token)
 	if err != nil {
-		return AccountData{}, clouderr.NewCloudError(clouderr.InvalidSessionToken)
+		return AccountData{}, errors.NewCloudError(errors.InvalidSessionToken)
 	}
 	user, ok := m.users[id]
 	if !ok {
-		return AccountData{}, clouderr.NewCloudError(clouderr.InvalidSessionToken)
+		return AccountData{}, errors.NewCloudError(errors.InvalidSessionToken)
 	}
 	return ToUserData(*user), nil
 }
@@ -86,7 +85,7 @@ func (m *MemoryUserDb) ChangeName(id Id, newName string) error {
 	defer m.mtx.Unlock()
 	existing, ok := m.users[id]
 	if !ok {
-		return errors.New("user does not exist")
+		return errors.NewCloudError(errors.UserDoesNotExist)
 	}
 	existing.Name = newName
 	return nil
@@ -101,9 +100,9 @@ func (m *MemoryUserDb) Authenticate(email string, password string) (AccountData,
 			if ok {
 				return ToUserData(*user), nil
 			} else {
-				return AccountData{}, clouderr.NewCloudError(clouderr.AuthenticationFailed)
+				return AccountData{}, errors.NewCloudError(errors.AuthenticationFailed)
 			}
 		}
 	}
-	return AccountData{}, clouderr.NewCloudError(clouderr.UserDoesNotExist)
+	return AccountData{}, errors.NewCloudError(errors.UserDoesNotExist)
 }

@@ -1,19 +1,18 @@
-package room
+package tables
 
 import (
 	"github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	t "github.com/supermihi/karlchencloud/server/table"
 	u "github.com/supermihi/karlchencloud/server/users"
 	"time"
 )
 
-// This file contains data types returned from the public interface of Room.
+// This file contains data types returned from the public interface of Tables.
 
-// TableData gives information on a table (not including a potential match)
+// TableData gives information on a table (not including match data)
 type TableData struct {
-	Id         t.Id
+	Id         TableId
 	Owner      u.Id
 	InviteCode string
 	Players    []u.Id
@@ -23,7 +22,7 @@ type TableData struct {
 }
 
 // NewTableData extracts TableData from a given Table.
-func NewTableData(t *t.Table) *TableData {
+func NewTableData(t *Table) *TableData {
 	players := t.PlayersInOrder
 	if t.PlayersInOrder == nil {
 		players = t.Players
@@ -60,7 +59,7 @@ type MatchData struct {
 	Evaluation      *match.GameEvaluation
 }
 
-func NewMatchData(tm *t.TableMatch) *MatchData {
+func NewMatchData(tm *TableMatch) *MatchData {
 	decls := tm.Match.Auction.Declarations
 	declarations := make(map[game.Player]DeclarationData, len(decls))
 	for k, v := range decls {

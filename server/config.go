@@ -5,13 +5,13 @@ import (
 	"math/rand"
 )
 
-type RoomConfig struct {
+type TablesConfig struct {
 	InputSeed int64 `yaml:"seed" env:"KC_DBG_SEED" env-default:"0"`
 }
 
 type ServerConfig struct {
-	Room    RoomConfig `yaml:"room"`
-	NoProxy bool       `yaml:"noProxy" env:"NO_PROXY" env-default:"0"`
+	Tables  TablesConfig `yaml:"tables"`
+	NoProxy bool         `yaml:"noProxy" env:"NO_PROXY" env-default:"0"`
 }
 
 func ReadConfig() (cfg ServerConfig, err error) {
@@ -19,7 +19,7 @@ func ReadConfig() (cfg ServerConfig, err error) {
 	return
 }
 
-func (cfg *RoomConfig) Seed() int64 {
+func (cfg *TablesConfig) Seed() int64 {
 	if cfg.InputSeed == 0 {
 		return rand.Int63()
 	}

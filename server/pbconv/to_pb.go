@@ -5,8 +5,7 @@ import (
 	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
-	r "github.com/supermihi/karlchencloud/server/room"
-	t "github.com/supermihi/karlchencloud/server/table"
+	t "github.com/supermihi/karlchencloud/server/tables"
 	u "github.com/supermihi/karlchencloud/server/users"
 )
 
@@ -153,7 +152,7 @@ func toPbBids(bids *match.Bids, users t.PlayerUserMap) []*pb.Bid {
 	return ans
 }
 
-func ToPbGameState(m *r.MatchData) *pb.GameState {
+func ToPbGameState(m *t.MatchData) *pb.GameState {
 	var prevTrick *pb.Trick
 	prevTrickGame := m.PreviousTrick
 	if prevTrickGame != nil {
@@ -166,7 +165,7 @@ func ToPbGameState(m *r.MatchData) *pb.GameState {
 		PreviousTrick:   prevTrick,
 	}
 }
-func ToPbMatchState(matchData *r.MatchData, user u.Id) *pb.MatchState {
+func ToPbMatchState(matchData *t.MatchData, user u.Id) *pb.MatchState {
 	turn := &pb.PlayerValue{}
 	if matchData.Turn != game.NoPlayer {
 		turn.UserId = matchData.Players[matchData.Turn].String()
@@ -204,7 +203,7 @@ func ToPbCards(cards game.Hand) []*pb.Card {
 
 type MemberResolver func(u.Id) *pb.TableMember
 
-func ToPbTableData(table *r.TableData, user u.Id, getPbTableMember MemberResolver) *pb.TableData {
+func ToPbTableData(table *t.TableData, user u.Id, getPbTableMember MemberResolver) *pb.TableData {
 	pbMembers := make([]*pb.TableMember, len(table.Players))
 	for i, player := range table.Players {
 		pbMembers[i] = getPbTableMember(player)
@@ -217,7 +216,7 @@ func ToPbTableData(table *r.TableData, user u.Id, getPbTableMember MemberResolve
 	return ans
 }
 
-func ToPbTables(tables []*r.TableData, user u.Id, getPbTableMember MemberResolver) []*pb.TableData {
+func ToPbTables(tables []*t.TableData, user u.Id, getPbTableMember MemberResolver) []*pb.TableData {
 	result := make([]*pb.TableData, len(tables))
 	for i, table := range tables {
 		result[i] = ToPbTableData(table, user, getPbTableMember)
@@ -225,7 +224,7 @@ func ToPbTables(tables []*r.TableData, user u.Id, getPbTableMember MemberResolve
 	return result
 }
 
-func toPbAuctionState(data *r.MatchData) *pb.AuctionState {
+func toPbAuctionState(data *t.MatchData) *pb.AuctionState {
 	declarations := make([]*pb.Declaration, len(data.Declarations))
 	i := 0
 	for player, decl := range data.Declarations {
@@ -235,7 +234,7 @@ func toPbAuctionState(data *r.MatchData) *pb.AuctionState {
 	return &pb.AuctionState{Declarations: declarations}
 }
 
-func addDetails(state *pb.MatchState, md *r.MatchData) {
+func addDetails(state *pb.MatchState, md *t.MatchData) {
 	switch md.Phase {
 	case match.InAuction:
 		state.Phase = pb.MatchPhase_AUCTION

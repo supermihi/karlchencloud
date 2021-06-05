@@ -18,6 +18,7 @@ const (
 	TableAlreadyExists
 	UserAlreadyAtTable
 	UserAlreadyAtOtherTable
+	UserAlreadyExists
 	UserNotAtTable
 	NotOwnerOfTable
 	UnableToJoinStartedTable
@@ -54,6 +55,8 @@ func (c ErrorCode) Message() string {
 		return "The table you are trying to create already exists"
 	case UserAlreadyAtTable:
 		return "The user is already at this table"
+	case UserAlreadyExists:
+		return "The users already exists"
 	case UserAlreadyAtOtherTable:
 		return "The user is already at another table"
 	case UserNotAtTable:

@@ -7,8 +7,7 @@ import (
 	"github.com/supermihi/karlchencloud/doko/match"
 	"github.com/supermihi/karlchencloud/server/errors"
 	"github.com/supermihi/karlchencloud/server/pbconv"
-	r "github.com/supermihi/karlchencloud/server/room"
-	t "github.com/supermihi/karlchencloud/server/table"
+	t "github.com/supermihi/karlchencloud/server/tables"
 	u "github.com/supermihi/karlchencloud/server/users"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -18,16 +17,16 @@ import (
 
 type dokoserver struct {
 	pb.UnimplementedDokoServer
-	room    *r.Room
+	tables  *t.Tables
 	auth    Auth
 	streams ClientStreams
 	config  ServerConfig
 }
 
-func CreateServer(users u.Users, room *r.Room, config ServerConfig) *grpc.Server {
+func CreateServer(users u.Users, tables *t.Tables, config ServerConfig) *grpc.Server {
 	auth := NewAuth(users)
 	grpcServer := CreateGrpcServerForAuth(auth)
-	serv := &dokoserver{room: room, auth: auth, streams: NewClientStreams(), config: config}
+	serv := &dokoserver{tables: tables, auth: auth, streams: NewClientStreams(), config: config}
 	pb.RegisterDokoServer(grpcServer, serv)
 	return grpcServer
 }
@@ -54,10 +53,10 @@ func (s *dokoserver) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 
 func (s *dokoserver) CreateTable(ctx context.Context, request *pb.CreateTableRequest) (*pb.TableData, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	table, err := s.room.CreateTable(
+	table, err := s.tables.CreateTable(
 		user.Id,
 		request.Public,
-		s.config.Room.Seed(),
+		s.config.Tables.Seed(),
 	)
 	if err != nil {
 		return nil, toGrpcError(err)
@@ -79,7 +78,7 @@ func (s *dokoserver) UsersInLobby() ([]u.Id, error) {
 	}
 	usersInLobby := make([]u.Id, 0)
 	for _, uid := range users {
-		if !s.room.IsAtAnyTable(uid) {
+		if !s.tables.IsAtAnyTable(uid) {
 			usersInLobby = append(usersInLobby, uid)
 		}
 	}
@@ -94,11 +93,11 @@ func (s *dokoserver) StartTable(ctx context.Context, req *pb.StartTableRequest) 
 		return nil, toGrpcError(err)
 	}
 	log.Printf("starting table %s", id)
-	table, err := s.room.StartTable(id, user.Id)
+	table, err := s.tables.StartTable(id, user.Id)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	matchData, err := s.room.GetMatchData(id)
+	matchData, err := s.tables.GetMatchData(id)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
@@ -112,18 +111,18 @@ func (s *dokoserver) StartTable(ctx context.Context, req *pb.StartTableRequest) 
 
 func (s *dokoserver) JoinTable(ctx context.Context, req *pb.JoinTableRequest) (*pb.TableState, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	var table *r.TableData
+	var table *t.TableData
 	var err error
 	switch td := req.TableDescription.(type) {
 	case *pb.JoinTableRequest_InviteCode:
-		table, err = s.room.JoinTableByInviteCode(user.Id, td.InviteCode)
+		table, err = s.tables.JoinTableByInviteCode(user.Id, td.InviteCode)
 	case *pb.JoinTableRequest_TableId:
-		var tableId t.Id
+		var tableId t.TableId
 		tableId, err = t.ParseTableId(td.TableId)
 		if err != nil {
 			return nil, err
 		}
-		table, err = s.room.JoinTableByTableId(user.Id, tableId)
+		table, err = s.tables.JoinTableByTableId(user.Id, tableId)
 	}
 
 	if err != nil {
@@ -137,7 +136,7 @@ func (s *dokoserver) JoinTable(ctx context.Context, req *pb.JoinTableRequest) (*
 
 func (s *dokoserver) getUserState(user u.AccountData) (*pb.UserState, error) {
 	ans := &pb.UserState{Name: user.Name}
-	activeTable := s.room.ActiveTableOf(user.Id)
+	activeTable := s.tables.ActiveTableOf(user.Id)
 	if activeTable != nil {
 		tableState, err := s.getTableState(activeTable, user.Id)
 		if err != nil {
@@ -171,7 +170,7 @@ func (s *dokoserver) startEventSubscription(user u.AccountData, srv pb.Doko_Star
 		return nil, err
 	}
 	s.streams.SendSingle(user.Id, &pb.Event{Event: &pb.Event_Welcome{Welcome: userState}})
-	receivers := s.room.UsersAtSameTable(user.Id)
+	receivers := s.tables.UsersAtSameTable(user.Id)
 	if receivers != nil {
 		s.streams.Send(receivers, pb.NewMemberEvent(user.Id.String(), user.Name, pb.MemberEventType_GO_ONLINE))
 	}
@@ -181,9 +180,9 @@ func (s *dokoserver) startEventSubscription(user u.AccountData, srv pb.Doko_Star
 
 func (s *dokoserver) endEventSubscription(srv pb.Doko_StartSessionServer, user u.AccountData) error {
 	log.Printf("user %s disconnected", user)
-	table := s.room.ActiveTableOf(user.Id)
+	table := s.tables.ActiveTableOf(user.Id)
 	if table != nil {
-		receivers := s.room.UsersAtSameTable(user.Id)
+		receivers := s.tables.UsersAtSameTable(user.Id)
 		if receivers != nil {
 			s.streams.Send(receivers, pb.NewMemberEvent(user.Id.String(), user.Name, pb.MemberEventType_GO_OFFLINE))
 		}
@@ -191,7 +190,7 @@ func (s *dokoserver) endEventSubscription(srv pb.Doko_StartSessionServer, user u
 	return srv.Context().Err()
 }
 
-func getOtherPlayers(table *r.TableData, player u.Id) []u.Id {
+func getOtherPlayers(table *t.TableData, player u.Id) []u.Id {
 	return u.IdsExcept(table.Players, player)
 }
 
@@ -203,7 +202,7 @@ func (s *dokoserver) Declare(ctx context.Context, d *pb.DeclareRequest) (*pb.Dec
 		return nil, toGrpcError(err)
 	}
 	gameType := pbconv.ToGameType(d.Declaration)
-	m, err := s.room.Declare(tableId, user.Id, gameType)
+	m, err := s.tables.Declare(tableId, user.Id, gameType)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
@@ -214,7 +213,7 @@ func (s *dokoserver) Declare(ctx context.Context, d *pb.DeclareRequest) (*pb.Dec
 		declaration.DefinedGameMode = pbconv.ToPbMode(m.Mode, m.Turn, m.Players)
 	}
 	event := &pb.Event{Event: &pb.Event_Declared{Declared: declaration}}
-	s.streams.Send(s.room.UsersAtSameTable(user.Id), event)
+	s.streams.Send(s.tables.UsersAtSameTable(user.Id), event)
 	return declaration, nil
 }
 
@@ -225,13 +224,13 @@ func (s *dokoserver) PlaceBid(ctx context.Context, req *pb.PlaceBidRequest) (*pb
 		log.Printf("placeBid: could not parse table id %s: %v\n", req.Table, err)
 		return nil, toGrpcError(err)
 	}
-	_, err = s.room.PlaceBid(tableId, user.Id, pbconv.ToBid(req.Bid))
+	_, err = s.tables.PlaceBid(tableId, user.Id, pbconv.ToBid(req.Bid))
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
 	bid := &pb.Bid{UserId: user.Id.String(), Bid: req.Bid}
 	event := &pb.Event{Event: &pb.Event_PlacedBid{PlacedBid: bid}}
-	s.streams.Send(s.room.UsersAtSameTable(user.Id), event)
+	s.streams.Send(s.tables.UsersAtSameTable(user.Id), event)
 	return bid, nil
 }
 
@@ -242,13 +241,13 @@ func (s *dokoserver) PlayCard(ctx context.Context, req *pb.PlayCardRequest) (*pb
 		log.Printf("playCard: could not parse table id %s: %v\n", req.Table, err)
 		return nil, toGrpcError(err)
 	}
-	m, err := s.room.PlayCard(tableId, user.Id, pbconv.ToCard(req.Card))
+	m, err := s.tables.PlayCard(tableId, user.Id, pbconv.ToCard(req.Card))
 	if err != nil {
 		log.Printf("%s failed to play %s: %s", user.Name, pbconv.ToCard(req.Card), err)
 		return nil, toGrpcError(err)
 	}
 	log.Printf("%s plays %s", user.Name, pbconv.ToCard(req.Card))
-	table, err := s.room.GetTable(tableId)
+	table, err := s.tables.GetTable(tableId)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
@@ -277,11 +276,11 @@ func (s *dokoserver) StartNextMatch(ctx context.Context, req *pb.StartNextMatchR
 		log.Printf("could not parse table id %s: %v\n", req.TableId, err)
 		return nil, toGrpcError(err)
 	}
-	matchData, err := s.room.StartNextMatch(tableId, user.Id)
+	matchData, err := s.tables.StartNextMatch(tableId, user.Id)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
-	table, err := s.room.GetTable(tableId)
+	table, err := s.tables.GetTable(tableId)
 	if err != nil {
 		return nil, toGrpcError(err)
 	}
@@ -295,16 +294,16 @@ func (s *dokoserver) StartNextMatch(ctx context.Context, req *pb.StartNextMatchR
 
 func (s *dokoserver) ListTables(ctx context.Context, _ *pb.ListTablesRequest) (*pb.ListTablesResult, error) {
 	user, _ := GetAuthenticatedUser(ctx)
-	tables := s.room.GetOpenTables(user.Id)
+	tables := s.tables.GetOpenTables(user.Id)
 	pbResult := pbconv.ToPbTables(tables, user.Id, s.createPbTableMember)
 	return &pb.ListTablesResult{Tables: pbResult}, nil
 }
 
-func (s *dokoserver) getTableState(table *r.TableData, user u.Id) (*pb.TableState, error) {
+func (s *dokoserver) getTableState(table *t.TableData, user u.Id) (*pb.TableState, error) {
 	data := pbconv.ToPbTableData(table, user, s.createPbTableMember)
 	state := &pb.TableState{Data: data, Phase: table.Phase}
 	if table.Phase == pb.TablePhase_PLAYING {
-		matchData, err := s.room.GetMatchData(table.Id)
+		matchData, err := s.tables.GetMatchData(table.Id)
 		if err != nil {
 			return nil, err
 		}

@@ -1,4 +1,4 @@
-package table
+package tables
 
 import (
 	"fmt"
@@ -7,14 +7,13 @@ import (
 	"github.com/supermihi/karlchencloud/doko/match"
 	"github.com/supermihi/karlchencloud/server/errors"
 	"github.com/supermihi/karlchencloud/server/users"
-	"github.com/supermihi/karlchencloud/utils"
 	"log"
 	"math/rand"
 	"time"
 )
 
 type Table struct {
-	Id             Id
+	Id             TableId
 	Created        time.Time
 	InviteCode     string
 	Public         bool
@@ -49,14 +48,6 @@ func (t *Table) Owner() users.Id {
 
 func (t *Table) String() string {
 	return fmt.Sprintf("Table %v", t.Id)
-}
-
-func randomTableId() Id {
-	return Id(rand.Int63())
-}
-
-func randomInviteCode() string {
-	return utils.RandomLetters(12)
 }
 
 func (t *Table) Start() error {

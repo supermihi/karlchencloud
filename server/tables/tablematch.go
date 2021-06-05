@@ -1,4 +1,4 @@
-package table
+package tables
 
 import (
 	"github.com/supermihi/karlchencloud/doko/game"
@@ -8,8 +8,9 @@ import (
 
 type PlayerUserMap [game.NumPlayers]users.Id
 
+// TableMatch represents a Match inside a table. It augments
 type TableMatch struct {
-	Match   match.Match
+	match.Match
 	Players PlayerUserMap
 }
 
