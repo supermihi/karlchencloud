@@ -28,48 +28,48 @@ export default function RegisterView({ register, loading, error }: Props): React
   return (
     <>
       <MainPaper>
-        <Typography component='h1' variant='h6'>
+        <Typography component="h1" variant="h6">
           Willkommen!
         </Typography>
-        <Typography component='p' variant='body1' gutterBottom>
+        <Typography component="p" variant="body1" gutterBottom>
           Sieht aus als wärst du zum ersten Mal hier. Wie heißt du?
         </Typography>
-        <form noValidate className={classes.root} autoComplete='off'>
+        <form noValidate className={classes.root} autoComplete="off">
           <TextField
             required
-            autoComplete='name'
+            autoComplete="name"
             error={!nameValid}
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
-            placeholder='Karlchen Müller'
+            placeholder="Karlchen Müller"
           />
           <TextField
             required
-            autoComplete='email'
-            type='email'
+            autoComplete="email"
+            type="email"
             error={!emailValid}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            placeholder='karlchen@mueller.de'
+            placeholder="karlchen@mueller.de"
           />
           <TextField
             required
-            autoComplete='new-password'
+            autoComplete="new-password"
             error={!passwordValid}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
-            type='password'
-            placeholder='password'
+            type="password"
+            placeholder="password"
           />
         </form>
         <div className={classes.buttons}>
           <Button
             disabled={!(nameValid && emailValid && passwordValid)}
-            variant='contained'
-            color='primary'
+            variant="contained"
+            color="primary"
             onClick={() => register({ name, email, password })}
           >
             Los

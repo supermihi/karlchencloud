@@ -19,15 +19,14 @@ export const register = createAsyncThunk<MyUserData, RegisterData>(
 
 export const login = createAsyncThunk<MyUserData, LoginData>(
   'login',
-  async ({email, password}, {dispatch}) => {
-    const { id, name, token} = await api.login(email, password);
-    const ans = {name, id, token, email};
+  async ({ email, password }, { dispatch }) => {
+    const { id, name, token } = await api.login(email, password);
+    const ans = { name, id, token, email };
     writeLoginDataToLocalStorage(ans);
     dispatch(localStorageUpdated(ans));
     return ans;
   }
-
-)
+);
 export const forgetLogin = (): AppThunk => (dispatch) => {
   deleteLoginDataInLocalStorage();
   dispatch(localStorageUpdated(null));

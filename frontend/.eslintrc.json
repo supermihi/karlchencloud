@@ -1,11 +1,12 @@
 {
+  "ignorePatterns": ["dist", ".yarn*", "src/api/karlchen_pb*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "react-hooks"],
-  "extends": ["plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": ["plugin:react/recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   "rules": {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

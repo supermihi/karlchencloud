@@ -16,5 +16,8 @@ jobs:
         run: yarn install
         working-directory: ./frontend
       - name: Run prettier
-        run: yarn run lint
+        run: yarn lint
+        working-directory: ./frontend
+      - name: build
+        run: yarn build
         working-directory: ./frontend

@@ -26,36 +26,36 @@ export default function LoginView({ login, loading, error }: Props): React.React
   return (
     <>
       <MainPaper>
-        <Typography component='h1' variant='h6'>
+        <Typography component="h1" variant="h6">
           Bei Karlchencloud einloggen
         </Typography>
-        <form noValidate className={classes.root} autoComplete='off'>
+        <form noValidate className={classes.root} autoComplete="off">
           <TextField
             required
-            autoComplete='email'
-            type='email'
+            autoComplete="email"
+            type="email"
             error={!emailValid}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            placeholder='karlchen@mueller.de'
+            placeholder="karlchen@mueller.de"
           />
           <TextField
             required
-            autoComplete='current-password'
+            autoComplete="current-password"
             error={!passwordValid}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
-            type='password'
-            placeholder='password'
+            type="password"
+            placeholder="password"
           />
         </form>
         <div className={classes.buttons}>
           <Button
             disabled={!(emailValid && passwordValid)}
-            variant='contained'
-            color='primary'
+            variant="contained"
+            color="primary"
             onClick={() => login({ email, password })}
           >
             Los

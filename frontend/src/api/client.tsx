@@ -29,8 +29,8 @@ export function getAuthenticatedClient(token: string): AuthenticatedClient {
 export async function register(email: string, name: string, password: string): Promise<MyUserData> {
   const request = new proto.RegisterRequest();
   request.setName(name);
-  request.setEmail(email)
-  request.setPassword(password)
+  request.setEmail(email);
+  request.setPassword(password);
   const ans = await getPbClient().register(request, null);
   const [id, token] = [ans.getUserId(), ans.getToken()];
   return { name, id, token, email };
@@ -38,11 +38,11 @@ export async function register(email: string, name: string, password: string): P
 
 export async function login(email: string, password: string): Promise<MyUserData> {
   const request = new proto.LoginRequest();
-  request.setEmail(email)
-  request.setPassword(password)
+  request.setEmail(email);
+  request.setPassword(password);
   const ans = await getPbClient().login(request, null);
   const [token, id, name] = [ans.getToken(), ans.getUserId(), ans.getName()];
-  return {name, id, token, email }
+  return { name, id, token, email };
 }
 
 export function isGrpcError(error: unknown): error is grpc.Error {

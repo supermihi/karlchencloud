@@ -51,7 +51,7 @@ export const reducer = createReducer<ActionState>(
 );
 export type PlayThunk<Returned, ThunkArg> = ((
   arg: ThunkArg
-) => ThunkAction<any, RootState, unknown, Action<string>>) & {
+) => ThunkAction<unknown, RootState, unknown, Action<string>>) & {
   fulfilled: PayloadActionCreator<Returned, string, PrepareAction<Returned>>;
 };
 export function createPlayThunk<TArg, Returned = void>(

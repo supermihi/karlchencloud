@@ -14,7 +14,7 @@ export const createTable = createPlayThunk<void, Table>(
   ActionKind.createTable,
   async (_, { client, meta }) => {
     const request = new api.CreateTableRequest();
-    request.setPublic(true)
+    request.setPublic(true);
     const result = await client.createTable(request, meta);
     return toTable(result, api.TablePhase.NOT_STARTED);
   }

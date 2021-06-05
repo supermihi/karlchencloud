@@ -1,1 +1,3 @@
 .yarn
+dist
+src/api/karlchen_pb.*

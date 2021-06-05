@@ -17,7 +17,14 @@ interface Props {
   resetError?: () => void;
 }
 
-const LoginWithTokenView: React.FC<Props> = ({ login, forgetLogin, loading, error, name, resetError }) => (
+const LoginWithTokenView: React.FC<Props> = ({
+  login,
+  forgetLogin,
+  loading,
+  error,
+  name,
+  resetError,
+}) => (
   <>
     <MainPaper>
       <Typography component="h1" variant="h6" gutterBottom>

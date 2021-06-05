@@ -7,7 +7,7 @@ import { actions } from '../slice';
 
 const mapStateToProps = createSelector(selectSession, (session) => ({
   loading: Boolean(session.loading),
-  error: session.error
+  error: session.error,
 }));
 const mapDispatchToProps = {
   login,

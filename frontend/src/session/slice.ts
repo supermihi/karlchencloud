@@ -5,9 +5,7 @@ import * as grpc from 'grpc-web';
 import * as events from './events';
 import { localStorageUpdated, login, register } from './thunks/authenticate';
 
-const reduceSessionStarted: CaseReducer<SessionState, PayloadAction> = (
-  state,
-) => {
+const reduceSessionStarted: CaseReducer<SessionState, PayloadAction> = (state) => {
   if (!state.startingSession) {
     return;
   }

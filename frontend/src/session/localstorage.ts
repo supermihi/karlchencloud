@@ -20,7 +20,7 @@ export function writeLoginDataToLocalStorage({ id, name, token, email }: MyUserD
   window.localStorage.setItem(key_id, id);
   window.localStorage.setItem(key_name, name);
   window.localStorage.setItem(key_token, token);
-  window.localStorage.setItem(key_email, email)
+  window.localStorage.setItem(key_email, email);
 }
 
 export function deleteLoginDataInLocalStorage(): void {
