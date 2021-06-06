@@ -22,8 +22,11 @@ export function afterPlayedCard(
   });
 }
 
-function removeCard(cards: Card[], card: Card): Card[] {
+export function removeCard(cards: Card[], card: Card): Card[] {
   const cardIndex = cards.findIndex((c) => c.rank === card.rank && c.suit === card.suit);
+  if (cardIndex === -1) {
+    return cards;
+  }
   return update(cards, { $splice: [[cardIndex, 1]] });
 }
 

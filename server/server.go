@@ -48,6 +48,7 @@ func (s *dokoserver) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 		log.Printf("error logging in: %v", err)
 		return nil, toGrpcError(err)
 	}
+	log.Printf("%s logged in", user.Name)
 	return &pb.LoginReply{Name: user.Name, UserId: user.Id.String(), Token: user.Token}, nil
 }
 
