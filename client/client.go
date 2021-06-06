@@ -157,7 +157,7 @@ func (c *Client) handleStart(s *api.MatchState) {
 func (c *Client) handleDeclare(d *api.Declaration) {
 	c.Match().UpdateOnDeclare(d)
 	if c.Match().Phase == match.InGame {
-		c.Logf("now in game! Forehand: %s", c.Table().MemberNamesById[c.Match().Trick.Forehand])
+		c.Logf("game phase started (forehand is %s)", c.Table().MemberNamesById[c.Match().Trick.Forehand])
 	}
 	c.checkMyTurn()
 }
@@ -186,7 +186,7 @@ func (c *Client) checkMyTurn() {
 }
 func (c *Client) PlayCard(i int) error {
 	card := c.Match().Cards[i]
-	log.Printf("playing card: %v", card)
+	c.Logf("playing card: %v", card)
 	result, err := c.client.Grpc.PlayCard(
 		c.client.Context,
 		&api.PlayCardRequest{Table: c.table.Id, Card: pbconv.ToPbCard(card)})
