@@ -1,16 +1,18 @@
 import { connect } from 'react-redux';
-import LoginView from './LoginView';
+import LoginOrRegisterView from './LoginOrRegisterView';
 import { createSelector } from '@reduxjs/toolkit';
 import { selectSession } from '../selectors';
-import { login } from '../thunks/authenticate';
+import { login, register } from '../thunks/authenticate';
 import { actions } from '../slice';
+import { SessionPhase } from '../model';
 
 const mapStateToProps = createSelector(selectSession, (session) => ({
-  loading: Boolean(session.loading),
+  loading: session.phase === SessionPhase.Starting,
   error: session.error,
 }));
 const mapDispatchToProps = {
   login,
+  register,
   resetError: actions.resetError,
 };
-export default connect(mapStateToProps, mapDispatchToProps)(LoginView);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginOrRegisterView);

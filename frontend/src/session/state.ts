@@ -1,20 +1,16 @@
-import { MyUserData } from 'session/model';
+import { MyUserData, SessionPhase } from 'session/model';
 import { getLoginDataFromLocalStorage } from './localstorage';
 
 export interface SessionState {
-  storedLogin: MyUserData | null;
-  activeSession: MyUserData | null;
-  startingSession: MyUserData | null;
+  userData: MyUserData | null;
+  phase: SessionPhase;
   error?: unknown;
-  loading: boolean;
 }
 
 export const initialState = (): SessionState => {
-  const existingLogin = getLoginDataFromLocalStorage();
+  const rememberedLogin = getLoginDataFromLocalStorage();
   return {
-    storedLogin: existingLogin,
-    activeSession: null,
-    startingSession: null,
-    loading: false,
+    userData: rememberedLogin,
+    phase: rememberedLogin === null ? SessionPhase.NoToken : SessionPhase.TokenObtained,
   };
 };

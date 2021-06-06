@@ -14,7 +14,7 @@ export function afterPlayedCard(
     game: {
       currentTrick: {
         winner: { $set: trickWinner },
-        cards: { $push: [card] },
+        cards: trickWinner === undefined ? { $push: [card] } : { $set: [] },
       },
     },
     cards: { $set: cards },

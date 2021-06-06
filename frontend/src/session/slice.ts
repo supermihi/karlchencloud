@@ -1,64 +1,62 @@
-import { CaseReducer, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MyUserData } from './model';
+import { CaseReducer, createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
+import { SessionPhase } from './model';
 import { initialState, SessionState } from './state';
-import * as grpc from 'grpc-web';
 import * as events from './events';
-import { localStorageUpdated, login, register } from './thunks/authenticate';
+import { forgetLogin, login, register } from './thunks/authenticate';
+import { sessionError, sessionStarting } from './thunks/session';
 
-const reduceSessionStarted: CaseReducer<SessionState, PayloadAction> = (state) => {
-  if (!state.startingSession) {
-    return;
-  }
-  state.activeSession = state.startingSession;
-  state.startingSession = null;
+const reduceLoginOrRegisterError: CaseReducer<
+  SessionState,
+  PayloadAction<unknown, string, never, SerializedError>
+> = (state, action) => {
+  state.error = action.error;
+  state.phase = SessionPhase.NoToken;
+  state.userData = null;
 };
 
 const sessionSlice = createSlice({
   name: 'session',
   initialState: initialState(),
   reducers: {
-    sessionStarting: (_, { payload: userData }: PayloadAction<MyUserData>) => ({
-      ...initialState(),
-      startingSession: userData,
-    }),
-    sessionError: (state, { payload: error }: PayloadAction<grpc.Error>) => {
-      state.loading = false;
-      state.activeSession = null;
-      state.startingSession = null;
-      state.error = error;
-    },
     resetError: (state) => {
       state.error = undefined;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(localStorageUpdated, (state, { payload }) => {
-        state.storedLogin = payload;
+      .addCase(sessionStarting, (state, { payload: userData }) => {
+        state.userData = userData;
+        state.phase = SessionPhase.Starting;
       })
-      .addCase(login.fulfilled, (state) => {
-        state.loading = false;
+      .addCase(sessionError, (state, { payload: error }) => {
+        state.phase = SessionPhase.TokenObtained;
+        state.error = error;
       })
-      .addCase(register.fulfilled, (state) => {
-        state.loading = false;
+      .addCase(login.fulfilled, (state, { payload }) => {
+        state.phase = SessionPhase.TokenObtained;
+        state.userData = payload;
+      })
+      .addCase(register.fulfilled, (state, { payload }) => {
+        state.phase = SessionPhase.TokenObtained;
+        state.userData = payload;
       })
       .addCase(login.pending, (state) => {
-        state.loading = true;
+        state.phase = SessionPhase.ObtainingToken;
         state.error = null;
       })
       .addCase(register.pending, (state) => {
-        state.loading = true;
+        state.phase = SessionPhase.ObtainingToken;
         state.error = null;
       })
-      .addCase(register.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error;
+      .addCase(register.rejected, reduceLoginOrRegisterError)
+      .addCase(login.rejected, reduceLoginOrRegisterError)
+      .addCase(events.sessionStarted, (state) => {
+        state.phase = SessionPhase.Established;
       })
-      .addCase(login.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error;
-      })
-      .addCase(events.sessionStarted, reduceSessionStarted);
+      .addCase(forgetLogin, (state) => {
+        state.userData = null;
+        state.phase = SessionPhase.NoToken;
+      });
   },
 });
 

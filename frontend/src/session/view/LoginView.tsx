@@ -22,7 +22,6 @@ export default function LoginView({ login, loading, error }: Props): React.React
   const [password, setPassword] = useState('');
   const emailValid = isValidEmail(email);
   const passwordValid = password.trim() !== '';
-
   return (
     <>
       <MainPaper>
@@ -33,7 +32,7 @@ export default function LoginView({ login, loading, error }: Props): React.React
           <TextField
             required
             autoComplete="email"
-            type="email"
+            type="text"
             error={!emailValid}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -49,6 +48,7 @@ export default function LoginView({ login, loading, error }: Props): React.React
             fullWidth
             type="password"
             placeholder="password"
+            onSubmit={() => login({ email, password })}
           />
         </form>
         <div className={classes.buttons}>

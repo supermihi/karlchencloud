@@ -1,10 +1,12 @@
 import * as api from 'api/karlchen_pb';
+import { TablePhase } from 'api/karlchen_pb';
 import { selectPlayers } from 'play/selectors';
 import { Dispatchable } from 'state';
-import { getCurrentTableState, toCard, toMatch, toMode } from 'model/apiconv';
+import { getCurrentTableState, toCard, toMatch, toMode, toTable } from 'model/apiconv';
 import { Declaration, DeclareResult } from 'model/auction';
 import { getPosition } from 'model/players';
 import * as events from '../events';
+
 const { EventCase } = api.Event;
 
 export const createEventAction = (event: api.Event): Dispatchable => {
@@ -19,6 +21,8 @@ export const createEventAction = (event: api.Event): Dispatchable => {
       return createDeclaredAction(event.getDeclared() as api.Declaration);
     case EventCase.PLAYED_CARD:
       return createPlayedCardAction(event.getPlayedCard() as api.PlayedCard);
+    case EventCase.NEW_TABLE:
+      return createNewTableAction(event.getNewTable() as api.TableData);
     default:
       return events.notImplementedEvent(event.getEventCase().toString());
   }
@@ -78,5 +82,12 @@ function createPlayedCardAction(event: api.PlayedCard): Dispatchable {
         trickWinner: winner === null ? undefined : getPosition(players, winner.getUserId()),
       })
     );
+  };
+}
+
+function createNewTableAction(t: api.TableData): Dispatchable {
+  const table = toTable(t, TablePhase.NOT_STARTED);
+  return (dispatch) => {
+    dispatch(events.tableCreated(table));
   };
 }
