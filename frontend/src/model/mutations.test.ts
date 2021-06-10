@@ -45,20 +45,21 @@ test('afterPlayedCard when placing first card of second trick', () => {
   const before = createMatch({
     phase: MatchPhase.GAME,
     forehand: Pos.top,
-    progress: 0,
-    numPlayedTricks: 1,
+    progress: 4,
+    numPlayedTricks: 0,
+    currentTrickWinner: Pos.left,
   }) as MatchInGame;
   const handBefore = [...before.cards];
-  const playedCard = { card: SpadeQ, player: Pos.top, trickWinner: null, matchWinner: null };
+  const playedCard = { card: SpadeQ, player: Pos.left, trickWinner: null, matchWinner: null };
   const after = afterPlayedCard(before, playedCard);
   expect(after.cards).toEqual(handBefore);
   const expectedTrick: Trick = {
-    forehand: Pos.top,
+    forehand: Pos.left,
     cards: [SpadeQ],
     winner: null,
   };
   expect(after.game.currentTrick).toEqual(expectedTrick);
-  expect(after.turn).toEqual(Pos.right);
+  expect(after.turn).toEqual(Pos.top);
 });
 
 test('afterPlayedCard when placing fourth card', () => {

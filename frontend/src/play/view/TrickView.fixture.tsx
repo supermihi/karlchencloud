@@ -7,7 +7,7 @@ interface Props {
   playedCards: number;
 }
 const Trick = ({ playedCards }: Props) => (
-  <div style={{ height: '400px' }}>
+  <div>
     <TrickView
       center={['50%', '50%']}
       cardWidth={150}

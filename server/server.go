@@ -255,6 +255,7 @@ func (s *dokoserver) PlayCard(ctx context.Context, req *pb.PlayCardRequest) (*pb
 	card := &pb.PlayedCard{UserId: user.Id.String(), Card: req.Card}
 	if m.CurrentTrick != nil && m.CurrentTrick.NumCardsPlayed() == 0 {
 		card.TrickWinner = &pb.PlayerValue{UserId: table.Players[m.PreviousTrick.Winner].String()}
+		log.Printf("trick finished. winner: %s", table.Players[m.PreviousTrick.Winner].String())
 	}
 	if m.Phase == match.MatchFinished {
 		card.Winner = &pb.PartyValue{}

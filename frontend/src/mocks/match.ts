@@ -11,6 +11,7 @@ export interface MatchConfig {
   forehand: Pos;
   progress: number;
   numPlayedTricks?: number;
+  currentTrickWinner?: Pos;
 }
 
 export interface AuctionConfig {
@@ -38,10 +39,20 @@ export interface GameConfig {
   numPlayedTricks?: number;
   forehand: Pos;
   progress: number;
+  currentTrickWinner?: Pos;
 }
 
-export function createGame({ numPlayedTricks, forehand, progress }: GameConfig): Game {
-  const trick = mc.trick(forehand, progress, progress === 4 ? Pos.left : undefined);
+export function createGame({
+  numPlayedTricks,
+  forehand,
+  progress,
+  currentTrickWinner,
+}: GameConfig): Game {
+  const trick = mc.trick(
+    forehand,
+    progress,
+    progress === 4 ? currentTrickWinner ?? Pos.left : undefined
+  );
   return {
     bids: emptyBids(),
     completedTricks: numPlayedTricks ?? 0,
@@ -53,14 +64,23 @@ export function createGame({ numPlayedTricks, forehand, progress }: GameConfig):
   };
 }
 
-export function createMatch({ phase, forehand, progress, numPlayedTricks }: MatchConfig): Match {
+export function createMatch({
+  phase,
+  forehand,
+  progress,
+  numPlayedTricks,
+  currentTrickWinner,
+}: MatchConfig): Match {
   return {
     players: mp.players,
     phase: phase,
     auction: phase === MatchPhase.AUCTION ? createAuction({ forehand, progress }) : null,
     cards: fullHand.slice(numPlayedTricks ?? 0),
     turn: nthNext(forehand, progress),
-    game: phase === MatchPhase.GAME ? createGame({ numPlayedTricks, forehand, progress }) : null,
+    game:
+      phase === MatchPhase.GAME
+        ? createGame({ numPlayedTricks, forehand, progress, currentTrickWinner })
+        : null,
     winner: numPlayedTricks === 12 && progress === 4 ? Party.RE : null,
   };
 }
