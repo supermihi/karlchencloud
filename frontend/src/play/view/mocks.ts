@@ -32,6 +32,7 @@ export const matchInGame: Match = {
   game: game,
   auction: emptyAuction(),
   turn: Pos.bottom,
+  winner: null,
 };
 export const matchInAuction: Match = {
   phase: MatchPhase.AUCTION,
@@ -40,6 +41,7 @@ export const matchInAuction: Match = {
   game: null,
   auction,
   turn: Pos.bottom,
+  winner: null,
 };
 
 export const table: Table = {

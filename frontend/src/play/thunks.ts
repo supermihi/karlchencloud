@@ -1,4 +1,4 @@
-import { toDeclareResult, toMatch, toTable, toTableState } from 'model/apiconv';
+import * as apiconv from 'model/apiconv';
 import * as api from 'api/karlchen_pb';
 import { ActionKind, createPlayThunk } from './playActions';
 import { Table } from 'model/table';
@@ -6,7 +6,6 @@ import { Match, PlayedCard } from 'model/match';
 import { Card } from 'model/core';
 import { selectCurrentTableOrThrow, selectPlayers } from './selectors';
 import { newDeclareRequest, newPlayCardRequest } from 'api/modelToPb';
-import { getPosition, Pos } from 'model/players';
 import { selectAuthenticatedClientOrThrow } from 'session/selectors';
 import { DeclareResult } from 'model/auction';
 
@@ -16,7 +15,7 @@ export const createTable = createPlayThunk<void, Table>(
     const request = new api.CreateTableRequest();
     request.setPublic(true);
     const result = await client.createTable(request, meta);
-    return toTable(result, api.TablePhase.NOT_STARTED);
+    return apiconv.toTable(result, api.TablePhase.NOT_STARTED);
   }
 );
 
@@ -26,7 +25,7 @@ export const joinTable = createPlayThunk(
     const req = new api.JoinTableRequest();
     req.setInviteCode(inviteCode);
     const table = await client.joinTable(req, meta);
-    return toTableState(table);
+    return apiconv.toTableState(table);
   }
 );
 
@@ -37,7 +36,7 @@ export const startTable = createPlayThunk<void, Match>(
     const request = new api.StartTableRequest();
     request.setTableId(id);
     const match = await client.startTable(request, meta);
-    return toMatch(match);
+    return apiconv.toMatch(match);
   }
 );
 
@@ -47,13 +46,8 @@ export const playCard = createPlayThunk<Card, PlayedCard>(
     const tableId = selectCurrentTableOrThrow(getState()).id;
     const req = newPlayCardRequest(card, tableId);
     const result = await client.playCard(req, meta);
-    let winner: Pos | undefined = undefined;
-    if (result.hasTrickWinner()) {
-      const winnerId = (result.getTrickWinner() as api.PlayerValue).getUserId();
-      const players = selectPlayers(getState());
-      winner = getPosition(players, winnerId);
-    }
-    return { card, player: Pos.bottom, trickWinner: winner };
+    const players = selectPlayers(getState());
+    return apiconv.toPlayedCard(result, players);
   }
 );
 
@@ -66,6 +60,6 @@ export const declare = createPlayThunk<api.GameType, DeclareResult & { gametype:
     const { client, meta } = selectAuthenticatedClientOrThrow(state);
     const ans = await client.declare(req, meta);
     const players = selectPlayers(state);
-    return { ...toDeclareResult(ans, players), gametype };
+    return { ...apiconv.toDeclareResult(ans, players), gametype };
   }
 );

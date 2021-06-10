@@ -14,6 +14,7 @@ const Trick = ({ playedCards }: Props) => (
       trick={{
         forehand: Pos.left,
         cards: [Diamond9, Diamond10, DiamondA, DiamondQ].slice(0, playedCards),
+        winner: playedCards === 4 ? Pos.bottom : null,
       }}
     />
   </div>

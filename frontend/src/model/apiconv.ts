@@ -2,7 +2,7 @@ import * as api from 'api/karlchen_pb';
 import { Table } from './table';
 import { User, Card } from './core';
 import { fromPairs, mapValues, groupBy } from 'lodash';
-import { Game, Match, Mode, Trick } from './match';
+import { Game, Match, Mode, PlayedCard, Trick } from './match';
 import { toDate } from 'api/helpers';
 import { getPosition, Pos, PlayerIds } from './players';
 import { Auction, Declaration, DeclareResult, emptyAuction } from './auction';
@@ -17,19 +17,19 @@ export function toTable(t: api.TableData, phase: api.TablePhase): Table {
     id: t.getTableId(),
     invite: t.getInviteCode(),
     members: t.getMembersList().map(toUser),
-    created: toDate(t.getCreated() as api.Timestamp).toLocaleString(),
+    created: toDate(t.getCreated()!).toLocaleString(),
     phase,
   };
 }
 
 export function getCurrentTableState(u: api.UserState): TableState | null {
-  return u.hasCurrenttable() ? toTableState(u.getCurrenttable() as api.TableState) : null;
+  return u.hasCurrenttable() ? toTableState(u.getCurrenttable()!) : null;
 }
 
 export function toTableState(t: api.TableState): TableState {
   return {
-    table: toTable(t.getData() as api.TableData, t.getPhase()),
-    match: t.hasCurrentMatch() ? toMatch(t.getCurrentMatch() as api.MatchState) : null,
+    table: toTable(t.getData()!, t.getPhase()),
+    match: t.hasCurrentMatch() ? toMatch(t.getCurrentMatch()!) : null,
   };
 }
 
@@ -93,9 +93,9 @@ function toGame(g: api.GameState, players: PlayerIds): Game {
 
 function toTrick(t: api.Trick, players: PlayerIds): Trick {
   const forehand = getPosition(players, t.getUserIdForehand());
-  let winner: Pos | undefined = undefined;
+  let winner: Pos | null = null;
   if (t.hasUserIdWinner()) {
-    winner = getPosition(players, (t.getUserIdWinner() as api.PlayerValue).getUserId());
+    winner = getPosition(players, t.getUserIdWinner()!.getUserId());
   }
   const cards = t.getCardsList().map(toCard);
   return { forehand, cards, winner };
@@ -108,21 +108,18 @@ export function toCard(c: api.Card): Card {
 }
 
 export function toMatch(m: api.MatchState): Match {
-  const players = toPlayers(m.getPlayers() as api.Players);
-  const cards = m.hasOwnCards() ? (m.getOwnCards() as api.Cards).getCardsList().map(toCard) : [];
-  const auction = m.hasAuctionState()
-    ? toAuction(players, m.getAuctionState() as api.AuctionState)
-    : emptyAuction();
-  const game = m.hasGameState() ? toGame(m.getGameState() as api.GameState, players) : null;
+  const players = toPlayers(m.getPlayers()!);
+  const cards = m.hasOwnCards() ? m.getOwnCards()!.getCardsList().map(toCard) : [];
+  const auction = m.hasAuctionState() ? toAuction(players, m.getAuctionState()!) : emptyAuction();
+  const game = m.hasGameState() ? toGame(m.getGameState()!, players) : null;
   return {
     phase: m.getPhase(),
-    turn: m.hasTurn()
-      ? getPosition(players, (m.getTurn() as api.PlayerValue).getUserId())
-      : undefined,
+    turn: m.hasTurn() ? getPosition(players, m.getTurn()!.getUserId()) : null,
     players,
     cards,
     auction,
     game,
+    winner: null,
   };
 }
 
@@ -133,5 +130,16 @@ export function toDeclareResult(decl: api.Declaration, players: PlayerIds): Decl
     mode,
     player: getPosition(players, decl.getUserId()),
     declaration: decl.getVorbehalt() ? Declaration.vorbehalt : Declaration.gesund,
+  };
+}
+
+export function toPlayedCard(card: api.PlayedCard, players: PlayerIds): PlayedCard {
+  return {
+    card: toCard(card.getCard()!),
+    player: getPosition(players, card.getUserId()),
+    trickWinner: card.hasTrickWinner()
+      ? getPosition(players, card.getTrickWinner()!.getUserId())
+      : null,
+    matchWinner: card.hasWinner() ? card.getWinner()!.getParty() : null,
   };
 }

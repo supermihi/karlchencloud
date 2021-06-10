@@ -18,6 +18,10 @@ export const fullHand = [
   cards.SpadeQ,
 ];
 
-export function trick(forehand: Pos, trickSize: number): Trick {
-  return { forehand, cards: trickCards.slice(0, trickSize) };
+export function trick(forehand: Pos, trickSize: number, trickWinner?: Pos): Trick {
+  return {
+    forehand,
+    cards: trickCards.slice(0, trickSize),
+    winner: trickWinner ?? null,
+  };
 }

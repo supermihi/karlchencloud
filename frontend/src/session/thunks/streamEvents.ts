@@ -2,9 +2,13 @@ import * as api from 'api/karlchen_pb';
 import { TablePhase } from 'api/karlchen_pb';
 import { selectPlayers } from 'play/selectors';
 import { Dispatchable } from 'state';
-import { getCurrentTableState, toCard, toMatch, toMode, toTable } from 'model/apiconv';
-import { Declaration, DeclareResult } from 'model/auction';
-import { getPosition } from 'model/players';
+import {
+  getCurrentTableState,
+  toMatch,
+  toTable,
+  toPlayedCard,
+  toDeclareResult,
+} from 'model/apiconv';
 import * as events from '../events';
 
 const { EventCase } = api.Event;
@@ -56,32 +60,17 @@ function createStartAction(ms: api.MatchState) {
 }
 
 function createDeclaredAction(decl: api.Declaration): Dispatchable {
-  const apiMode = decl.getDefinedgamemode();
   return (dispatch, getState) => {
     const players = selectPlayers(getState());
-    const mode = apiMode === undefined ? null : toMode(apiMode, players);
-    const declaration: DeclareResult = {
-      mode,
-      player: getPosition(players, decl.getUserId()),
-      declaration: decl.getVorbehalt() ? Declaration.vorbehalt : Declaration.gesund,
-    };
-    dispatch(events.playerDeclared(declaration));
+    dispatch(events.playerDeclared(toDeclareResult(decl, players)));
   };
 }
 
 function createPlayedCardAction(event: api.PlayedCard): Dispatchable {
-  const card = toCard(event.getCard() as api.Card);
-  const winner = event.hasTrickWinner() ? (event.getTrickWinner() as api.PlayerValue) : null;
   return (dispatch, getState) => {
     const players = selectPlayers(getState());
-    const player = getPosition(players, event.getUserId());
-    dispatch(
-      events.cardPlayed({
-        card,
-        player,
-        trickWinner: winner === null ? undefined : getPosition(players, winner.getUserId()),
-      })
-    );
+    const playedCard = toPlayedCard(event, players);
+    dispatch(events.cardPlayed(playedCard));
   };
 }
 

@@ -1,11 +1,12 @@
-import { BidType, GameType, MatchPhase } from 'api/karlchen_pb';
+import { BidType, GameType, MatchPhase, Party } from 'api/karlchen_pb';
 import { Auction } from './auction';
 import { Card } from './core';
 import { Pos, PlayerIds, newPlayerMap } from './players';
 
 export interface Match {
   phase: MatchPhase;
-  turn?: Pos;
+  turn: Pos | null;
+  winner: Party | null;
   players: PlayerIds;
   cards: Card[];
   game: Game | null;
@@ -26,11 +27,15 @@ export function inAuction(match: Match): match is MatchInAuction {
 }
 
 export interface Game {
-  bids: Record<Pos, BidType[]>;
+  bids: Bids;
   completedTricks: number;
   currentTrick: Trick;
   previousTrick?: Trick;
   mode: Mode;
+}
+export type Bids = Record<Pos, BidType[]>;
+export function emptyBids(): Bids {
+  return newPlayerMap(() => [] as BidType[]);
 }
 
 export function newGame(mode: Mode): Game {
@@ -45,16 +50,17 @@ export function newGame(mode: Mode): Game {
 export interface PlayedCard {
   card: Card;
   player: Pos;
-  trickWinner?: Pos;
+  trickWinner: Pos | null;
+  matchWinner: Party | null;
 }
 export interface Trick {
   forehand: Pos;
-  winner?: Pos;
+  winner: Pos | null;
   cards: Card[];
 }
 
 export function newTrick(forehand: Pos): Trick {
-  return { forehand, cards: [] };
+  return { forehand, cards: [], winner: null };
 }
 
 export interface Mode {

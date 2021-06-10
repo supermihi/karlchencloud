@@ -7,18 +7,21 @@ import { MatchPhase } from 'api/karlchen_pb';
 
 export function afterPlayedCard(
   match: MatchInGame,
-  { card, player, trickWinner }: PlayedCard
+  { card, player, trickWinner, matchWinner }: PlayedCard
 ): MatchInGame {
   const cards = player === Pos.bottom ? removeCard(match.cards, card) : match.cards;
+  const cardsBefore = match.game.currentTrick.cards.length;
+  const turn = matchWinner !== null ? null : cardsBefore === 3 ? trickWinner : nextPos(player);
   return update(match, {
     game: {
       currentTrick: {
         winner: { $set: trickWinner },
-        cards: trickWinner === undefined ? { $push: [card] } : { $set: [] },
+        cards: cardsBefore < 4 ? { $push: [card] } : { $set: [] },
       },
     },
     cards: { $set: cards },
-    turn: { $set: nextPos(player) },
+    turn: { $set: turn },
+    winner: { $set: matchWinner },
   });
 }
 
