@@ -17,20 +17,20 @@ You can debug the game with bots (that just play random cards).
 To start a game on the command line, you need three terminals and start in the
 following order:
 1. Server terminal:
-   `CONSTANT_INVITE_CODE=1234 CONSTANT_TABLE_ID=5678 go run cmd/server/main.go`
+   `go run './cmd/server`
 1. Client terminal:
-   `go run cmd/cli_client/main.go`
-1. Input `c` to create a table.
+   `go run ./cmd/client --name "Karlchen Müller" --email karlchen@mueller.de --password 12345`
+1. Follow the instructions
 1. Bot terminal:
-   `INVITE_CODE=1234 TABLE_ID=5678 go run cmd/bot_client/main.go`
+   `go run ./cmd/client bot --num-bots 3 --delay 2000`
 1. Play the game in the client terminal.
 
 #### Bots Only
 This is very similar, but only requires two terminals (in order):
 1. Server terminal:
-   `CONSTANT_INVITE_CODE=1234 CONSTANT_TABLE_ID=5678 go run cmd/server/main.go`
+   `go run ./cmd/server`
 1. Bot terminal:
-   `INVITE_CODE=1234 TABLE_ID=5678 INIT_TABLE=1 NUM_BOTS=4 go run cmd/bot_client/main.go`
+   `go run ./cmd/client bot --num-bots 3 --delay 250 --owner`
 1. "Enjoy" bots at work.
 
 
