@@ -10,13 +10,15 @@ export function afterPlayedCard(
   { card, player, trickWinner, matchWinner }: PlayedCard
 ): MatchInGame {
   const cards = player === Pos.bottom ? removeCard(match.cards, card) : match.cards;
-  const cardsBefore = match.game.currentTrick.cards.length;
+  const trickBefore = match.game.currentTrick;
+  const cardsBefore = trickBefore.cards.length;
   const turn = matchWinner !== null ? null : cardsBefore === 3 ? trickWinner : nextPos(player);
   return update(match, {
     game: {
       currentTrick: {
         winner: { $set: trickWinner },
-        cards: cardsBefore < 4 ? { $push: [card] } : { $set: [] },
+        cards: cardsBefore < 4 ? { $push: [card] } : { $set: [card] },
+        forehand: { $set: cardsBefore === 4 ? trickBefore.winner! : trickBefore.forehand },
       },
     },
     cards: { $set: cards },
