@@ -1,3 +1,5 @@
 .yarn
 dist
-src/api/karlchen_pb.*
+src/api/karlchen_pb.d.ts
+src/api/karlchen_pb.js
+src/api/KarlchenServiceClientPb.ts
