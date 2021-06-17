@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	port  int
-	noWeb bool
-	seed  int64
+	port            int
+	noWeb           bool
+	seed            int64
+	staticDirectory string
 )
 var rootCmd = &cobra.Command{
 	Use:   "server",
@@ -38,27 +39,22 @@ var rootCmd = &cobra.Command{
 		config := server.ServerConfig{Tables: server.TablesConfig{InputSeed: seed}}
 		srv := server.CreateServer(users, tables.NewTables(), config)
 
-		if noWeb {
-			log.Printf("starting bare grpc server")
-			lis, err := net.Listen("tcp", ":"+strconv.Itoa(port))
-			if err != nil {
-				log.Fatalf("failed to listen: %v", err)
-			}
-			if err := srv.Serve(lis); err != nil {
-				log.Fatalf("failed to serve: %v", err)
-			}
-		} else {
-			httpServer := server.WrapServer(srv)
-			lisHttp, err := net.Listen("tcp", ":"+strconv.Itoa(port))
-			if err != nil {
-				log.Fatalf("failed to listen HTTP: %v", err)
-			}
-			log.Printf("starting HTTP proxy server")
-			if err := httpServer.Serve(lisHttp); err != nil {
-				log.Fatalf("failed to serve HTTP: %v", err)
-			}
+		lis, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+		if err != nil {
+			log.Fatalf("failed to listen on port %d: %v", port, err)
 		}
-	}}
+		log.Printf("listening on port %d\n", port)
+		if noWeb {
+			err = srv.Serve(lis)
+		} else {
+			httpServer := server.WrapServer(srv, staticDirectory)
+			err = httpServer.Serve(lis)
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+	},
+}
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {
@@ -70,4 +66,5 @@ func init() {
 	rootCmd.Flags().BoolVar(&noWeb, "no-web", false, "don't enable grpc-web wrapper")
 	rootCmd.Flags().IntVarP(&port, "port", "p", 50501, "gRPC server port")
 	rootCmd.Flags().Int64Var(&seed, "seed", 0, "random seed")
+	rootCmd.Flags().StringVar(&staticDirectory, "static-dir", "frontend/dist", "directory for serving static files")
 }

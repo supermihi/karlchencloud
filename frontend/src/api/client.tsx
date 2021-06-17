@@ -3,8 +3,6 @@ import * as proto from './karlchen_pb';
 import * as grpc from 'grpc-web';
 import { MyUserData } from 'session/model';
 
-const url = 'http://localhost:8080';
-
 let _client: karlchen.DokoClient | null = null;
 
 export interface AuthenticatedClient {
@@ -13,7 +11,7 @@ export interface AuthenticatedClient {
 }
 export function getPbClient(): karlchen.DokoClient {
   if (!_client) {
-    _client = new karlchen.DokoClient(url, null, null);
+    _client = new karlchen.DokoClient(window.location.origin, null, null);
   }
   return _client;
 }

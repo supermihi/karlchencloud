@@ -1,3 +1,4 @@
 frontend
+!frontend/dist
 .github
 .idea

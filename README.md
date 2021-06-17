@@ -8,7 +8,10 @@ We provide a web application that can be used without any installation.
 Using the open and simple [API](api/README.md), however, other clients an be developed as well.
 ## Usage
 ### Docker
-Run `docker-compose build`, then `docker-compose up` to start the server.
+- optional: [build the frontend](frontend/README.md)
+- run `docker-compose build`
+- run `docker-compose up`
+- optional: if you built the frontend, visit http://localhost:5051 in a browser
 
 ### Command line game with bots
 You can debug the game with bots (that just play random cards).
@@ -17,7 +20,7 @@ You can debug the game with bots (that just play random cards).
 To start a game on the command line, you need three terminals and start in the
 following order:
 1. Server terminal:
-   `go run './cmd/server`
+   `go run ./cmd/server`
 1. Client terminal:
    `go run ./cmd/client --name "Karlchen Müller" --email karlchen@mueller.de --password 12345`
 1. Follow the instructions

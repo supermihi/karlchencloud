@@ -46,7 +46,7 @@ module.exports = {
     historyApiFallback: true,
     port: 4000,
     proxy: {
-      '/api.Doko': 'http://localhost:8080',
+      '/api.Doko': 'http://localhost:50501',
     },
     open: true,
     hot: true,
