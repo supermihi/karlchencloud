@@ -22,7 +22,7 @@ following order:
 1. Server terminal:
    `go run ./cmd/server`
 1. Client terminal:
-   `go run ./cmd/client --name "Karlchen Müller" --email karlchen@mueller.de --password 12345`
+   `go run ./cmd/client interactive --name "Karlchen Müller" --email karlchen@mueller.de --password 12345`
 1. Follow the instructions
 1. Bot terminal:
    `go run ./cmd/client bot --num-bots 3 --delay 2000`
@@ -33,7 +33,7 @@ This is very similar, but only requires two terminals (in order):
 1. Server terminal:
    `go run ./cmd/server`
 1. Bot terminal:
-   `go run ./cmd/client bot --num-bots 3 --delay 250 --owner`
+   `go run ./cmd/client bot --num-bots 4 --delay 250 --owner`
 1. "Enjoy" bots at work.
 
 
