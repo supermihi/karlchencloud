@@ -16,7 +16,7 @@ interface Props {
 const useStyles = makeStyles(() => ({
   [Pos.top]: {
     animation: '$playCardTop 1000ms',
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes playCardTop': {
     from: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
   },
   [Pos.right]: {
     animation: '$playCardRight 1000ms',
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes playCardRight': {
     from: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles(() => ({
   },
   [Pos.bottom]: {
     animation: '$playCardBottom 1000ms',
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes playCardBottom': {
     from: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
   },
   [Pos.left]: {
     animation: '$playCardLeft 1000ms',
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes playCardLeft': {
     from: {
@@ -53,7 +53,7 @@ const useStyles = makeStyles(() => ({
   card: {},
   fadeBottom: {
     animation: `$fadeBottom 2000ms`,
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes fadeBottom': {
     '100%': {
@@ -62,7 +62,7 @@ const useStyles = makeStyles(() => ({
   },
   fadeTop: {
     animation: `$fadeTop 2000ms`,
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes fadeTop': {
     '100%': {
@@ -71,7 +71,7 @@ const useStyles = makeStyles(() => ({
   },
   fadeLeft: {
     animation: `$fadeLeft 2000ms`,
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes fadeLeft': {
     '100%': {
@@ -80,7 +80,7 @@ const useStyles = makeStyles(() => ({
   },
   fadeRight: {
     animation: `fadeRight 2000ms`,
-    animationFill: 'forwards',
+    animationFillMode: 'forwards',
   },
   '@keyframes fadeRight': {
     '100%': {
