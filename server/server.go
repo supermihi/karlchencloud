@@ -18,21 +18,20 @@ import (
 type dokoserver struct {
 	pb.UnimplementedDokoServer
 	tables  *t.Tables
-	auth    Auth
+	users   u.Users
 	streams ClientStreams
 	config  ServerConfig
 }
 
 func CreateServer(users u.Users, tables *t.Tables, config ServerConfig) *grpc.Server {
-	auth := NewAuth(users)
-	grpcServer := CreateGrpcServerForAuth(auth)
-	serv := &dokoserver{tables: tables, auth: auth, streams: NewClientStreams(), config: config}
+	grpcServer := CreateAuthenticatingGrpcServer(users)
+	serv := &dokoserver{tables: tables, users: users, streams: NewClientStreams(), config: config}
 	pb.RegisterDokoServer(grpcServer, serv)
 	return grpcServer
 }
 
 func (s *dokoserver) Register(_ context.Context, req *pb.RegisterRequest) (*pb.RegisterReply, error) {
-	user, err := s.auth.Users.Add(req.Email, req.Password, req.Name)
+	user, err := s.users.Add(req.Email, req.Password, req.Name)
 	if err != nil {
 		log.Printf("error registering: %v", err)
 		return nil, status.Error(codes.Internal, "error registering")
@@ -43,7 +42,7 @@ func (s *dokoserver) Register(_ context.Context, req *pb.RegisterRequest) (*pb.R
 }
 
 func (s *dokoserver) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginReply, error) {
-	user, err := s.auth.Users.Authenticate(req.Email, req.Password)
+	user, err := s.users.Authenticate(req.Email, req.Password)
 	if err != nil {
 		log.Printf("error logging in: %v", err)
 		return nil, toGrpcError(err)
@@ -73,7 +72,7 @@ func (s *dokoserver) CreateTable(ctx context.Context, request *pb.CreateTableReq
 }
 
 func (s *dokoserver) UsersInLobby() ([]u.Id, error) {
-	users, err := s.auth.Users.ListIds()
+	users, err := s.users.ListIds()
 	if err != nil {
 		return nil, err
 	}
@@ -315,7 +314,7 @@ func (s *dokoserver) getTableState(table *t.TableData, user u.Id) (*pb.TableStat
 }
 
 func (s *dokoserver) createPbTableMember(id u.Id) *pb.TableMember {
-	data, err := s.auth.Users.GetData(id)
+	data, err := s.users.GetData(id)
 	if err != nil {
 		panic("not existingt user at table - should not be here!")
 	}

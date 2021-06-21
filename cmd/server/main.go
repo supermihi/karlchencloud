@@ -20,6 +20,7 @@ var (
 	noWeb           bool
 	seed            int64
 	staticDirectory string
+	allowedOrigin   string
 )
 var rootCmd = &cobra.Command{
 	Use:   "server",
@@ -47,7 +48,7 @@ var rootCmd = &cobra.Command{
 		if noWeb {
 			err = srv.Serve(lis)
 		} else {
-			httpServer := server.WrapServer(srv, staticDirectory)
+			httpServer := server.WrapServerForGrpcWeb(srv, staticDirectory, allowedOrigin)
 			err = httpServer.Serve(lis)
 		}
 		if err != nil {
@@ -67,4 +68,5 @@ func init() {
 	rootCmd.Flags().IntVarP(&port, "port", "p", 50501, "gRPC server port")
 	rootCmd.Flags().Int64Var(&seed, "seed", 0, "random seed")
 	rootCmd.Flags().StringVar(&staticDirectory, "static-dir", "frontend/dist", "directory for serving static files")
+	rootCmd.Flags().StringVar(&allowedOrigin, "allowed-origin", "localhost", "allowed CORS origin host (without port) for grpc-web")
 }
