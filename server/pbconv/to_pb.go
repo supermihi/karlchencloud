@@ -2,6 +2,7 @@ package pbconv
 
 import (
 	"fmt"
+
 	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
@@ -248,4 +249,16 @@ func addDetails(state *pb.MatchState, md *t.MatchData) {
 	default:
 		panic(fmt.Sprintf("ToPbMatchState called with invalid match phase %v", md.Phase))
 	}
+}
+
+func ToPbTrickEvent(e match.ExtraPointType) pb.TrickEvent {
+	switch e {
+	case match.FoxCaught:
+		return pb.TrickEvent_FOXCAUGHT;
+	case match.Doppelkopf:
+		return pb.TrickEvent_DOPPELKOPFSCORED;
+	case match.Charlie:
+		return pb.TrickEvent_CHARLIESCORED;
+	}
+	panic(fmt.Sprintf("not a extra point type: %v", e))
 }

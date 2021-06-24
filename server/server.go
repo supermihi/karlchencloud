@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"log"
+
 	pb "github.com/supermihi/karlchencloud/api"
 	"github.com/supermihi/karlchencloud/doko/game"
 	"github.com/supermihi/karlchencloud/doko/match"
@@ -12,7 +14,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
 )
 
 type dokoserver struct {
@@ -255,6 +256,17 @@ func (s *dokoserver) PlayCard(ctx context.Context, req *pb.PlayCardRequest) (*pb
 	if m.CurrentTrick != nil && m.CurrentTrick.NumCardsPlayed() == 0 {
 		card.TrickWinner = &pb.PlayerValue{UserId: table.Players[m.PreviousTrick.Winner].String()}
 		log.Printf("trick finished. winner: %s", table.Players[m.PreviousTrick.Winner].String())
+		for _, event := range m.TrickEvent {
+			card.TrickEvent = append(card.TrickEvent, pbconv.ToPbTrickEvent(event))
+			switch match.ExtraPointType(event) {
+			case match.FoxCaught:
+				log.Printf("a fox had been caught!")
+			case match.Doppelkopf:
+				log.Printf("Doppelkopf scored!")
+			case match.Charlie:
+				log.Printf("Charlie Miller won the last trick of the match!")
+			}
+		}
 	}
 	if m.Phase == match.MatchFinished {
 		card.Winner = &pb.PartyValue{}
