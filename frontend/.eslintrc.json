@@ -1,4 +1,5 @@
 {
+  "root": true,
   "ignorePatterns": ["dist", ".yarn*", "src/api/karlchen_pb*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
