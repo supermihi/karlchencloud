@@ -2,6 +2,7 @@ import * as karlchen from './KarlchenServiceClientPb';
 import * as proto from './karlchen_pb';
 import * as grpc from 'grpc-web';
 import { MyUserData } from 'session/model';
+import { isGrpcError, isRpcError } from 'shared/errors';
 
 let _client: karlchen.DokoClient | null = null;
 
@@ -43,10 +44,6 @@ export async function login(email: string, password: string): Promise<MyUserData
   return { name, id, token, email };
 }
 
-export function isGrpcError(error: unknown): error is grpc.Error {
-  return typeof error === 'object' && error !== null && 'code' in error && 'message' in error;
-}
-
 export function isError(error: unknown): error is { message: string } {
   return typeof error === 'object' && error !== null && 'message' in error;
 }
@@ -55,8 +52,11 @@ export function formatError(error: unknown): string {
   if (!error) {
     return '';
   }
-  if (isGrpcError(error)) {
+  if (isRpcError(error)) {
     return `error ${error.code}: ${error.message}`;
+  }
+  if (isGrpcError(error)) {
+    return `error ${error.status}: ${error.message}`;
   }
   if (isError(error)) {
     return error.message;

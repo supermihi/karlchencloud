@@ -92,9 +92,13 @@ func (c *Client) handleMemberEvent(ev *api.MemberEvent) {
 		c.Logf("user %s joined table", ev.Name)
 		c.handler.OnMemberJoin(ev.UserId, ev.Name)
 	case api.MemberEventType_GO_ONLINE:
-		c.Logf("user %s is now online", c.table.MemberNamesById[ev.UserId])
+    if c.table != nil {
+      c.Logf("user %s is now online", c.table.MemberNamesById[ev.UserId])
+    }
 	case api.MemberEventType_GO_OFFLINE:
-		c.Logf("user %s is now offline", c.table.MemberNamesById[ev.UserId])
+    if c.table != nil {
+      c.Logf("user %s is now offline", c.table.MemberNamesById[ev.UserId])
+    }
 	default:
 		c.Logf("unexpected MemberEvent: %v", ev)
 	}

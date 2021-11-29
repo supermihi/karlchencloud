@@ -32,7 +32,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'src/index.html',
     }),
-    new webpack.HotModuleReplacementPlugin(),
     new ESLintPlugin({
       extensions: ['ts', 'tsx'],
     }),
@@ -42,7 +41,9 @@ module.exports = {
   ],
   devtool: 'inline-source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'build'),
+    static: {
+      directory: path.resolve(__dirname, 'build')
+    },
     historyApiFallback: true,
     port: 4000,
     proxy: {

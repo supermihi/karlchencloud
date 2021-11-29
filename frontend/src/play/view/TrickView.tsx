@@ -5,7 +5,7 @@ import { cardString } from 'model/cards';
 import { nthNext, Pos } from 'model/players';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import { sleep } from '../../shared/sleep';
+import { sleep } from 'shared/sleep';
 
 interface Props {
   trick: Trick;
@@ -94,7 +94,6 @@ export default function TrickView({
   cardWidth,
   center: [x, y],
 }: Props): React.ReactElement {
-  const excenter = cardWidth / 4;
   const classes = useStyles();
   const [fade, setFade] = React.useState(false);
   React.useEffect(() => {
@@ -130,7 +129,7 @@ export default function TrickView({
               width={cardWidth}
               className={classes.card}
               style={{
-                transform: cardTransform(pos, excenter),
+                transform: cardTransform(pos),
               }}
             />
           </div>
@@ -140,7 +139,7 @@ export default function TrickView({
   );
 }
 
-function cardTransform(pos: Pos, excenter: number): string {
+function cardTransform(pos: Pos): string {
   switch (pos) {
     case Pos.top:
       return `translate(-50%, -50%) rotate(5deg) translate(0, -25%)`;

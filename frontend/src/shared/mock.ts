@@ -1,7 +1,6 @@
-import * as grpc from 'grpc-web';
-export function mockGrpcError(msg: string): grpc.Error {
-  return {
-    code: 42,
-    message: msg,
-  };
+import { StatusCode } from 'grpc-web';
+import { GrpcError } from 'shared/errors';
+
+export function mockGrpcError(msg: string): GrpcError {
+  return { status: StatusCode.UNIMPLEMENTED, message: msg };
 }

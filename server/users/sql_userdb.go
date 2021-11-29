@@ -1,7 +1,9 @@
 package users
 
 import (
-	"github.com/jmoiron/sqlx"
+  syserrors "errors"
+  "fmt"
+  "github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/supermihi/karlchencloud/server/errors"
 	"github.com/supermihi/karlchencloud/utils/security"
@@ -60,8 +62,38 @@ func (s *SqlUserDatabase) GetData(id Id) (data AccountData, err error) {
 	return
 }
 
+func (s *SqlUserDatabase) FindByEmail(email string) (data AccountData, err error) {
+  row := s.db.QueryRow("SELECT id FROM user WHERE email = ?", email)
+  var id Id
+  err = row.Scan(&id)
+  if err == nil {
+    data, err = s.GetData(id)
+  }
+  return
+}
+
 func (s *SqlUserDatabase) ChangeName(id Id, newName string) error {
 	panic("implement me")
+}
+
+func (s *SqlUserDatabase) ChangePassword(id Id, newPassword string) error {
+  hash, err := security.HashAndSalt(newPassword)
+  if err != nil {
+    return err
+  }
+  result, err := s.db.Exec("UPDATE user SET secret = ? WHERE id = ?", hash, id)
+  if err != nil {
+    log.Printf("error updating password: %v", err)
+    return err
+  }
+  num, err := result.RowsAffected()
+  if err != nil {
+    return syserrors.New(fmt.Sprintf("other error updating password: %v", err))
+  }
+  if num != 1 {
+    return syserrors.New(fmt.Sprintf("unexpected rows matched: %v", num))
+  }
+  return nil
 }
 
 func (s *SqlUserDatabase) Authenticate(email string, password string) (user AccountData, err error) {

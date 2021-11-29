@@ -38,6 +38,7 @@ type Users interface {
 	ListIds() ([]Id, error)
 	GetData(id Id) (AccountData, error)
 	ChangeName(id Id, newName string) error
+  ChangePassword(id Id, newPassword string) error
 	VerifyToken(token string) (AccountData, error)
 	Authenticate(email string, password string) (AccountData, error)
 }

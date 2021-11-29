@@ -6,11 +6,11 @@ import { createEventAction } from './streamEvents';
 import { selectSession } from 'session/selectors';
 import { Action, createAction } from '@reduxjs/toolkit';
 import { MyUserData } from '../model';
-import * as grpc from 'grpc-web';
+import { GrpcError, toGrpcError } from 'shared/errors';
 
 let _stream: ClientReadableStream<api.Event>;
 export const sessionStarting = createAction<MyUserData>('session/starting');
-export const sessionError = createAction<grpc.Error>('session/error');
+export const sessionError = createAction<GrpcError>('session/error');
 
 export const startSession =
   (givenUserData?: MyUserData): AppThunk =>
@@ -31,7 +31,7 @@ export const startSession =
           dispatch(dispatchable as Action);
         })
         .on('error', (e) => {
-          dispatch(sessionError(e));
+          dispatch(sessionError(toGrpcError(e)));
           _stream.cancel();
           console.log(`Stream error: ${e.message}`);
         });

@@ -1,11 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="cli_client" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="client bot -n 3" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="karlchencloud" />
     <working_directory value="$PROJECT_DIR$" />
+    <parameters value="bot -n 3" />
     <kind value="FILE" />
-    <filePath value="$PROJECT_DIR$/cmd/cli_client/main.go" />
     <package value="github.com/supermihi/karlchencloud" />
     <directory value="$PROJECT_DIR$/" />
+    <filePath value="$PROJECT_DIR$/cmd/client/main.go" />
     <method v="2" />
   </configuration>
 </component>

@@ -9,6 +9,7 @@ import {
 import { AuthenticatedClient } from 'api/client';
 import { selectAuthenticatedClientOrThrow } from 'session/selectors';
 import { RootState, AppThunk } from 'state';
+import { isRpcError, toGrpcError } from 'shared/errors';
 
 export enum ActionKind {
   noAction = 'noAction',
@@ -72,6 +73,9 @@ export function createPlayThunk<TArg, Returned = void>(
       dispatch(actionSucceeded(actionKind));
       return result;
     } catch (err) {
+      if (isRpcError(err)) {
+        err = toGrpcError(err);
+      }
       dispatch(actionFailed({ error: err, action: actionKind }));
     }
   };
