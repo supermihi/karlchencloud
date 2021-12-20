@@ -6,9 +6,9 @@ import { Table } from 'model/table';
 import MatchView from 'play/view/MatchView';
 import InGameView from 'play/view/InGameView';
 import { createSelector } from '@reduxjs/toolkit';
-import { toUserMap } from '../../model/core';
-import { PlayerIds, toPlayerMap } from '../../model/players';
-import { AppDispatch } from '../../state';
+import { toUserMap } from 'model/core';
+import { PlayerIds, toPlayerMap } from 'model/players';
+import { AppDispatch } from 'state';
 
 interface Props {
   match: Match | null;

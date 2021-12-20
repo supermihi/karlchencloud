@@ -9,8 +9,7 @@ interface Props {
 }
 
 const InGameView: React.FC<Props> = ({ game, tableSize }) => {
-  return (
-    <TrickView trick={game.currentTrick} cardWidth={tableSize.width / 6} center={['50%', '50%']} />
-  );
+  const cardWidth = Math.max(tableSize.width, tableSize.height) / 5;
+  return <TrickView trick={game.currentTrick} cardWidth={cardWidth} center={['50%', '50%']} />;
 };
 export default InGameView;

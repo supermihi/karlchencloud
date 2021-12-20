@@ -8,6 +8,8 @@ import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import TableCard from './TableCard';
 import { User } from 'model/core';
+import AppBar from '../shared/AppBar';
+import { BottomNavigation, BottomNavigationAction, Paper } from '@material-ui/core';
 
 interface Props {
   activeTable: Table | null;
@@ -20,15 +22,19 @@ const useStyles = makeStyles((theme) => ({
   addTable: {
     marginTop: theme.spacing(2),
     alignSelf: 'center',
-  } as const,
+  },
   main: {
     display: 'flex',
-    marginTop: theme.spacing(2),
     flexDirection: 'column',
-  } as const,
+  },
+  content: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    flexGrow: 1,
+  },
   buttons: {
     marginBottom: theme.spacing(2),
-  } as const,
+  },
 }));
 
 export default function LobbyView({
@@ -40,29 +46,22 @@ export default function LobbyView({
   const classes = useStyles();
   return (
     <div className={classes.main}>
-      <Grid container spacing={2} className={classes.buttons}>
-        <Grid item xs={4}>
-          <Button fullWidth startIcon={<MailOutlineIcon />}>
-            Einladung
-          </Button>
-        </Grid>
-        <Grid item xs={4}>
-          <Button fullWidth startIcon={<SearchIcon />}>
-            Tisch suchen
-          </Button>
-        </Grid>
-        <Grid item xs={4}>
-          <Button
-            startIcon={<AddIcon />}
-            disabled={Boolean(activeTable)}
-            fullWidth
-            onClick={createTable}
-          >
-            Neuer Tisch
-          </Button>
-        </Grid>
-      </Grid>
-      {activeTable && <TableCard me={me} table={activeTable} startTable={startTable} />}
+      <AppBar location="Lobby" />
+      <Paper className={classes.content}>
+        <div>
+          {activeTable && <TableCard me={me} table={activeTable} startTable={startTable} />}
+        </div>
+      </Paper>
+      <BottomNavigation showLabels>
+        <BottomNavigationAction
+          label="Neu"
+          disabled={Boolean(activeTable)}
+          onClick={createTable}
+          icon={<AddIcon />}
+        />
+        <BottomNavigationAction label="Suchen" icon={<SearchIcon />} />
+        <BottomNavigationAction label="Einladung" icon={<MailOutlineIcon />} />
+      </BottomNavigation>
     </div>
   );
 }

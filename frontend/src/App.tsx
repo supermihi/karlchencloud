@@ -11,11 +11,9 @@ export default function App(): React.ReactElement {
   const location = useSelector(selectLocation);
   const classes = useStyles();
   return (
-    <>
-      <main className={classes.layout}>
-        <Content location={location} />
-      </main>
-    </>
+    <main className={classes.layout}>
+      <Content location={location} />
+    </main>
   );
 }
 function Content({ location }: { location: Location }) {
@@ -33,8 +31,6 @@ function Content({ location }: { location: Location }) {
 
 const useStyles = makeStyles((theme) => ({
   layout: {
-    width: 'auto',
-    flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),

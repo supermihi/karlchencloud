@@ -245,9 +245,6 @@ export class MemberEvent extends jspb.Message {
   getType(): MemberEventType;
   setType(value: MemberEventType): MemberEvent;
 
-  getOnline(): boolean;
-  setOnline(value: boolean): MemberEvent;
-
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MemberEvent.AsObject;
   static toObject(includeInstance: boolean, msg: MemberEvent): MemberEvent.AsObject;
@@ -261,7 +258,6 @@ export namespace MemberEvent {
     userId: string,
     name: string,
     type: MemberEventType,
-    online: boolean,
   }
 }
 

@@ -2522,8 +2522,7 @@ proto.api.MemberEvent.toObject = function(includeInstance, msg) {
   var f, obj = {
     userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
     name: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    type: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    online: jspb.Message.getBooleanFieldWithDefault(msg, 4, false)
+    type: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -2572,10 +2571,6 @@ proto.api.MemberEvent.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {!proto.api.MemberEventType} */ (reader.readEnum());
       msg.setType(value);
       break;
-    case 4:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setOnline(value);
-      break;
     default:
       reader.skipField();
       break;
@@ -2623,13 +2618,6 @@ proto.api.MemberEvent.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0.0) {
     writer.writeEnum(
       3,
-      f
-    );
-  }
-  f = message.getOnline();
-  if (f) {
-    writer.writeBool(
-      4,
       f
     );
   }
@@ -2687,24 +2675,6 @@ proto.api.MemberEvent.prototype.getType = function() {
  */
 proto.api.MemberEvent.prototype.setType = function(value) {
   return jspb.Message.setProto3EnumField(this, 3, value);
-};
-
-
-/**
- * optional bool online = 4;
- * @return {boolean}
- */
-proto.api.MemberEvent.prototype.getOnline = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 4, false));
-};
-
-
-/**
- * @param {boolean} value
- * @return {!proto.api.MemberEvent} returns this
- */
-proto.api.MemberEvent.prototype.setOnline = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 4, value);
 };
 
 

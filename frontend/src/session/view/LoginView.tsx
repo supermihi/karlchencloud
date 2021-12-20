@@ -28,9 +28,19 @@ export default function LoginView({ login, loading, error }: Props): React.React
         <Typography component="h1" variant="h6">
           Bei Karlchencloud einloggen
         </Typography>
-        <form noValidate className={classes.root} autoComplete="off">
+        <form
+          noValidate
+          className={classes.root}
+          autoComplete="on"
+          onSubmit={(e) => {
+            e.preventDefault();
+            login({ email, password });
+          }}
+        >
           <TextField
             required
+            id="login-email"
+            name="login-email"
             autoComplete="email"
             type="text"
             error={!emailValid}
@@ -42,6 +52,8 @@ export default function LoginView({ login, loading, error }: Props): React.React
           <TextField
             required
             autoComplete="current-password"
+            id="login-password"
+            name="login-password"
             error={!passwordValid}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -50,17 +62,22 @@ export default function LoginView({ login, loading, error }: Props): React.React
             placeholder="password"
             onSubmit={() => login({ email, password })}
           />
+          <div className={classes.buttons}>
+            <Button
+              type="submit"
+              disabled={!(emailValid && passwordValid)}
+              variant="contained"
+              color="primary"
+              onClick={(e) => {
+                e.preventDefault();
+                login({ email, password });
+              }}
+            >
+              Los
+            </Button>
+          </div>
         </form>
-        <div className={classes.buttons}>
-          <Button
-            disabled={!(emailValid && passwordValid)}
-            variant="contained"
-            color="primary"
-            onClick={() => login({ email, password })}
-          >
-            Los
-          </Button>
-        </div>
+
         <SpinBackdrop open={loading} />
       </MainPaper>
       {error && <ErrorAlert message={`Error logging in: ${formatError(error)}`} />}

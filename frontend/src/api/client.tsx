@@ -11,7 +11,8 @@ export interface AuthenticatedClient {
 }
 export function getPbClient(): karlchen.DokoClient {
   if (!_client) {
-    _client = new karlchen.DokoClient(window.location.origin, null, null);
+//    _client = new karlchen.DokoClient(window.location.origin, null, null);
+    _client = new karlchen.DokoClient("http://localhost:50501", null, null);
   }
   return _client;
 }

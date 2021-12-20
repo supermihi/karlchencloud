@@ -13,7 +13,7 @@ const tableSlice = createSlice({
     builder
       .addCase(events.tableChanged, (_, { payload }) => payload?.table ?? null)
       .addCase(events.memberJoined, (table, { payload }) => {
-        table?.members.push(payload);
+        table?.members.push({ ...payload, online: true });
       })
       .addCase(events.memberLeft, (table, { payload: id }: PayloadAction<string>) => {
         if (table === null) return;
